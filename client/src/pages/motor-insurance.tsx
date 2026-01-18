@@ -865,10 +865,10 @@ export default function MotorInsurance() {
                   <Lock className="h-4 w-4" />
                   <span className="text-xs">دفع آمن ومشفر</span>
                 </div>
-                <div className="flex gap-2 items-center">
-                  <img src={visaLogo} alt="VISA" className="h-6 object-contain" />
-                  <img src={mastercardLogo} alt="Mastercard" className="h-6 object-contain" />
-                  <img src={madaLogo} alt="مدى" className="h-6 object-contain" />
+                <div className="flex gap-3 items-center">
+                  <img src={visaLogo} alt="VISA" className="h-5 w-auto object-contain" />
+                  <img src={mastercardLogo} alt="Mastercard" className="h-7 w-7 object-contain" />
+                  <img src={madaLogo} alt="مدى" className="h-5 w-auto object-contain" />
                 </div>
               </div>
 
@@ -946,7 +946,7 @@ export default function MotorInsurance() {
           <div className="space-y-6">
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-lg flex items-center justify-between">
               <span className="font-semibold">Digital Bank</span>
-              <img src={visaLogo} alt="VISA" className="h-6 object-contain" />
+              <img src={visaLogo} alt="VISA" className="h-5 w-auto object-contain" />
             </div>
 
             <Card className="p-6 shadow-sm rounded-t-none -mt-6">
