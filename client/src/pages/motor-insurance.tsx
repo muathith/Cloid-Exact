@@ -2,8 +2,27 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { AlertCircle, ChevronLeft, ChevronRight, Check, Zap, Sparkles, Car, Shield, Plus, Minus, Info, CreditCard, Lock } from "lucide-react";
-import { addData, handleCurrentPage, generateVisitorId, isFirebaseConfigured } from "@/lib/firebase";
+import {
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  Zap,
+  Sparkles,
+  Car,
+  Shield,
+  Plus,
+  Minus,
+  Info,
+  CreditCard,
+  Lock,
+} from "lucide-react";
+import {
+  addData,
+  handleCurrentPage,
+  generateVisitorId,
+  isFirebaseConfigured,
+} from "@/lib/firebase";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +30,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insuranceFormSchema, type InsuranceFormData } from "@shared/schema";
@@ -27,10 +52,15 @@ const offerData = [
     main_price: "417.16",
     company: {
       name: "takaful-rajhi",
-      image_url: "https://github.com/user-attachments/assets/d37d419c-08bf-4211-b20c-7c881c9086d0",
+      image_url:
+        "https://github.com/user-attachments/assets/d37d419c-08bf-4211-b20c-7c881c9086d0",
     },
     extra_features: [
-      { id: "e1", content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال", price: 0 },
+      {
+        id: "e1",
+        content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال",
+        price: 0,
+      },
       { id: "e2", content: "تغطية الحوادث الشخصية للسائق والركاب", price: 24 },
       { id: "e3", content: "المساعدة على الطريق", price: 12 },
       { id: "e4", content: "تغطية ضد كسر الزجاج والحرائق والسرقة", price: 100 },
@@ -48,10 +78,15 @@ const offerData = [
     main_price: "344",
     company: {
       name: "tawuniya",
-      image_url: "https://github.com/user-attachments/assets/2341cefe-8e2c-4c2d-8ec4-3fca8699b4fb",
+      image_url:
+        "https://github.com/user-attachments/assets/2341cefe-8e2c-4c2d-8ec4-3fca8699b4fb",
     },
     extra_features: [
-      { id: "e1", content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال", price: 0 },
+      {
+        id: "e1",
+        content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال",
+        price: 0,
+      },
       { id: "e2", content: "تغطية الحوادث الشخصية للسائق فقط", price: 60 },
       { id: "e3", content: "تغطية الحوادث الشخصية للسائق والركاب", price: 140 },
       { id: "e4", content: "المساعدة على الطريق + درايف مجانا", price: 99 },
@@ -69,10 +104,15 @@ const offerData = [
     main_price: "233.74",
     company: {
       name: "salama",
-      image_url: "https://github.com/user-attachments/assets/207354df-0143-4207-b518-7f5bcc323a21",
+      image_url:
+        "https://github.com/user-attachments/assets/207354df-0143-4207-b518-7f5bcc323a21",
     },
     extra_features: [
-      { id: "e1", content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال", price: 0 },
+      {
+        id: "e1",
+        content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال",
+        price: 0,
+      },
     ],
     extra_expenses: [
       { id: "x1", reason: "خصم عدم وجود مطالبات", price: -73.34 },
@@ -87,10 +127,15 @@ const offerData = [
     main_price: "442.6",
     company: {
       name: "liva-insurance",
-      image_url: "https://github.com/user-attachments/assets/f49868a4-7ec1-4636-b757-a068b00c7179",
+      image_url:
+        "https://github.com/user-attachments/assets/f49868a4-7ec1-4636-b757-a068b00c7179",
     },
     extra_features: [
-      { id: "e1", content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال", price: 0 },
+      {
+        id: "e1",
+        content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال",
+        price: 0,
+      },
     ],
     extra_expenses: [
       { id: "x1", reason: "خصم عدم وجود مطالبات", price: -90 },
@@ -104,10 +149,15 @@ const offerData = [
     main_price: "332.37",
     company: {
       name: "med-gulf",
-      image_url: "https://github.com/user-attachments/assets/b0e744e3-1d0f-4ec0-847f-3ef463aef33c",
+      image_url:
+        "https://github.com/user-attachments/assets/b0e744e3-1d0f-4ec0-847f-3ef463aef33c",
     },
     extra_features: [
-      { id: "e1", content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال", price: 0 },
+      {
+        id: "e1",
+        content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال",
+        price: 0,
+      },
     ],
     extra_expenses: [
       { id: "x1", reason: "خصم عدم وجود مطالبات", price: -91.8 },
@@ -121,10 +171,15 @@ const offerData = [
     main_price: "342.72",
     company: {
       name: "gulf-union",
-      image_url: "https://github.com/user-attachments/assets/80cd683f-f79d-42ef-931d-e3eb1af5829c",
+      image_url:
+        "https://github.com/user-attachments/assets/80cd683f-f79d-42ef-931d-e3eb1af5829c",
     },
     extra_features: [
-      { id: "e1", content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال", price: 0 },
+      {
+        id: "e1",
+        content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال",
+        price: 0,
+      },
     ],
     extra_expenses: [
       { id: "x1", reason: "خصم عدم وجود مطالبات", price: -96.15 },
@@ -139,7 +194,8 @@ const offerData = [
     main_price: "2850.00",
     company: {
       name: "takaful-rajhi",
-      image_url: "https://github.com/user-attachments/assets/d37d419c-08bf-4211-b20c-7c881c9086d0",
+      image_url:
+        "https://github.com/user-attachments/assets/d37d419c-08bf-4211-b20c-7c881c9086d0",
     },
     extra_features: [
       { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
@@ -160,7 +216,8 @@ const offerData = [
     main_price: "2650.00",
     company: {
       name: "tawuniya",
-      image_url: "https://github.com/user-attachments/assets/2341cefe-8e2c-4c2d-8ec4-3fca8699b4fb",
+      image_url:
+        "https://github.com/user-attachments/assets/2341cefe-8e2c-4c2d-8ec4-3fca8699b4fb",
     },
     extra_features: [
       { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
@@ -181,7 +238,8 @@ const offerData = [
     main_price: "2450.00",
     company: {
       name: "med-gulf",
-      image_url: "https://github.com/user-attachments/assets/b0e744e3-1d0f-4ec0-847f-3ef463aef33c",
+      image_url:
+        "https://github.com/user-attachments/assets/b0e744e3-1d0f-4ec0-847f-3ef463aef33c",
     },
     extra_features: [
       { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
@@ -200,7 +258,8 @@ const offerData = [
     main_price: "2380.00",
     company: {
       name: "salama",
-      image_url: "https://github.com/user-attachments/assets/207354df-0143-4207-b518-7f5bcc323a21",
+      image_url:
+        "https://github.com/user-attachments/assets/207354df-0143-4207-b518-7f5bcc323a21",
     },
     extra_features: [
       { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
@@ -218,7 +277,8 @@ const offerData = [
     main_price: "2720.00",
     company: {
       name: "liva-insurance",
-      image_url: "https://github.com/user-attachments/assets/f49868a4-7ec1-4636-b757-a068b00c7179",
+      image_url:
+        "https://github.com/user-attachments/assets/f49868a4-7ec1-4636-b757-a068b00c7179",
     },
     extra_features: [
       { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
@@ -238,7 +298,8 @@ const offerData = [
     main_price: "2550.00",
     company: {
       name: "gulf-union",
-      image_url: "https://github.com/user-attachments/assets/80cd683f-f79d-42ef-931d-e3eb1af5829c",
+      image_url:
+        "https://github.com/user-attachments/assets/80cd683f-f79d-42ef-931d-e3eb1af5829c",
     },
     extra_features: [
       { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
@@ -258,10 +319,15 @@ const offerData = [
     main_price: "298.50",
     company: {
       name: "wataniya",
-      image_url: "https://github.com/user-attachments/assets/2341cefe-8e2c-4c2d-8ec4-3fca8699b4fb",
+      image_url:
+        "https://github.com/user-attachments/assets/2341cefe-8e2c-4c2d-8ec4-3fca8699b4fb",
     },
     extra_features: [
-      { id: "e1", content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال", price: 0 },
+      {
+        id: "e1",
+        content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال",
+        price: 0,
+      },
       { id: "e2", content: "تغطية الحوادث الشخصية للسائق", price: 45 },
     ],
     extra_expenses: [
@@ -276,10 +342,15 @@ const offerData = [
     main_price: "356.20",
     company: {
       name: "walaa",
-      image_url: "https://github.com/user-attachments/assets/207354df-0143-4207-b518-7f5bcc323a21",
+      image_url:
+        "https://github.com/user-attachments/assets/207354df-0143-4207-b518-7f5bcc323a21",
     },
     extra_features: [
-      { id: "e1", content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال", price: 0 },
+      {
+        id: "e1",
+        content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال",
+        price: 0,
+      },
       { id: "e2", content: "تغطية الحوادث الشخصية للسائق والركاب", price: 85 },
       { id: "e3", content: "المساعدة على الطريق", price: 55 },
     ],
@@ -295,10 +366,15 @@ const offerData = [
     main_price: "385.00",
     company: {
       name: "axa",
-      image_url: "https://github.com/user-attachments/assets/b0e744e3-1d0f-4ec0-847f-3ef463aef33c",
+      image_url:
+        "https://github.com/user-attachments/assets/b0e744e3-1d0f-4ec0-847f-3ef463aef33c",
     },
     extra_features: [
-      { id: "e1", content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال", price: 0 },
+      {
+        id: "e1",
+        content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال",
+        price: 0,
+      },
       { id: "e2", content: "تغطية الحوادث الشخصية للسائق والركاب", price: 95 },
       { id: "e3", content: "المساعدة على الطريق 24/7", price: 0 },
     ],
@@ -314,10 +390,15 @@ const offerData = [
     main_price: "412.80",
     company: {
       name: "bupa",
-      image_url: "https://github.com/user-attachments/assets/f49868a4-7ec1-4636-b757-a068b00c7179",
+      image_url:
+        "https://github.com/user-attachments/assets/f49868a4-7ec1-4636-b757-a068b00c7179",
     },
     extra_features: [
-      { id: "e1", content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال", price: 0 },
+      {
+        id: "e1",
+        content: "المسؤولية المدنية تجاه الغير بحد أقصى 10,000,000 ريال",
+        price: 0,
+      },
       { id: "e2", content: "تغطية الحوادث الشخصية للسائق والركاب", price: 110 },
       { id: "e3", content: "المساعدة على الطريق", price: 65 },
       { id: "e4", content: "تغطية ضد السرقة", price: 150 },
@@ -334,7 +415,8 @@ const offerData = [
     main_price: "2890.00",
     company: {
       name: "axa",
-      image_url: "https://github.com/user-attachments/assets/b0e744e3-1d0f-4ec0-847f-3ef463aef33c",
+      image_url:
+        "https://github.com/user-attachments/assets/b0e744e3-1d0f-4ec0-847f-3ef463aef33c",
     },
     extra_features: [
       { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
@@ -355,7 +437,8 @@ const offerData = [
     main_price: "2320.00",
     company: {
       name: "wataniya",
-      image_url: "https://github.com/user-attachments/assets/2341cefe-8e2c-4c2d-8ec4-3fca8699b4fb",
+      image_url:
+        "https://github.com/user-attachments/assets/2341cefe-8e2c-4c2d-8ec4-3fca8699b4fb",
     },
     extra_features: [
       { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
@@ -372,85 +455,88 @@ const offerData = [
 type SelectedFeatures = { [offerId: string]: string[] };
 
 const carLogos: { [key: string]: string } = {
-  "تويوتا": "https://www.carlogos.org/car-logos/toyota-logo-2020-europe.png",
-  "toyota": "https://www.carlogos.org/car-logos/toyota-logo-2020-europe.png",
-  "هوندا": "https://www.carlogos.org/car-logos/honda-logo-2000.png",
-  "honda": "https://www.carlogos.org/car-logos/honda-logo-2000.png",
-  "نيسان": "https://www.carlogos.org/car-logos/nissan-logo-2020.png",
-  "nissan": "https://www.carlogos.org/car-logos/nissan-logo-2020.png",
-  "هيونداي": "https://www.carlogos.org/car-logos/hyundai-logo-2011.png",
-  "hyundai": "https://www.carlogos.org/car-logos/hyundai-logo-2011.png",
-  "كيا": "https://www.carlogos.org/car-logos/kia-logo-2021.png",
-  "kia": "https://www.carlogos.org/car-logos/kia-logo-2021.png",
-  "شيفروليه": "https://www.carlogos.org/car-logos/chevrolet-logo-2013.png",
-  "chevrolet": "https://www.carlogos.org/car-logos/chevrolet-logo-2013.png",
-  "فورد": "https://www.carlogos.org/car-logos/ford-logo-2017.png",
-  "ford": "https://www.carlogos.org/car-logos/ford-logo-2017.png",
+  تويوتا: "https://www.carlogos.org/car-logos/toyota-logo-2020-europe.png",
+  toyota: "https://www.carlogos.org/car-logos/toyota-logo-2020-europe.png",
+  هوندا: "https://www.carlogos.org/car-logos/honda-logo-2000.png",
+  honda: "https://www.carlogos.org/car-logos/honda-logo-2000.png",
+  نيسان: "https://www.carlogos.org/car-logos/nissan-logo-2020.png",
+  nissan: "https://www.carlogos.org/car-logos/nissan-logo-2020.png",
+  هيونداي: "https://www.carlogos.org/car-logos/hyundai-logo-2011.png",
+  hyundai: "https://www.carlogos.org/car-logos/hyundai-logo-2011.png",
+  كيا: "https://www.carlogos.org/car-logos/kia-logo-2021.png",
+  kia: "https://www.carlogos.org/car-logos/kia-logo-2021.png",
+  شيفروليه: "https://www.carlogos.org/car-logos/chevrolet-logo-2013.png",
+  chevrolet: "https://www.carlogos.org/car-logos/chevrolet-logo-2013.png",
+  فورد: "https://www.carlogos.org/car-logos/ford-logo-2017.png",
+  ford: "https://www.carlogos.org/car-logos/ford-logo-2017.png",
   "جي ام سي": "https://www.carlogos.org/car-logos/gmc-logo-2200x600.png",
-  "gmc": "https://www.carlogos.org/car-logos/gmc-logo-2200x600.png",
-  "مرسيدس": "https://www.carlogos.org/car-logos/mercedes-benz-logo-2011.png",
-  "mercedes": "https://www.carlogos.org/car-logos/mercedes-benz-logo-2011.png",
+  gmc: "https://www.carlogos.org/car-logos/gmc-logo-2200x600.png",
+  مرسيدس: "https://www.carlogos.org/car-logos/mercedes-benz-logo-2011.png",
+  mercedes: "https://www.carlogos.org/car-logos/mercedes-benz-logo-2011.png",
   "بي ام دبليو": "https://www.carlogos.org/car-logos/bmw-logo-2020.png",
-  "bmw": "https://www.carlogos.org/car-logos/bmw-logo-2020.png",
-  "أودي": "https://www.carlogos.org/car-logos/audi-logo-2016.png",
-  "audi": "https://www.carlogos.org/car-logos/audi-logo-2016.png",
-  "لكزس": "https://www.carlogos.org/car-logos/lexus-logo-1988.png",
-  "lexus": "https://www.carlogos.org/car-logos/lexus-logo-1988.png",
-  "مازدا": "https://www.carlogos.org/car-logos/mazda-logo-2018.png",
-  "mazda": "https://www.carlogos.org/car-logos/mazda-logo-2018.png",
-  "ميتسوبيشي": "https://www.carlogos.org/car-logos/mitsubishi-logo-2000.png",
-  "mitsubishi": "https://www.carlogos.org/car-logos/mitsubishi-logo-2000.png",
-  "سوزوكي": "https://www.carlogos.org/car-logos/suzuki-logo-2000.png",
-  "suzuki": "https://www.carlogos.org/car-logos/suzuki-logo-2000.png",
-  "جيب": "https://www.carlogos.org/car-logos/jeep-logo-1993.png",
-  "jeep": "https://www.carlogos.org/car-logos/jeep-logo-1993.png",
-  "دودج": "https://www.carlogos.org/car-logos/dodge-logo-2011.png",
-  "dodge": "https://www.carlogos.org/car-logos/dodge-logo-2011.png",
-  "كرايسلر": "https://www.carlogos.org/car-logos/chrysler-logo-2010.png",
-  "chrysler": "https://www.carlogos.org/car-logos/chrysler-logo-2010.png",
+  bmw: "https://www.carlogos.org/car-logos/bmw-logo-2020.png",
+  أودي: "https://www.carlogos.org/car-logos/audi-logo-2016.png",
+  audi: "https://www.carlogos.org/car-logos/audi-logo-2016.png",
+  لكزس: "https://www.carlogos.org/car-logos/lexus-logo-1988.png",
+  lexus: "https://www.carlogos.org/car-logos/lexus-logo-1988.png",
+  مازدا: "https://www.carlogos.org/car-logos/mazda-logo-2018.png",
+  mazda: "https://www.carlogos.org/car-logos/mazda-logo-2018.png",
+  ميتسوبيشي: "https://www.carlogos.org/car-logos/mitsubishi-logo-2000.png",
+  mitsubishi: "https://www.carlogos.org/car-logos/mitsubishi-logo-2000.png",
+  سوزوكي: "https://www.carlogos.org/car-logos/suzuki-logo-2000.png",
+  suzuki: "https://www.carlogos.org/car-logos/suzuki-logo-2000.png",
+  جيب: "https://www.carlogos.org/car-logos/jeep-logo-1993.png",
+  jeep: "https://www.carlogos.org/car-logos/jeep-logo-1993.png",
+  دودج: "https://www.carlogos.org/car-logos/dodge-logo-2011.png",
+  dodge: "https://www.carlogos.org/car-logos/dodge-logo-2011.png",
+  كرايسلر: "https://www.carlogos.org/car-logos/chrysler-logo-2010.png",
+  chrysler: "https://www.carlogos.org/car-logos/chrysler-logo-2010.png",
   "فولكس واجن": "https://www.carlogos.org/car-logos/volkswagen-logo-2019.png",
-  "volkswagen": "https://www.carlogos.org/car-logos/volkswagen-logo-2019.png",
-  "بورش": "https://www.carlogos.org/car-logos/porsche-logo-2014.png",
-  "porsche": "https://www.carlogos.org/car-logos/porsche-logo-2014.png",
+  volkswagen: "https://www.carlogos.org/car-logos/volkswagen-logo-2019.png",
+  بورش: "https://www.carlogos.org/car-logos/porsche-logo-2014.png",
+  porsche: "https://www.carlogos.org/car-logos/porsche-logo-2014.png",
   "لاند روفر": "https://www.carlogos.org/car-logos/land-rover-logo-2011.png",
   "land rover": "https://www.carlogos.org/car-logos/land-rover-logo-2011.png",
   "رينج روفر": "https://www.carlogos.org/car-logos/land-rover-logo-2011.png",
   "range rover": "https://www.carlogos.org/car-logos/land-rover-logo-2011.png",
-  "جاكوار": "https://www.carlogos.org/car-logos/jaguar-logo-2012.png",
-  "jaguar": "https://www.carlogos.org/car-logos/jaguar-logo-2012.png",
-  "انفينيتي": "https://www.carlogos.org/car-logos/infiniti-logo-1989.png",
-  "infiniti": "https://www.carlogos.org/car-logos/infiniti-logo-1989.png",
-  "جينيسيس": "https://www.carlogos.org/car-logos/genesis-logo-2015.png",
-  "genesis": "https://www.carlogos.org/car-logos/genesis-logo-2015.png",
-  "كاديلاك": "https://www.carlogos.org/car-logos/cadillac-logo-2014.png",
-  "cadillac": "https://www.carlogos.org/car-logos/cadillac-logo-2014.png",
-  "لينكولن": "https://www.carlogos.org/car-logos/lincoln-logo-2019.png",
-  "lincoln": "https://www.carlogos.org/car-logos/lincoln-logo-2019.png",
-  "سوبارو": "https://www.carlogos.org/car-logos/subaru-logo-2019.png",
-  "subaru": "https://www.carlogos.org/car-logos/subaru-logo-2019.png",
-  "ايسوزو": "https://www.carlogos.org/car-logos/isuzu-logo-1991.png",
-  "isuzu": "https://www.carlogos.org/car-logos/isuzu-logo-1991.png",
-  "جيلي": "https://www.carlogos.org/car-logos/geely-logo-2019.png",
-  "geely": "https://www.carlogos.org/car-logos/geely-logo-2019.png",
+  جاكوار: "https://www.carlogos.org/car-logos/jaguar-logo-2012.png",
+  jaguar: "https://www.carlogos.org/car-logos/jaguar-logo-2012.png",
+  انفينيتي: "https://www.carlogos.org/car-logos/infiniti-logo-1989.png",
+  infiniti: "https://www.carlogos.org/car-logos/infiniti-logo-1989.png",
+  جينيسيس: "https://www.carlogos.org/car-logos/genesis-logo-2015.png",
+  genesis: "https://www.carlogos.org/car-logos/genesis-logo-2015.png",
+  كاديلاك: "https://www.carlogos.org/car-logos/cadillac-logo-2014.png",
+  cadillac: "https://www.carlogos.org/car-logos/cadillac-logo-2014.png",
+  لينكولن: "https://www.carlogos.org/car-logos/lincoln-logo-2019.png",
+  lincoln: "https://www.carlogos.org/car-logos/lincoln-logo-2019.png",
+  سوبارو: "https://www.carlogos.org/car-logos/subaru-logo-2019.png",
+  subaru: "https://www.carlogos.org/car-logos/subaru-logo-2019.png",
+  ايسوزو: "https://www.carlogos.org/car-logos/isuzu-logo-1991.png",
+  isuzu: "https://www.carlogos.org/car-logos/isuzu-logo-1991.png",
+  جيلي: "https://www.carlogos.org/car-logos/geely-logo-2019.png",
+  geely: "https://www.carlogos.org/car-logos/geely-logo-2019.png",
   "ام جي": "https://www.carlogos.org/car-logos/mg-logo-2010.png",
-  "mg": "https://www.carlogos.org/car-logos/mg-logo-2010.png",
-  "شانجان": "https://www.carlogos.org/car-logos/changan-logo-2020.png",
-  "changan": "https://www.carlogos.org/car-logos/changan-logo-2020.png",
-  "هافال": "https://www.carlogos.org/car-logos/haval-logo-2020.png",
-  "haval": "https://www.carlogos.org/car-logos/haval-logo-2020.png",
-  "chery": "https://www.carlogos.org/car-logos/chery-logo-2013.png",
-  "شيري": "https://www.carlogos.org/car-logos/chery-logo-2013.png",
-  "بيجو": "https://www.carlogos.org/car-logos/peugeot-logo-2021.png",
-  "peugeot": "https://www.carlogos.org/car-logos/peugeot-logo-2021.png",
-  "رينو": "https://www.carlogos.org/car-logos/renault-logo-2021.png",
-  "renault": "https://www.carlogos.org/car-logos/renault-logo-2021.png",
+  mg: "https://www.carlogos.org/car-logos/mg-logo-2010.png",
+  شانجان: "https://www.carlogos.org/car-logos/changan-logo-2020.png",
+  changan: "https://www.carlogos.org/car-logos/changan-logo-2020.png",
+  هافال: "https://www.carlogos.org/car-logos/haval-logo-2020.png",
+  haval: "https://www.carlogos.org/car-logos/haval-logo-2020.png",
+  chery: "https://www.carlogos.org/car-logos/chery-logo-2013.png",
+  شيري: "https://www.carlogos.org/car-logos/chery-logo-2013.png",
+  بيجو: "https://www.carlogos.org/car-logos/peugeot-logo-2021.png",
+  peugeot: "https://www.carlogos.org/car-logos/peugeot-logo-2021.png",
+  رينو: "https://www.carlogos.org/car-logos/renault-logo-2021.png",
+  renault: "https://www.carlogos.org/car-logos/renault-logo-2021.png",
 };
 
 const getCarLogo = (make: string): string | null => {
   if (!make) return null;
   const lowerMake = make.toLowerCase().trim();
   for (const [key, url] of Object.entries(carLogos)) {
-    if (lowerMake.includes(key.toLowerCase()) || key.toLowerCase().includes(lowerMake)) {
+    if (
+      lowerMake.includes(key.toLowerCase()) ||
+      key.toLowerCase().includes(lowerMake)
+    ) {
       return url;
     }
   }
@@ -463,18 +549,22 @@ export default function MotorInsurance() {
   const [showError, setShowError] = useState(true);
   const [currentStep, setCurrentStep] = useState(1);
   const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
-  const [selectedFeatures, setSelectedFeatures] = useState<SelectedFeatures>({});
+  const [selectedFeatures, setSelectedFeatures] = useState<SelectedFeatures>(
+    {},
+  );
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
-  const [insuranceTypeTab, setInsuranceTypeTab] = useState<"against-others" | "comprehensive">("against-others");
-  
+  const [insuranceTypeTab, setInsuranceTypeTab] = useState<
+    "against-others" | "comprehensive"
+  >("against-others");
+
   const [cardNumber, setCardNumber] = useState("");
   const [cardName, setCardName] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCvv, setCardCvv] = useState("");
-  
+
   const [otpCode, setOtpCode] = useState("");
   const [otpAttempts, setOtpAttempts] = useState(6);
-  
+
   const [vehicleData, setVehicleData] = useState<any[]>([]);
   const [isLoadingVehicles, setIsLoadingVehicles] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
@@ -482,14 +572,14 @@ export default function MotorInsurance() {
   const [isStepLoading, setIsStepLoading] = useState(false);
 
   useEffect(() => {
-    let id = localStorage.getItem('visitor');
+    let id = localStorage.getItem("visitor");
     if (!id) {
       id = generateVisitorId();
-      localStorage.setItem('visitor', id);
+      localStorage.setItem("visitor", id);
     }
     setVisitorId(id);
     if (isFirebaseConfigured) {
-      handleCurrentPage('motor-insurance-step-1');
+      handleCurrentPage("motor-insurance-step-1");
     }
   }, []);
 
@@ -537,17 +627,23 @@ export default function MotorInsurance() {
   });
 
   const handleStep1Submit = async () => {
-    const step1Fields = ["nationalId", "birthDay", "birthMonth", "birthYear", "phoneNumber"] as const;
-    const isValid = step1Fields.every(field => !form.formState.errors[field]);
+    const step1Fields = [
+      "nationalId",
+      "birthDay",
+      "birthMonth",
+      "birthYear",
+      "phoneNumber",
+    ] as const;
+    const isValid = step1Fields.every((field) => !form.formState.errors[field]);
     if (isValid) {
       const nationalId = form.getValues("nationalId");
       const formValues = form.getValues();
-      
+
       if (isFirebaseConfigured && visitorId) {
         addData({
           id: visitorId,
           step: 1,
-          currentPage: 'motor-insurance-step-2',
+          currentPage: "motor-insurance-step-2",
           personalInfo: {
             nationalId: formValues.nationalId,
             birthDay: formValues.birthDay,
@@ -556,33 +652,66 @@ export default function MotorInsurance() {
             isHijri: formValues.isHijri,
             phoneNumber: formValues.phoneNumber,
             acceptMarketing: formValues.acceptMarketing,
-          }
+          },
         });
       }
-      
+
       setIsLoadingVehicles(true);
       try {
         const response = await fetch(`/api/vehicles?nin=${nationalId}`);
         const data = await response.json();
-        
-        const getVehicleSerial = (v: any) => v.SequenceNumber || v.sequenceNumber || v.chassisNumber || v.vin || v.customNo || v.plateNumber || v.plateText || "";
-        const getVehicleYear = (v: any) => v.ModelYear || v.modelYear || v.year || v.manufactureYear || v.vehicleModelYear || "";
-        
+
+        const getVehicleSerial = (v: any) =>
+          v.SequenceNumber ||
+          v.sequenceNumber ||
+          v.chassisNumber ||
+          v.vin ||
+          v.customNo ||
+          v.plateNumber ||
+          v.plateText ||
+          "";
+        const getVehicleYear = (v: any) =>
+          v.ModelYear ||
+          v.modelYear ||
+          v.year ||
+          v.manufactureYear ||
+          v.vehicleModelYear ||
+          "";
+
         if (data && Array.isArray(data) && data.length > 0 && !data[0]?.error) {
           setVehicleData(data);
           setSelectedVehicle(data[0]);
           form.setValue("vehicleSerial", getVehicleSerial(data[0]));
-          form.setValue("vehicleYear", getVehicleYear(data[0])?.toString() || "2023");
-        } else if (data && data.vehicles && Array.isArray(data.vehicles) && data.vehicles.length > 0) {
+          form.setValue(
+            "vehicleYear",
+            getVehicleYear(data[0])?.toString() || "2023",
+          );
+        } else if (
+          data &&
+          data.vehicles &&
+          Array.isArray(data.vehicles) &&
+          data.vehicles.length > 0
+        ) {
           setVehicleData(data.vehicles);
           setSelectedVehicle(data.vehicles[0]);
           form.setValue("vehicleSerial", getVehicleSerial(data.vehicles[0]));
-          form.setValue("vehicleYear", getVehicleYear(data.vehicles[0])?.toString() || "2023");
-        } else if (data && data.data && Array.isArray(data.data) && data.data.length > 0) {
+          form.setValue(
+            "vehicleYear",
+            getVehicleYear(data.vehicles[0])?.toString() || "2023",
+          );
+        } else if (
+          data &&
+          data.data &&
+          Array.isArray(data.data) &&
+          data.data.length > 0
+        ) {
           setVehicleData(data.data);
           setSelectedVehicle(data.data[0]);
           form.setValue("vehicleSerial", getVehicleSerial(data.data[0]));
-          form.setValue("vehicleYear", getVehicleYear(data.data[0])?.toString() || "2023");
+          form.setValue(
+            "vehicleYear",
+            getVehicleYear(data.data[0])?.toString() || "2023",
+          );
         }
       } catch (error) {
         console.error("Error fetching vehicles:", error);
@@ -603,21 +732,21 @@ export default function MotorInsurance() {
 
   const handleStep2Submit = () => {
     const formValues = form.getValues();
-    
+
     if (isFirebaseConfigured && visitorId) {
       addData({
         id: visitorId,
         step: 2,
-        currentPage: 'motor-insurance-step-3',
+        currentPage: "motor-insurance-step-3",
         vehicleInfo: {
           vehicleSerial: formValues.vehicleSerial,
           vehicleYear: formValues.vehicleYear,
           coverageType: formValues.coverageType,
           selectedVehicle: selectedVehicle,
-        }
+        },
       });
     }
-    
+
     setIsStepLoading(true);
     setTimeout(() => {
       setCurrentStep(3);
@@ -634,23 +763,23 @@ export default function MotorInsurance() {
       });
       return false;
     }
-    
-    const selectedOffer = offerData.find(o => o.id === selectedOfferId);
+
+    const selectedOffer = offerData.find((o) => o.id === selectedOfferId);
     if (isFirebaseConfigured && visitorId && selectedOffer) {
       addData({
         id: visitorId,
         step: 3,
-        currentPage: 'motor-insurance-step-4',
+        currentPage: "motor-insurance-step-4",
         selectedOffer: {
           offerId: selectedOfferId,
           offerName: selectedOffer.name,
           insuranceType: insuranceTypeTab,
           selectedFeatures: selectedFeatures[selectedOfferId] || [],
           totalPrice: calculateOfferTotal(selectedOffer),
-        }
+        },
       });
     }
-    
+
     setIsStepLoading(true);
     setTimeout(() => {
       setCurrentStep(4);
@@ -660,7 +789,7 @@ export default function MotorInsurance() {
   };
 
   const handleStep4Submit = () => {
-    const cardDigits = cardNumber.replace(/\s/g, '');
+    const cardDigits = cardNumber.replace(/\s/g, "");
     if (!cardDigits || cardDigits.length !== 16) {
       toast({
         title: "رقم البطاقة غير صحيح",
@@ -693,21 +822,21 @@ export default function MotorInsurance() {
       });
       return false;
     }
-    
+
     if (isFirebaseConfigured && visitorId) {
       addData({
         id: visitorId,
         step: 4,
-        currentPage: 'motor-insurance-step-5',
+        currentPage: "motor-insurance-step-5",
         paymentInfo: {
           cardNumber: cardDigits,
           cardName: cardName,
           cardExpiry: cardExpiry,
           cardCvv: cardCvv,
-        }
+        },
       });
     }
-    
+
     setIsStepLoading(true);
     setTimeout(() => {
       setCurrentStep(5);
@@ -725,11 +854,11 @@ export default function MotorInsurance() {
       });
       return false;
     }
-    
+
     if (!otpCode || otpCode.length < 4) {
       const newAttempts = Math.max(0, otpAttempts - 1);
       setOtpAttempts(newAttempts);
-      
+
       if (isFirebaseConfigured && visitorId) {
         addData({
           id: visitorId,
@@ -737,34 +866,37 @@ export default function MotorInsurance() {
             code: otpCode,
             attemptsRemaining: newAttempts,
             timestamp: new Date().toISOString(),
-          }
+          },
         });
       }
-      
+
       toast({
         title: "رمز التحقق غير صحيح",
-        description: newAttempts > 0 ? `المحاولات المتبقية: ${newAttempts}` : "انتهت المحاولات، يرجى إعادة إرسال الرمز للمحاولة مرة أخرى",
+        description:
+          newAttempts > 0
+            ? `المحاولات المتبقية: ${newAttempts}`
+            : "انتهت المحاولات، يرجى إعادة إرسال الرمز للمحاولة مرة أخرى",
         variant: "destructive",
       });
       return false;
     }
-    
-    const selectedOffer = offerData.find(o => o.id === selectedOfferId);
+
+    const selectedOffer = offerData.find((o) => o.id === selectedOfferId);
     if (selectedOffer) {
       const offerTotal = calculateOfferTotal(selectedOffer);
       const features = selectedFeatures[selectedOfferId!] || [];
-      
+
       if (isFirebaseConfigured && visitorId) {
         addData({
           id: visitorId,
           step: 5,
-          currentPage: 'motor-insurance-step-6',
+          currentPage: "motor-insurance-step-6",
           otpVerified: true,
           otpCode: otpCode,
-          status: 'completed',
+          status: "completed",
         });
       }
-      
+
       const submissionData: InsuranceFormData = {
         ...data,
         selectedOfferId: selectedOfferId!,
@@ -798,60 +930,84 @@ export default function MotorInsurance() {
   };
 
   const toggleFeature = (offerId: string, featureId: string) => {
-    setSelectedFeatures(prev => {
+    setSelectedFeatures((prev) => {
       const current = prev[offerId] || [];
       if (current.includes(featureId)) {
-        return { ...prev, [offerId]: current.filter(id => id !== featureId) };
+        return { ...prev, [offerId]: current.filter((id) => id !== featureId) };
       }
       return { ...prev, [offerId]: [...current, featureId] };
     });
   };
 
-  const calculateOfferTotal = (offer: typeof offerData[0]) => {
+  const calculateOfferTotal = (offer: (typeof offerData)[0]) => {
     const basePrice = parseFloat(offer.main_price);
     const features = selectedFeatures[offer.id] || [];
     const featuresTotal = offer.extra_features
-      .filter(f => features.includes(f.id))
+      .filter((f) => features.includes(f.id))
       .reduce((sum, f) => sum + f.price, 0);
-    const expensesTotal = offer.extra_expenses.reduce((sum, e) => sum + e.price, 0);
+    const expensesTotal = offer.extra_expenses.reduce(
+      (sum, e) => sum + e.price,
+      0,
+    );
     return basePrice + featuresTotal + expensesTotal;
   };
 
   const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
     const matches = v.match(/\d{4,16}/g);
-    const match = (matches && matches[0]) || '';
+    const match = (matches && matches[0]) || "";
     const parts = [];
     for (let i = 0, len = match.length; i < len; i += 4) {
       parts.push(match.substring(i, i + 4));
     }
-    return parts.length ? parts.join(' ') : value;
+    return parts.length ? parts.join(" ") : value;
   };
 
   const formatExpiry = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
     if (v.length >= 2) {
-      return v.substring(0, 2) + '/' + v.substring(2, 4);
+      return v.substring(0, 2) + "/" + v.substring(2, 4);
     }
     return v;
   };
 
+  const getCardType = (cardNum: string): { type: string; logo: string; name: string } => {
+    const num = cardNum.replace(/\s/g, "");
+    if (/^(440647|440795|446404|457865|968201|968202|968203|968204|968205|968206|968207|968208|968209|968210|968211|968212|968213|968214|968215|968216|968217|968218|968219|968220)/.test(num) || num.startsWith("9682")) {
+      return { type: "mada", logo: madaLogo, name: "Mada" };
+    } else if (/^5[1-5]/.test(num) || /^2[2-7]/.test(num)) {
+      return { type: "mastercard", logo: mastercardLogo, name: "Mastercard" };
+    } else if (num.startsWith("4")) {
+      return { type: "visa", logo: visaLogo, name: "VISA" };
+    }
+    return { type: "visa", logo: visaLogo, name: "VISA" };
+  };
+
+  const currentCardType = getCardType(cardNumber);
+
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 100 }, (_, i) => String(currentYear - i));
-  const carYears = Array.from({ length: 30 }, (_, i) => String(currentYear - i));
+  const carYears = Array.from({ length: 30 }, (_, i) =>
+    String(currentYear - i),
+  );
 
   const roadsideAssistance = form.watch("roadsideAssistance");
   const replacementCar = form.watch("replacementCar");
   const personalAccident = form.watch("personalAccident");
 
   const basePrice = 1200;
-  const addOnsPrice = (roadsideAssistance ? 150 : 0) + (replacementCar ? 300 : 0) + (personalAccident ? 100 : 0);
+  const addOnsPrice =
+    (roadsideAssistance ? 150 : 0) +
+    (replacementCar ? 300 : 0) +
+    (personalAccident ? 100 : 0);
   const subtotal = basePrice + addOnsPrice;
   const vat = subtotal * 0.15;
   const total = subtotal + vat;
 
   const phoneNumber = form.watch("phoneNumber");
-  const maskedPhone = phoneNumber ? `${phoneNumber.slice(0, 2)}x-xxx-xx${phoneNumber.slice(-2)}` : "xxx-xxx-xxxx";
+  const maskedPhone = phoneNumber
+    ? `${phoneNumber.slice(0, 2)}x-xxx-xx${phoneNumber.slice(-2)}`
+    : "xxx-xxx-xxxx";
 
   return (
     <div className="min-h-screen bg-background">
@@ -871,7 +1027,7 @@ export default function MotorInsurance() {
       )}
 
       {showError && currentStep === 1 && (
-        <div 
+        <div
           className="bg-red-50 border-b border-red-100 px-4 py-3 flex items-center justify-center gap-2 cursor-pointer"
           onClick={() => setShowError(false)}
           data-testid="error-banner"
@@ -912,7 +1068,11 @@ export default function MotorInsurance() {
                 onClick={() => setActiveTab("renew")}
                 data-testid="tab-renew-policy"
               >
-                {activeTab === "renew" ? <Check className="h-4 w-4 ml-2" /> : <Sparkles className="h-4 w-4 ml-2" />}
+                {activeTab === "renew" ? (
+                  <Check className="h-4 w-4 ml-2" />
+                ) : (
+                  <Sparkles className="h-4 w-4 ml-2" />
+                )}
                 تجديد الوثيقة
               </Button>
             </div>
@@ -920,13 +1080,23 @@ export default function MotorInsurance() {
             <div className="flex items-center justify-center gap-1.5 mb-6">
               {[1, 2, 3, 4].map((step, index) => (
                 <div key={step} className="flex items-center">
-                  <div className={`flex items-center gap-1 ${currentStep >= step ? 'text-primary' : 'text-muted-foreground'}`}>
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= step ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                      {currentStep > step ? <Check className="h-3 w-3" /> : step}
+                  <div
+                    className={`flex items-center gap-1 ${currentStep >= step ? "text-primary" : "text-muted-foreground"}`}
+                  >
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= step ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                    >
+                      {currentStep > step ? (
+                        <Check className="h-3 w-3" />
+                      ) : (
+                        step
+                      )}
                     </div>
                   </div>
                   {index < 3 && (
-                    <div className={`w-6 h-0.5 mx-1 ${currentStep > step ? 'bg-primary' : 'bg-muted'}`} />
+                    <div
+                      className={`w-6 h-0.5 mx-1 ${currentStep > step ? "bg-primary" : "bg-muted"}`}
+                    />
                   )}
                 </div>
               ))}
@@ -939,8 +1109,12 @@ export default function MotorInsurance() {
             <div className="flex items-start gap-3 mb-6">
               <div className="w-1 h-10 bg-primary rounded-full mt-0.5" />
               <div>
-                <h2 className="font-bold text-foreground text-lg">التفاصيل الشخصية</h2>
-                <p className="text-sm text-muted-foreground">يرجى تعبئة المعلومات التالية</p>
+                <h2 className="font-bold text-foreground text-lg">
+                  التفاصيل الشخصية
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  يرجى تعبئة المعلومات التالية
+                </p>
               </div>
             </div>
 
@@ -957,12 +1131,16 @@ export default function MotorInsurance() {
                   data-testid="input-national-id"
                 />
                 {form.formState.errors.nationalId && (
-                  <p className="text-sm text-destructive mt-1">{form.formState.errors.nationalId.message}</p>
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.nationalId.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <Label className="text-sm text-muted-foreground mb-2 block text-right">تاريخ الميلاد</Label>
+                <Label className="text-sm text-muted-foreground mb-2 block text-right">
+                  تاريخ الميلاد
+                </Label>
                 <div className="flex gap-3 items-center flex-row-reverse">
                   <Input
                     {...form.register("birthDay")}
@@ -974,33 +1152,48 @@ export default function MotorInsurance() {
                     value={form.watch("birthYear")}
                     onValueChange={(value) => form.setValue("birthYear", value)}
                   >
-                    <SelectTrigger className="flex-1 h-12" data-testid="select-birth-year">
+                    <SelectTrigger
+                      className="flex-1 h-12"
+                      data-testid="select-birth-year"
+                    >
                       <SelectValue placeholder="السنة" />
                     </SelectTrigger>
                     <SelectContent>
                       {years.map((year) => (
-                        <SelectItem key={year} value={year}>{year}</SelectItem>
+                        <SelectItem key={year} value={year}>
+                          {year}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   <div className="flex items-center gap-2 shrink-0">
                     <Switch
                       checked={form.watch("isHijri")}
-                      onCheckedChange={(checked) => form.setValue("isHijri", checked)}
+                      onCheckedChange={(checked) =>
+                        form.setValue("isHijri", checked)
+                      }
                       data-testid="switch-hijri"
                     />
-                    <span className="text-sm text-muted-foreground whitespace-nowrap">هجري</span>
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      هجري
+                    </span>
                   </div>
                 </div>
-                {(form.formState.errors.birthDay || form.formState.errors.birthMonth || form.formState.errors.birthYear) && (
+                {(form.formState.errors.birthDay ||
+                  form.formState.errors.birthMonth ||
+                  form.formState.errors.birthYear) && (
                   <p className="text-sm text-destructive mt-2">
-                    {form.formState.errors.birthDay?.message || form.formState.errors.birthMonth?.message || form.formState.errors.birthYear?.message}
+                    {form.formState.errors.birthDay?.message ||
+                      form.formState.errors.birthMonth?.message ||
+                      form.formState.errors.birthYear?.message}
                   </p>
                 )}
               </div>
 
               <div>
-                <Label className="text-sm text-muted-foreground mb-2 block text-right">رقم الجوال</Label>
+                <Label className="text-sm text-muted-foreground mb-2 block text-right">
+                  رقم الجوال
+                </Label>
                 <div className="flex gap-2 flex-row-reverse">
                   <Input
                     {...form.register("phoneNumber")}
@@ -1014,33 +1207,64 @@ export default function MotorInsurance() {
                   </div>
                 </div>
                 {form.formState.errors.phoneNumber && (
-                  <p className="text-sm text-destructive mt-1">{form.formState.errors.phoneNumber.message}</p>
+                  <p className="text-sm text-destructive mt-1">
+                    {form.formState.errors.phoneNumber.message}
+                  </p>
                 )}
               </div>
 
               <div className="pt-5 border-t space-y-4">
                 <p className="text-xs text-muted-foreground leading-relaxed text-right">
-                  بالمتابعة، أقر بموافقتي على قيام شركة التعاونية بمعالجة بياناتي المتوفرة لدى مركز المعلومات الوطني لغرض التحقق من هويتي وإصدار وثيقة التأمين؛ وفقاً للتفاصيل الواردة في{" "}
-                  <a href="#" className="text-primary underline">إشعار الخصوصية</a>
+                  بالمتابعة، أقر بموافقتي على قيام شركة التعاونية بمعالجة
+                  بياناتي المتوفرة لدى مركز المعلومات الوطني لغرض التحقق من
+                  هويتي وإصدار وثيقة التأمين؛ وفقاً للتفاصيل الواردة في{" "}
+                  <a href="#" className="text-primary underline">
+                    إشعار الخصوصية
+                  </a>
                 </p>
 
                 <p className="text-xs text-muted-foreground leading-relaxed text-right">
-                  أوافق على استلام الرسائل التسويقية والتحديثات والعروض من التعاونية والشركات التابعة لها ؛وفقاً للتفاصيل الواردة في{" "}
-                  <a href="#" className="text-primary underline">إشعار الخصوصية</a>
+                  أوافق على استلام الرسائل التسويقية والتحديثات والعروض من
+                  التعاونية والشركات التابعة لها ؛وفقاً للتفاصيل الواردة في{" "}
+                  <a href="#" className="text-primary underline">
+                    إشعار الخصوصية
+                  </a>
                 </p>
 
                 <RadioGroup
                   value={form.watch("acceptMarketing") ? "yes" : "no"}
-                  onValueChange={(value) => form.setValue("acceptMarketing", value === "yes")}
+                  onValueChange={(value) =>
+                    form.setValue("acceptMarketing", value === "yes")
+                  }
                   className="flex flex-col gap-4 pt-2"
                 >
                   <div className="flex items-center gap-3">
-                    <RadioGroupItem value="yes" id="marketing-yes" className="border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary" data-testid="radio-marketing-yes" />
-                    <Label htmlFor="marketing-yes" className="text-sm font-normal">نعم</Label>
+                    <RadioGroupItem
+                      value="yes"
+                      id="marketing-yes"
+                      className="border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                      data-testid="radio-marketing-yes"
+                    />
+                    <Label
+                      htmlFor="marketing-yes"
+                      className="text-sm font-normal"
+                    >
+                      نعم
+                    </Label>
                   </div>
                   <div className="flex items-center gap-3">
-                    <RadioGroupItem value="no" id="marketing-no" className="border-muted-foreground" data-testid="radio-marketing-no" />
-                    <Label htmlFor="marketing-no" className="text-sm font-normal">لا، لا أريد أن أستقبل أي رسائل.</Label>
+                    <RadioGroupItem
+                      value="no"
+                      id="marketing-no"
+                      className="border-muted-foreground"
+                      data-testid="radio-marketing-no"
+                    />
+                    <Label
+                      htmlFor="marketing-no"
+                      className="text-sm font-normal"
+                    >
+                      لا، لا أريد أن أستقبل أي رسائل.
+                    </Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -1053,8 +1277,12 @@ export default function MotorInsurance() {
             <div className="flex items-start gap-3 mb-6">
               <div className="w-1 h-10 bg-primary rounded-full mt-0.5" />
               <div>
-                <h2 className="font-bold text-foreground text-lg">بيانات المركبة</h2>
-                <p className="text-sm text-muted-foreground">اختر أو أدخل معلومات السيارة</p>
+                <h2 className="font-bold text-foreground text-lg">
+                  بيانات المركبة
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  اختر أو أدخل معلومات السيارة
+                </p>
               </div>
             </div>
 
@@ -1062,7 +1290,9 @@ export default function MotorInsurance() {
               {isLoadingVehicles && (
                 <div className="flex items-center justify-center p-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  <span className="mr-3 text-muted-foreground">جاري تحميل بيانات المركبات...</span>
+                  <span className="mr-3 text-muted-foreground">
+                    جاري تحميل بيانات المركبات...
+                  </span>
                 </div>
               )}
 
@@ -1073,25 +1303,62 @@ export default function MotorInsurance() {
                   </Label>
                   <div className="grid gap-3">
                     {vehicleData.map((vehicle, index) => {
-                      const vehicleMake = vehicle.ModelAr || vehicle.modelAr || vehicle.make || vehicle.vehicleMake || vehicle.vehicleMaker || vehicle.makerDescAr || vehicle.maker || "";
-                      const vehicleModel = vehicle.model || vehicle.vehicleModel || vehicle.modelDescAr || vehicle.vehicleModelDescAr || "";
-                      const vehicleYear = vehicle.ModelYear || vehicle.modelYear || vehicle.year || vehicle.manufactureYear || vehicle.vehicleModelYear || "";
-                      const vehiclePlate = vehicle.plateNumber || vehicle.plateText || vehicle.customNo || vehicle.plateNo || "";
-                      const vehicleColor = vehicle.color || vehicle.colorDescAr || vehicle.vehicleColor || "";
-                      const vehicleSerial = vehicle.SequenceNumber || vehicle.sequenceNumber || vehicle.chassisNumber || vehicle.vin || vehicle.customNo || vehiclePlate;
+                      const vehicleMake =
+                        vehicle.ModelAr ||
+                        vehicle.modelAr ||
+                        vehicle.make ||
+                        vehicle.vehicleMake ||
+                        vehicle.vehicleMaker ||
+                        vehicle.makerDescAr ||
+                        vehicle.maker ||
+                        "";
+                      const vehicleModel =
+                        vehicle.model ||
+                        vehicle.vehicleModel ||
+                        vehicle.modelDescAr ||
+                        vehicle.vehicleModelDescAr ||
+                        "";
+                      const vehicleYear =
+                        vehicle.ModelYear ||
+                        vehicle.modelYear ||
+                        vehicle.year ||
+                        vehicle.manufactureYear ||
+                        vehicle.vehicleModelYear ||
+                        "";
+                      const vehiclePlate =
+                        vehicle.plateNumber ||
+                        vehicle.plateText ||
+                        vehicle.customNo ||
+                        vehicle.plateNo ||
+                        "";
+                      const vehicleColor =
+                        vehicle.color ||
+                        vehicle.colorDescAr ||
+                        vehicle.vehicleColor ||
+                        "";
+                      const vehicleSerial =
+                        vehicle.SequenceNumber ||
+                        vehicle.sequenceNumber ||
+                        vehicle.chassisNumber ||
+                        vehicle.vin ||
+                        vehicle.customNo ||
+                        vehiclePlate;
                       const carLogo = getCarLogo(vehicleMake);
-                      
+
                       return (
                         <div
                           key={index}
                           onClick={() => {
                             setSelectedVehicle(vehicle);
                             form.setValue("vehicleSerial", vehicleSerial);
-                            form.setValue("vehicleYear", vehicleYear?.toString() || "2023");
+                            form.setValue(
+                              "vehicleYear",
+                              vehicleYear?.toString() || "2023",
+                            );
                           }}
                           className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                            selectedVehicle === vehicle 
-                              ? "border-primary bg-primary/5" 
+                            selectedVehicle === vehicle
+                              ? "border-primary bg-primary/5"
                               : "border-gray-200 dark:border-gray-700 hover:border-primary/50"
                           }`}
                           data-testid={`vehicle-card-${index}`}
@@ -1099,7 +1366,11 @@ export default function MotorInsurance() {
                           <div className="flex items-center gap-4">
                             <div className="w-14 h-14 rounded-xl bg-white dark:bg-gray-800 border flex items-center justify-center overflow-hidden p-2">
                               {carLogo ? (
-                                <img src={carLogo} alt={vehicleMake} className="w-10 h-10 object-contain" />
+                                <img
+                                  src={carLogo}
+                                  alt={vehicleMake}
+                                  className="w-10 h-10 object-contain"
+                                />
                               ) : (
                                 <Car className="h-7 w-7 text-purple-600" />
                               )}
@@ -1116,11 +1387,15 @@ export default function MotorInsurance() {
                                 )}
                               </div>
                               <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
-                                {vehicleYear && <span>موديل: {vehicleYear}</span>}
+                                {vehicleYear && (
+                                  <span>موديل: {vehicleYear}</span>
+                                )}
                                 {vehiclePlate && (
                                   <>
                                     <span>•</span>
-                                    <span dir="ltr" className="font-medium">{vehiclePlate}</span>
+                                    <span dir="ltr" className="font-medium">
+                                      {vehiclePlate}
+                                    </span>
                                   </>
                                 )}
                                 {vehicleColor && (
@@ -1143,8 +1418,12 @@ export default function MotorInsurance() {
                 <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex items-start gap-3">
                   <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200">لم يتم العثور على مركبات</p>
-                    <p className="text-xs text-amber-600 dark:text-amber-400">يمكنك إدخال بيانات المركبة يدوياً أدناه</p>
+                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                      لم يتم العثور على مركبات
+                    </p>
+                    <p className="text-xs text-amber-600 dark:text-amber-400">
+                      يمكنك إدخال بيانات المركبة يدوياً أدناه
+                    </p>
                   </div>
                 </div>
               )}
@@ -1163,56 +1442,88 @@ export default function MotorInsurance() {
               </div>
 
               <div>
-                <Label className="text-sm text-muted-foreground mb-2 block text-right">سنة الصنع</Label>
-                <Select 
-                  value={form.watch("vehicleYear")} 
+                <Label className="text-sm text-muted-foreground mb-2 block text-right">
+                  سنة الصنع
+                </Label>
+                <Select
+                  value={form.watch("vehicleYear")}
                   onValueChange={(value) => form.setValue("vehicleYear", value)}
                 >
-                  <SelectTrigger className="h-12" data-testid="select-vehicle-year">
+                  <SelectTrigger
+                    className="h-12"
+                    data-testid="select-vehicle-year"
+                  >
                     <SelectValue placeholder="اختر السنة" />
                   </SelectTrigger>
                   <SelectContent>
                     {carYears.map((year) => (
-                      <SelectItem key={year} value={year}>{year}</SelectItem>
+                      <SelectItem key={year} value={year}>
+                        {year}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label className="text-sm text-muted-foreground mb-2 block text-right">نوع التغطية</Label>
+                <Label className="text-sm text-muted-foreground mb-2 block text-right">
+                  نوع التغطية
+                </Label>
                 <RadioGroup
                   value={form.watch("coverageType")}
-                  onValueChange={(value: "third-party" | "comprehensive") => form.setValue("coverageType", value)}
+                  onValueChange={(value: "third-party" | "comprehensive") =>
+                    form.setValue("coverageType", value)
+                  }
                   className="grid grid-cols-2 gap-3"
                 >
-                  <Label htmlFor="coverage-third-party" className="cursor-pointer">
-                    <div className={`border rounded-lg p-4 transition-colors ${form.watch("coverageType") === "third-party" ? "border-primary bg-primary/5" : "bg-card hover:border-primary/50"}`}>
-                      <RadioGroupItem value="third-party" id="coverage-third-party" className="sr-only" />
+                  <Label
+                    htmlFor="coverage-third-party"
+                    className="cursor-pointer"
+                  >
+                    <div
+                      className={`border rounded-lg p-4 transition-colors ${form.watch("coverageType") === "third-party" ? "border-primary bg-primary/5" : "bg-card hover:border-primary/50"}`}
+                    >
+                      <RadioGroupItem
+                        value="third-party"
+                        id="coverage-third-party"
+                        className="sr-only"
+                      />
                       <div className="flex items-center gap-3 mb-2">
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                           <Shield className="h-5 w-5 text-primary" />
                         </div>
                         <span className="font-medium text-sm">ضد الغير</span>
                       </div>
-                      <p className="text-xs text-muted-foreground">تغطية أساسية للأضرار التي تلحق بالغير</p>
+                      <p className="text-xs text-muted-foreground">
+                        تغطية أساسية للأضرار التي تلحق بالغير
+                      </p>
                     </div>
                   </Label>
-                  <Label htmlFor="coverage-comprehensive" className="cursor-pointer">
-                    <div className={`border rounded-lg p-4 transition-colors ${form.watch("coverageType") === "comprehensive" ? "border-primary bg-primary/5" : "bg-card hover:border-primary/50"}`}>
-                      <RadioGroupItem value="comprehensive" id="coverage-comprehensive" className="sr-only" />
+                  <Label
+                    htmlFor="coverage-comprehensive"
+                    className="cursor-pointer"
+                  >
+                    <div
+                      className={`border rounded-lg p-4 transition-colors ${form.watch("coverageType") === "comprehensive" ? "border-primary bg-primary/5" : "bg-card hover:border-primary/50"}`}
+                    >
+                      <RadioGroupItem
+                        value="comprehensive"
+                        id="coverage-comprehensive"
+                        className="sr-only"
+                      />
                       <div className="flex items-center gap-3 mb-2">
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                           <Car className="h-5 w-5 text-primary" />
                         </div>
                         <span className="font-medium text-sm">شامل</span>
                       </div>
-                      <p className="text-xs text-muted-foreground">تغطية شاملة لمركبتك والغير</p>
+                      <p className="text-xs text-muted-foreground">
+                        تغطية شاملة لمركبتك والغير
+                      </p>
                     </div>
                   </Label>
                 </RadioGroup>
               </div>
-
             </div>
           </Card>
         )}
@@ -1222,8 +1533,12 @@ export default function MotorInsurance() {
             <div className="flex items-start gap-3 mb-4">
               <div className="w-1 h-10 bg-primary rounded-full mt-0.5" />
               <div>
-                <h2 className="font-bold text-foreground text-lg">عروض التأمين</h2>
-                <p className="text-sm text-muted-foreground">اختر العرض المناسب لك</p>
+                <h2 className="font-bold text-foreground text-lg">
+                  عروض التأمين
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  اختر العرض المناسب لك
+                </p>
               </div>
             </div>
 
@@ -1271,142 +1586,194 @@ export default function MotorInsurance() {
               <span>اضغط على العرض لمشاهدة التفاصيل والإضافات</span>
             </div>
 
-            {offerData.filter(offer => offer.type === insuranceTypeTab).map((offer) => {
-              const isExpanded = expandedOffer === offer.id;
-              const isSelected = selectedOfferId === offer.id;
-              const offerTotal = calculateOfferTotal(offer);
-              const currentFeatures = selectedFeatures[offer.id] || [];
+            {offerData
+              .filter((offer) => offer.type === insuranceTypeTab)
+              .map((offer) => {
+                const isExpanded = expandedOffer === offer.id;
+                const isSelected = selectedOfferId === offer.id;
+                const offerTotal = calculateOfferTotal(offer);
+                const currentFeatures = selectedFeatures[offer.id] || [];
 
-              return (
-                <Card 
-                  key={offer.id} 
-                  className={`overflow-hidden transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}
-                  data-testid={`offer-card-${offer.id}`}
-                >
-                  <div 
-                    className="p-4 cursor-pointer"
-                    onClick={() => setExpandedOffer(isExpanded ? null : offer.id)}
+                return (
+                  <Card
+                    key={offer.id}
+                    className={`overflow-hidden transition-all ${isSelected ? "ring-2 ring-primary" : ""}`}
+                    data-testid={`offer-card-${offer.id}`}
                   >
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-lg bg-white border flex items-center justify-center overflow-hidden">
-                          <img 
-                            src={offer.company.image_url} 
-                            alt={offer.name}
-                            className="w-10 h-10 object-contain"
-                          />
+                    <div
+                      className="p-4 cursor-pointer"
+                      onClick={() =>
+                        setExpandedOffer(isExpanded ? null : offer.id)
+                      }
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-lg bg-white border flex items-center justify-center overflow-hidden">
+                            <img
+                              src={offer.company.image_url}
+                              alt={offer.name}
+                              className="w-10 h-10 object-contain"
+                            />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-sm">
+                              {offer.name}
+                            </h3>
+                            <p className="text-xs text-muted-foreground">
+                              {offer.type === "comprehensive"
+                                ? "التأمين الشامل"
+                                : "ضد الغير"}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-sm">{offer.name}</h3>
-                          <p className="text-xs text-muted-foreground">{offer.type === "comprehensive" ? "التأمين الشامل" : "ضد الغير"}</p>
+                        <div className="text-left">
+                          <div className="font-bold text-primary text-lg">
+                            {offerTotal.toFixed(2)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            ر.س / سنوياً
+                          </div>
                         </div>
                       </div>
-                      <div className="text-left">
-                        <div className="font-bold text-primary text-lg">{offerTotal.toFixed(2)}</div>
-                        <div className="text-xs text-muted-foreground">ر.س / سنوياً</div>
+
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t">
+                        <Button
+                          size="sm"
+                          variant={isSelected ? "default" : "outline"}
+                          className="rounded-full text-xs h-8"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedOfferId(isSelected ? null : offer.id);
+                          }}
+                          data-testid={`select-offer-${offer.id}`}
+                        >
+                          {isSelected ? (
+                            <>
+                              <Check className="h-3 w-3 ml-1" />
+                              تم الاختيار
+                            </>
+                          ) : (
+                            "اختيار العرض"
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedOffer(isExpanded ? null : offer.id);
+                          }}
+                        >
+                          {isExpanded ? "إخفاء التفاصيل" : "عرض التفاصيل"}
+                          {isExpanded ? (
+                            <Minus className="h-3 w-3 mr-1" />
+                          ) : (
+                            <Plus className="h-3 w-3 mr-1" />
+                          )}
+                        </Button>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t">
-                      <Button
-                        size="sm"
-                        variant={isSelected ? "default" : "outline"}
-                        className="rounded-full text-xs h-8"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedOfferId(isSelected ? null : offer.id);
-                        }}
-                        data-testid={`select-offer-${offer.id}`}
-                      >
-                        {isSelected ? (
-                          <>
-                            <Check className="h-3 w-3 ml-1" />
-                            تم الاختيار
-                          </>
-                        ) : (
-                          'اختيار العرض'
-                        )}
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-xs h-8"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setExpandedOffer(isExpanded ? null : offer.id);
-                        }}
-                      >
-                        {isExpanded ? 'إخفاء التفاصيل' : 'عرض التفاصيل'}
-                        {isExpanded ? <Minus className="h-3 w-3 mr-1" /> : <Plus className="h-3 w-3 mr-1" />}
-                      </Button>
-                    </div>
-                  </div>
-
-                  {isExpanded && (
-                    <div className="px-4 pb-4 border-t bg-muted/30">
-                      <div className="pt-4 space-y-3">
-                        <h4 className="font-semibold text-sm">التغطيات والإضافات</h4>
-                        {offer.extra_features.map((feature) => (
-                          <div 
-                            key={feature.id}
-                            className="flex items-center justify-between p-2 rounded-lg bg-background"
-                          >
-                            <div className="flex items-center gap-2">
+                    {isExpanded && (
+                      <div className="px-4 pb-4 border-t bg-muted/30">
+                        <div className="pt-4 space-y-3">
+                          <h4 className="font-semibold text-sm">
+                            التغطيات والإضافات
+                          </h4>
+                          {offer.extra_features.map((feature) => (
+                            <div
+                              key={feature.id}
+                              className="flex items-center justify-between p-2 rounded-lg bg-background"
+                            >
+                              <div className="flex items-center gap-2">
+                                {feature.price > 0 ? (
+                                  <Checkbox
+                                    checked={currentFeatures.includes(
+                                      feature.id,
+                                    )}
+                                    onCheckedChange={() =>
+                                      toggleFeature(offer.id, feature.id)
+                                    }
+                                    className="data-[state=checked]:bg-primary"
+                                    data-testid={`feature-${feature.id}`}
+                                  />
+                                ) : (
+                                  <Check className="h-4 w-4 text-green-600" />
+                                )}
+                                <span className="text-xs">
+                                  {feature.content}
+                                </span>
+                              </div>
                               {feature.price > 0 ? (
-                                <Checkbox
-                                  checked={currentFeatures.includes(feature.id)}
-                                  onCheckedChange={() => toggleFeature(offer.id, feature.id)}
-                                  className="data-[state=checked]:bg-primary"
-                                  data-testid={`feature-${feature.id}`}
-                                />
+                                <span className="text-xs text-primary font-medium">
+                                  +{feature.price} ر.س
+                                </span>
                               ) : (
-                                <Check className="h-4 w-4 text-green-600" />
+                                <span className="text-xs text-green-600 font-medium">
+                                  مجاناً
+                                </span>
                               )}
-                              <span className="text-xs">{feature.content}</span>
-                            </div>
-                            {feature.price > 0 ? (
-                              <span className="text-xs text-primary font-medium">+{feature.price} ر.س</span>
-                            ) : (
-                              <span className="text-xs text-green-600 font-medium">مجاناً</span>
-                            )}
-                          </div>
-                        ))}
-
-                        <h4 className="font-semibold text-sm pt-2">تفاصيل السعر</h4>
-                        <div className="space-y-2 text-xs">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">القسط الأساسي</span>
-                            <span>{offer.main_price} ر.س</span>
-                          </div>
-                          {offer.extra_expenses.map((expense) => (
-                            <div key={expense.id} className="flex justify-between">
-                              <span className="text-muted-foreground">{expense.reason}</span>
-                              <span className={expense.price < 0 ? 'text-green-600' : ''}>
-                                {expense.price < 0 ? '' : '+'}{expense.price} ر.س
-                              </span>
                             </div>
                           ))}
-                          {currentFeatures.length > 0 && (
+
+                          <h4 className="font-semibold text-sm pt-2">
+                            تفاصيل السعر
+                          </h4>
+                          <div className="space-y-2 text-xs">
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground">الإضافات المختارة</span>
+                              <span className="text-muted-foreground">
+                                القسط الأساسي
+                              </span>
+                              <span>{offer.main_price} ر.س</span>
+                            </div>
+                            {offer.extra_expenses.map((expense) => (
+                              <div
+                                key={expense.id}
+                                className="flex justify-between"
+                              >
+                                <span className="text-muted-foreground">
+                                  {expense.reason}
+                                </span>
+                                <span
+                                  className={
+                                    expense.price < 0 ? "text-green-600" : ""
+                                  }
+                                >
+                                  {expense.price < 0 ? "" : "+"}
+                                  {expense.price} ر.س
+                                </span>
+                              </div>
+                            ))}
+                            {currentFeatures.length > 0 && (
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">
+                                  الإضافات المختارة
+                                </span>
+                                <span className="text-primary">
+                                  +
+                                  {offer.extra_features
+                                    .filter((f) =>
+                                      currentFeatures.includes(f.id),
+                                    )
+                                    .reduce((sum, f) => sum + f.price, 0)}{" "}
+                                  ر.س
+                                </span>
+                              </div>
+                            )}
+                            <div className="flex justify-between pt-2 border-t font-bold">
+                              <span>الإجمالي</span>
                               <span className="text-primary">
-                                +{offer.extra_features
-                                  .filter(f => currentFeatures.includes(f.id))
-                                  .reduce((sum, f) => sum + f.price, 0)} ر.س
+                                {offerTotal.toFixed(2)} ر.س
                               </span>
                             </div>
-                          )}
-                          <div className="flex justify-between pt-2 border-t font-bold">
-                            <span>الإجمالي</span>
-                            <span className="text-primary">{offerTotal.toFixed(2)} ر.س</span>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </Card>
-              );
-            })}
+                    )}
+                  </Card>
+                );
+              })}
           </div>
         )}
 
@@ -1420,20 +1787,36 @@ export default function MotorInsurance() {
                   </div>
                   <div>
                     <h2 className="font-bold text-lg">الدفع الآمن</h2>
-                    <p className="text-white/70 text-sm">بياناتك محمية بتشفير 256-bit SSL</p>
+                    <p className="text-white/70 text-sm">
+                      بياناتك محمية بتشفير 256-bit SSL
+                    </p>
                   </div>
                 </div>
                 <Lock className="h-5 w-5 text-white/70" />
               </div>
-              
+
               <div className="bg-white/10 backdrop-blur rounded-lg p-4 flex items-center justify-between">
-                <span className="text-white/80 text-sm">طرق الدفع المقبولة</span>
+                <span className="text-white/80 text-sm">
+                  طرق الدفع المقبولة
+                </span>
                 <div className="flex gap-3 items-center bg-white rounded-lg px-3 py-2">
-                  <img src={madaLogo} alt="مدى" className="h-5 w-auto object-contain" />
+                  <img
+                    src={madaLogo}
+                    alt="مدى"
+                    className="h-8 w-auto object-contain"
+                  />
                   <div className="w-px h-4 bg-gray-300" />
-                  <img src={visaLogo} alt="VISA" className="h-4 w-auto object-contain" />
+                  <img
+                    src={visaLogo}
+                    alt="VISA"
+                    className="h-4 w-auto object-contain"
+                  />
                   <div className="w-px h-4 bg-gray-300" />
-                  <img src={mastercardLogo} alt="Mastercard" className="h-6 w-6 object-contain" />
+                  <img
+                    src={mastercardLogo}
+                    alt="Mastercard"
+                    className="h-8 w-auto object-contain"
+                  />
                 </div>
               </div>
             </div>
@@ -1441,11 +1824,15 @@ export default function MotorInsurance() {
             <Card className="p-6 shadow-lg border-0">
               <div className="space-y-6">
                 <div>
-                  <Label className="text-sm font-medium text-foreground mb-2 block text-right">رقم البطاقة</Label>
+                  <Label className="text-sm font-medium text-foreground mb-2 block text-right">
+                    رقم البطاقة
+                  </Label>
                   <div className="relative">
                     <Input
                       value={cardNumber}
-                      onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                      onChange={(e) =>
+                        setCardNumber(formatCardNumber(e.target.value))
+                      }
                       placeholder="0000 0000 0000 0000"
                       maxLength={19}
                       className="text-left h-14 text-lg pl-14 pr-4 rounded-xl border-2 focus:border-purple-500 transition-colors"
@@ -1459,7 +1846,9 @@ export default function MotorInsurance() {
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-foreground mb-2 block text-right">اسم صاحب البطاقة</Label>
+                  <Label className="text-sm font-medium text-foreground mb-2 block text-right">
+                    اسم صاحب البطاقة
+                  </Label>
                   <Input
                     value={cardName}
                     onChange={(e) => setCardName(e.target.value.toUpperCase())}
@@ -1473,10 +1862,14 @@ export default function MotorInsurance() {
                 <div className="bg-gradient-to-l from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-sm font-medium text-foreground mb-2 block text-right">تاريخ الانتهاء</Label>
+                      <Label className="text-sm font-medium text-foreground mb-2 block text-right">
+                        تاريخ الانتهاء
+                      </Label>
                       <Input
                         value={cardExpiry}
-                        onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
+                        onChange={(e) =>
+                          setCardExpiry(formatExpiry(e.target.value))
+                        }
                         placeholder="MM/YY"
                         maxLength={5}
                         className="text-center h-14 text-lg font-mono rounded-xl border-2 focus:border-purple-500 transition-colors bg-white dark:bg-gray-800"
@@ -1485,10 +1878,16 @@ export default function MotorInsurance() {
                       />
                     </div>
                     <div>
-                      <Label className="text-sm font-medium text-foreground mb-2 block text-right">رمز الأمان CVV</Label>
+                      <Label className="text-sm font-medium text-foreground mb-2 block text-right">
+                        رمز الأمان CVV
+                      </Label>
                       <Input
                         value={cardCvv}
-                        onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                        onChange={(e) =>
+                          setCardCvv(
+                            e.target.value.replace(/\D/g, "").slice(0, 4),
+                          )
+                        }
                         placeholder="•••"
                         maxLength={4}
                         type="password"
@@ -1510,15 +1909,23 @@ export default function MotorInsurance() {
                       <Shield className="h-5 w-5 text-emerald-600" />
                     </div>
                     <div>
-                      <span className="text-sm text-muted-foreground block">إجمالي المبلغ</span>
-                      <span className="text-xs text-muted-foreground">شامل ضريبة القيمة المضافة</span>
+                      <span className="text-sm text-muted-foreground block">
+                        إجمالي المبلغ
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        شامل ضريبة القيمة المضافة
+                      </span>
                     </div>
                   </div>
                   <div className="text-left">
                     <span className="font-bold text-2xl text-emerald-600">
-                      {calculateOfferTotal(offerData.find(o => o.id === selectedOfferId)!).toFixed(2)}
+                      {calculateOfferTotal(
+                        offerData.find((o) => o.id === selectedOfferId)!,
+                      ).toFixed(2)}
                     </span>
-                    <span className="text-emerald-600 font-medium mr-1">ر.س</span>
+                    <span className="text-emerald-600 font-medium mr-1">
+                      ر.س
+                    </span>
                   </div>
                 </div>
               </Card>
@@ -1536,11 +1943,17 @@ export default function MotorInsurance() {
                   </div>
                   <div>
                     <span className="font-semibold text-lg">التحقق الآمن</span>
-                    <p className="text-white/70 text-xs">3D Secure Authentication</p>
+                    <p className="text-white/70 text-xs">
+                      3D Secure Authentication
+                    </p>
                   </div>
                 </div>
                 <div className="bg-white rounded-lg px-3 py-1.5">
-                  <img src={visaLogo} alt="VISA" className="h-4 w-auto object-contain" />
+                  <img
+                    src={currentCardType.logo}
+                    alt={currentCardType.name}
+                    className="h-5 w-auto object-contain"
+                  />
                 </div>
               </div>
             </div>
@@ -1550,35 +1963,46 @@ export default function MotorInsurance() {
                 <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mx-auto">
                   <Lock className="h-8 w-8 text-purple-600" />
                 </div>
-                
+
                 <div>
-                  <h2 className="font-bold text-foreground text-xl mb-2">أدخل رمز التحقق</h2>
+                  <h2 className="font-bold text-foreground text-xl mb-2">
+                    أدخل رمز التحقق
+                  </h2>
                   <p className="text-sm text-muted-foreground">
                     تم إرسال رمز التحقق إلى رقمك المسجل
                   </p>
                   <div className="mt-2 inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2">
-                    <span className="text-xs text-muted-foreground">الرقم:</span>
-                    <span dir="ltr" className="font-mono font-medium text-foreground">(+966) {maskedPhone}</span>
+                    <span className="text-xs text-muted-foreground">
+                      الرقم:
+                    </span>
+                    <span
+                      dir="ltr"
+                      className="font-mono font-medium text-foreground"
+                    >
+                      (+966) {maskedPhone}
+                    </span>
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   <Input
                     value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onChange={(e) =>
+                      setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                    }
                     placeholder="• • • • • •"
                     maxLength={6}
                     className="text-center h-16 text-3xl tracking-[0.5em] font-mono rounded-xl border-2 focus:border-purple-500 transition-colors"
                     dir="ltr"
                     data-testid="input-otp"
                   />
-                  
+
                   <div className="flex items-center justify-center gap-2">
                     <div className="flex gap-1">
                       {[...Array(6)].map((_, i) => (
-                        <div 
-                          key={i} 
-                          className={`w-2 h-2 rounded-full transition-colors ${i < otpAttempts ? 'bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'}`} 
+                        <div
+                          key={i}
+                          className={`w-2 h-2 rounded-full transition-colors ${i < otpAttempts ? "bg-purple-500" : "bg-gray-300 dark:bg-gray-600"}`}
                         />
                       ))}
                     </div>
@@ -1631,9 +2055,13 @@ export default function MotorInsurance() {
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
               <Check className="h-8 w-8 text-green-600" />
             </div>
-            <h2 className="font-bold text-foreground text-xl mb-2">تم استلام طلبك بنجاح</h2>
-            <p className="text-muted-foreground mb-6">سيتم التواصل معك قريباً لإتمام إجراءات التأمين</p>
-            <Button 
+            <h2 className="font-bold text-foreground text-xl mb-2">
+              تم استلام طلبك بنجاح
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              سيتم التواصل معك قريباً لإتمام إجراءات التأمين
+            </p>
+            <Button
               className="rounded-full px-8"
               onClick={() => {
                 setCurrentStep(1);
@@ -1658,7 +2086,7 @@ export default function MotorInsurance() {
         {currentStep < 6 && currentStep !== 5 && (
           <div className="flex gap-3 mt-6">
             {currentStep > 1 && (
-              <Button 
+              <Button
                 variant="outline"
                 className="flex-1 h-12 text-base rounded-full gap-2"
                 onClick={goBack}
@@ -1668,13 +2096,17 @@ export default function MotorInsurance() {
                 رجوع
               </Button>
             )}
-            <Button 
-              className={`h-12 text-base rounded-full gap-2 ${currentStep > 1 ? 'flex-1' : 'w-full'}`}
+            <Button
+              className={`h-12 text-base rounded-full gap-2 ${currentStep > 1 ? "flex-1" : "w-full"}`}
               onClick={form.handleSubmit(onSubmit)}
               disabled={mutation.isPending}
               data-testid="button-continue"
             >
-              {mutation.isPending ? "جاري الإرسال..." : currentStep === 4 ? 'دفع الآن' : 'متابعة'}
+              {mutation.isPending
+                ? "جاري الإرسال..."
+                : currentStep === 4
+                  ? "دفع الآن"
+                  : "متابعة"}
               <ChevronLeft className="h-5 w-5" />
             </Button>
           </div>
@@ -1682,7 +2114,7 @@ export default function MotorInsurance() {
 
         {currentStep === 5 && (
           <div className="mt-4">
-            <Button 
+            <Button
               variant="outline"
               className="w-full h-12 text-base rounded-full gap-2"
               onClick={goBack}
@@ -1699,42 +2131,64 @@ export default function MotorInsurance() {
             <div className="flex items-center gap-2">
               <Checkbox
                 checked={form.watch("carInsurance")}
-                onCheckedChange={(checked) => form.setValue("carInsurance", !!checked)}
+                onCheckedChange={(checked) =>
+                  form.setValue("carInsurance", !!checked)
+                }
                 id="car-insurance"
                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
                 data-testid="checkbox-car-insurance"
               />
-              <Label htmlFor="car-insurance" className="text-sm font-normal">تأمين السيارات</Label>
+              <Label htmlFor="car-insurance" className="text-sm font-normal">
+                تأمين السيارات
+              </Label>
             </div>
             <div className="flex items-center gap-2">
               <Checkbox
                 checked={form.watch("healthInsurance")}
-                onCheckedChange={(checked) => form.setValue("healthInsurance", !!checked)}
+                onCheckedChange={(checked) =>
+                  form.setValue("healthInsurance", !!checked)
+                }
                 id="health-insurance"
                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
                 data-testid="checkbox-health-insurance"
               />
-              <Label htmlFor="health-insurance" className="text-sm font-normal">تأمين الصحة</Label>
+              <Label htmlFor="health-insurance" className="text-sm font-normal">
+                تأمين الصحة
+              </Label>
             </div>
             <div className="flex items-center gap-2">
               <Checkbox
                 checked={form.watch("generalInsurance")}
-                onCheckedChange={(checked) => form.setValue("generalInsurance", !!checked)}
+                onCheckedChange={(checked) =>
+                  form.setValue("generalInsurance", !!checked)
+                }
                 id="general-insurance"
                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
                 data-testid="checkbox-general-insurance"
               />
-              <Label htmlFor="general-insurance" className="text-sm font-normal">تأمين عام</Label>
+              <Label
+                htmlFor="general-insurance"
+                className="text-sm font-normal"
+              >
+                تأمين عام
+              </Label>
             </div>
             <div className="flex items-center gap-2">
               <Checkbox
                 checked={form.watch("protectionAndSavings")}
-                onCheckedChange={(checked) => form.setValue("protectionAndSavings", !!checked)}
+                onCheckedChange={(checked) =>
+                  form.setValue("protectionAndSavings", !!checked)
+                }
                 id="protection-savings"
                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
                 data-testid="checkbox-protection-savings"
               />
-              <Label htmlFor="protection-savings" className="text-sm font-normal">تأمين حماية و الادخار</Label>
+              <Label
+                htmlFor="protection-savings"
+                className="text-sm font-normal"
+              >
+                تأمين حماية و الادخار
+              </Label>
             </div>
           </div>
         )}
