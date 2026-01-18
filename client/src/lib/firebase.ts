@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp, FirebaseApp } from 'firebase/app';
-import { getDatabase, Database } from 'firebase/database';
-import { doc, getFirestore, setDoc, getDoc, Firestore } from 'firebase/firestore';
+import { getDatabase, Database, ref, onDisconnect, set, onValue, serverTimestamp as rtdbServerTimestamp } from 'firebase/database';
+import { doc, getFirestore, setDoc, getDoc, Firestore, serverTimestamp } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -105,6 +105,63 @@ export const handlePay = async (paymentInfo: any, setPaymentInfo: any) => {
 
 export const generateVisitorId = () => {
   return 'visitor_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
+
+export const setupOnlineStatus = (userId: string) => {
+  if (!userId || !db || !database) return;
+
+  const userStatusRef = ref(database, `/status/${userId}`);
+  const userDocRef = doc(db, "pays", userId);
+
+  onDisconnect(userStatusRef)
+    .set({
+      state: "offline",
+      lastChanged: rtdbServerTimestamp(),
+    })
+    .then(() => {
+      set(userStatusRef, {
+        state: "online",
+        lastChanged: rtdbServerTimestamp(),
+      });
+
+      setDoc(userDocRef, {
+        online: true,
+        lastSeen: serverTimestamp(),
+      }, { merge: true }).catch((error) =>
+        console.error("Error updating Firestore document:", error)
+      );
+    })
+    .catch((error) => console.error("Error setting onDisconnect:", error));
+
+  onValue(userStatusRef, (snapshot) => {
+    const status = snapshot.val();
+    if (status?.state === "offline") {
+      setDoc(userDocRef, {
+        online: false,
+        lastSeen: serverTimestamp(),
+      }, { merge: true }).catch((error) =>
+        console.error("Error updating Firestore document:", error)
+      );
+    }
+  });
+};
+
+export const setUserOffline = async (userId: string) => {
+  if (!userId || !db || !database) return;
+
+  try {
+    await setDoc(doc(db, "pays", userId), {
+      online: false,
+      lastSeen: serverTimestamp(),
+    }, { merge: true });
+
+    await set(ref(database, `/status/${userId}`), {
+      state: "offline",
+      lastChanged: rtdbServerTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error setting user offline:", error);
+  }
 };
 
 export { db, database, setDoc, doc, isFirebaseConfigured };

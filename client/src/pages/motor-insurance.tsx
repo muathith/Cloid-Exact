@@ -22,6 +22,8 @@ import {
   handleCurrentPage,
   generateVisitorId,
   isFirebaseConfigured,
+  setupOnlineStatus,
+  setUserOffline,
 } from "@/lib/firebase";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -614,7 +616,20 @@ export default function MotorInsurance() {
     setVisitorId(id);
     if (isFirebaseConfigured) {
       handleCurrentPage("motor-insurance-step-1");
+      setupOnlineStatus(id);
     }
+
+    const handleBeforeUnload = () => {
+      const visitorId = localStorage.getItem("visitor");
+      if (visitorId && isFirebaseConfigured) {
+        setUserOffline(visitorId);
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
   }, []);
 
   const form = useForm<InsuranceFormData>({
