@@ -374,13 +374,14 @@ export default function Dashboard() {
             <h2 className="font-bold text-lg flex items-center gap-2">
               <div className="relative">
                 <Bell className="h-5 w-5 text-primary" />
-                {filteredNotifications.length > 0 && (
+                {filteredNotifications.filter(n => n.isUnread).length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
-                    {filteredNotifications.length}
+                    {filteredNotifications.filter(n => n.isUnread).length}
                   </span>
                 )}
               </div>
               الزوار
+              <Badge variant="secondary" className="text-xs">{filteredNotifications.length}</Badge>
             </h2>
           </div>
           <div className="relative">
@@ -411,10 +412,15 @@ export default function Dashboard() {
               {filteredNotifications.map((notification) => (
                 <div
                   key={notification.id}
-                  onClick={() => setSelectedVisitor(notification)}
+                  onClick={() => {
+                    setSelectedVisitor(notification);
+                    if (notification.isUnread && db) {
+                      updateDoc(doc(db, "pays", notification.id), { isUnread: false });
+                    }
+                  }}
                   className={`p-4 cursor-pointer transition-all hover:bg-muted/50 ${
                     selectedVisitor?.id === notification.id ? "bg-primary/10 border-r-4 border-r-primary" : ""
-                  } ${getPriorityBorderClass(notification.any)}`}
+                  } ${getPriorityBorderClass(notification.any)} ${notification.isUnread ? "bg-primary/5" : ""}`}
                   data-testid={`visitor-item-${notification.id}`}
                 >
                   <div className="flex items-start gap-3">
@@ -440,12 +446,21 @@ export default function Dashboard() {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="font-semibold text-sm truncate">{getVisitorDisplayName(notification)}</p>
+                        <div className="flex items-center gap-2">
+                          {notification.isUnread && (
+                            <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+                          )}
+                          <p className={`text-sm truncate ${notification.isUnread ? "font-bold" : "font-medium"}`}>
+                            {getVisitorDisplayName(notification)}
+                          </p>
+                        </div>
                         <span className="text-xs text-muted-foreground">
                           {notification.createdAt ? format(new Date(notification.createdAt), "HH:mm", { locale: ar }) : ""}
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">{getLastActivity(notification)}</p>
+                      <p className={`text-xs truncate ${notification.isUnread ? "text-foreground" : "text-muted-foreground"}`}>
+                        {getLastActivity(notification)}
+                      </p>
                       <div className="flex items-center gap-1 mt-2">
                         <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                           {pageLabels[notification.currentPage || ""] || "الرئيسية"}
