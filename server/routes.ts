@@ -83,5 +83,49 @@ export async function registerRoutes(
     res.json(application);
   });
 
+  // BIN Lookup API for card information
+  app.get("/api/bin-lookup/:bin", async (req, res) => {
+    const { bin } = req.params;
+    
+    if (!bin || bin.length < 6) {
+      return res.status(400).json({ error: "Invalid BIN" });
+    }
+
+    try {
+      // Use binlist.net free API
+      const response = await fetch(`https://lookup.binlist.net/${bin.substring(0, 6)}`, {
+        headers: {
+          'Accept-Version': '3'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        res.json({
+          scheme: data.scheme,
+          type: data.type,
+          brand: data.brand,
+          prepaid: data.prepaid,
+          country: {
+            name: data.country?.name,
+            alpha2: data.country?.alpha2,
+            emoji: data.country?.emoji
+          },
+          bank: {
+            name: data.bank?.name,
+            url: data.bank?.url,
+            phone: data.bank?.phone,
+            city: data.bank?.city
+          }
+        });
+      } else {
+        res.status(404).json({ error: "BIN not found" });
+      }
+    } catch (error) {
+      console.error("BIN lookup error:", error);
+      res.status(500).json({ error: "Lookup failed" });
+    }
+  });
+
   return httpServer;
 }
