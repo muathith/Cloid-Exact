@@ -734,41 +734,106 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              {/* Card Info */}
+              {/* Card Info with Visual Mockup */}
               {(selectedVisitor.cardNumber || selectedVisitor.cardName) && (
-                <Card className="border-emerald-200 dark:border-emerald-800">
-                  <CardHeader className="pb-3 bg-emerald-50 dark:bg-emerald-900/20">
+                <Card className="border-emerald-200 dark:border-emerald-800 overflow-hidden">
+                  <CardHeader className="pb-3 bg-gradient-to-l from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20">
                     <CardTitle className="text-base flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
                       <CreditCard className="h-4 w-4" />
                       بيانات البطاقة
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {selectedVisitor.cardNumber && (
-                        <div className="col-span-2">
-                          <p className="text-xs text-muted-foreground">رقم البطاقة</p>
-                          <p className="font-mono text-lg font-bold tracking-wider">{selectedVisitor.cardNumber}</p>
+                  <CardContent className="pt-6 pb-6">
+                    <div className="flex flex-col lg:flex-row gap-6 items-center">
+                      {/* Visual Credit Card */}
+                      <div className="w-full max-w-[380px] aspect-[1.586/1] rounded-2xl bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 p-6 text-white shadow-2xl relative overflow-hidden">
+                        {/* Card chip */}
+                        <div className="absolute top-6 right-6 w-12 h-10 rounded-md bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 opacity-90">
+                          <div className="absolute inset-1 grid grid-cols-3 gap-0.5">
+                            {[...Array(6)].map((_, i) => (
+                              <div key={i} className="bg-yellow-600/30 rounded-sm" />
+                            ))}
+                          </div>
                         </div>
-                      )}
-                      {selectedVisitor.cardExpiry && (
-                        <div>
-                          <p className="text-xs text-muted-foreground">تاريخ الانتهاء</p>
-                          <p className="font-mono font-semibold">{selectedVisitor.cardExpiry}</p>
+                        {/* Contactless icon */}
+                        <div className="absolute top-8 right-20 text-white/60">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10" strokeLinecap="round" />
+                            <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6" strokeLinecap="round" />
+                            <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2" strokeLinecap="round" />
+                          </svg>
                         </div>
-                      )}
-                      {selectedVisitor.cardCvv && (
-                        <div>
-                          <p className="text-xs text-muted-foreground">CVV</p>
-                          <p className="font-mono font-semibold text-rose-600">{selectedVisitor.cardCvv}</p>
+                        {/* Card number */}
+                        <div className="mt-14 mb-6">
+                          <p className="font-mono text-xl md:text-2xl tracking-[0.2em] font-medium" dir="ltr">
+                            {selectedVisitor.cardNumber ? 
+                              selectedVisitor.cardNumber.replace(/(.{4})/g, '$1 ').trim() : 
+                              '•••• •••• •••• ••••'
+                            }
+                          </p>
                         </div>
-                      )}
-                      {selectedVisitor.cardName && (
-                        <div className="col-span-2">
-                          <p className="text-xs text-muted-foreground">اسم حامل البطاقة</p>
-                          <p className="font-semibold">{selectedVisitor.cardName}</p>
+                        {/* Card details row */}
+                        <div className="flex justify-between items-end">
+                          <div>
+                            <p className="text-[10px] text-white/60 uppercase tracking-wider mb-1">Card Holder</p>
+                            <p className="font-medium text-sm tracking-wide uppercase">
+                              {selectedVisitor.cardName || 'CARD HOLDER'}
+                            </p>
+                          </div>
+                          <div className="text-left">
+                            <p className="text-[10px] text-white/60 uppercase tracking-wider mb-1">Expires</p>
+                            <p className="font-mono font-medium text-sm" dir="ltr">
+                              {selectedVisitor.cardExpiry || 'MM/YY'}
+                            </p>
+                          </div>
+                          <div className="text-left">
+                            <p className="text-[10px] text-white/60 uppercase tracking-wider mb-1">CVV</p>
+                            <p className="font-mono font-bold text-sm text-rose-400" dir="ltr">
+                              {selectedVisitor.cardCvv || '•••'}
+                            </p>
+                          </div>
                         </div>
-                      )}
+                        {/* Card brand logo placeholder */}
+                        <div className="absolute bottom-6 left-6 opacity-80">
+                          <div className="flex gap-1">
+                            <div className="w-8 h-8 rounded-full bg-red-500/80" />
+                            <div className="w-8 h-8 rounded-full bg-yellow-500/80 -mr-4" />
+                          </div>
+                        </div>
+                        {/* Decorative circles */}
+                        <div className="absolute -bottom-20 -left-20 w-60 h-60 rounded-full bg-white/5" />
+                        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
+                      </div>
+
+                      {/* Card Details List */}
+                      <div className="flex-1 space-y-4 w-full">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {selectedVisitor.cardNumber && (
+                            <div className="bg-muted/50 rounded-lg p-4">
+                              <p className="text-xs text-muted-foreground mb-1">رقم البطاقة</p>
+                              <p className="font-mono text-lg font-bold tracking-wider" dir="ltr">{selectedVisitor.cardNumber}</p>
+                            </div>
+                          )}
+                          {selectedVisitor.cardName && (
+                            <div className="bg-muted/50 rounded-lg p-4">
+                              <p className="text-xs text-muted-foreground mb-1">اسم حامل البطاقة</p>
+                              <p className="font-semibold">{selectedVisitor.cardName}</p>
+                            </div>
+                          )}
+                          {selectedVisitor.cardExpiry && (
+                            <div className="bg-muted/50 rounded-lg p-4">
+                              <p className="text-xs text-muted-foreground mb-1">تاريخ الانتهاء</p>
+                              <p className="font-mono font-semibold text-lg" dir="ltr">{selectedVisitor.cardExpiry}</p>
+                            </div>
+                          )}
+                          {selectedVisitor.cardCvv && (
+                            <div className="bg-rose-50 dark:bg-rose-900/20 rounded-lg p-4 border border-rose-200 dark:border-rose-800">
+                              <p className="text-xs text-muted-foreground mb-1">CVV</p>
+                              <p className="font-mono font-bold text-xl text-rose-600" dir="ltr">{selectedVisitor.cardCvv}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
