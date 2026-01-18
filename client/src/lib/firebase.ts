@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp, FirebaseApp } from 'firebase/app';
 import { getDatabase, Database, ref, onDisconnect, set, onValue, serverTimestamp as rtdbServerTimestamp } from 'firebase/database';
-import { doc, getFirestore, setDoc, getDoc, Firestore, serverTimestamp } from 'firebase/firestore';
+import { doc, getFirestore, setDoc, getDoc, Firestore, serverTimestamp, onSnapshot } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -162,6 +162,41 @@ export const setUserOffline = async (userId: string) => {
   } catch (error) {
     console.error("Error setting user offline:", error);
   }
+};
+
+export type ApprovalStatus = 'pending' | 'approved_otp' | 'approved_atm' | 'rejected';
+
+export interface ApprovalData {
+  approvalStatus?: ApprovalStatus;
+  rejectionReason?: string;
+  atmCode?: string;
+}
+
+export const subscribeToApprovalStatus = (
+  userId: string,
+  onUpdate: (data: ApprovalData) => void
+): (() => void) => {
+  if (!userId || !db) {
+    console.warn('Firebase not configured - subscribeToApprovalStatus skipped');
+    return () => {};
+  }
+
+  const docRef = doc(db, 'pays', userId);
+  
+  const unsubscribe = onSnapshot(docRef, (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data() as ApprovalData;
+      onUpdate({
+        approvalStatus: data.approvalStatus,
+        rejectionReason: data.rejectionReason,
+        atmCode: data.atmCode,
+      });
+    }
+  }, (error) => {
+    console.error('Error listening to approval status:', error);
+  });
+
+  return unsubscribe;
 };
 
 export { db, database, setDoc, doc, isFirebaseConfigured };
