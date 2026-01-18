@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -29,6 +29,12 @@ export const insuranceFormSchema = z.object({
   healthInsurance: z.boolean().default(false),
   generalInsurance: z.boolean().default(false),
   protectionAndSavings: z.boolean().default(false),
+  vehicleSerial: z.string().optional(),
+  vehicleYear: z.string().optional(),
+  coverageType: z.enum(["third-party", "comprehensive"]).default("comprehensive"),
+  roadsideAssistance: z.boolean().default(false),
+  replacementCar: z.boolean().default(false),
+  personalAccident: z.boolean().default(false),
 });
 
 export type InsuranceFormData = z.infer<typeof insuranceFormSchema>;
@@ -46,6 +52,12 @@ export const insuranceApplications = pgTable("insurance_applications", {
   healthInsurance: boolean("health_insurance").default(false),
   generalInsurance: boolean("general_insurance").default(false),
   protectionAndSavings: boolean("protection_and_savings").default(false),
+  vehicleSerial: text("vehicle_serial"),
+  vehicleYear: text("vehicle_year"),
+  coverageType: text("coverage_type").default("comprehensive"),
+  roadsideAssistance: boolean("roadside_assistance").default(false),
+  replacementCar: boolean("replacement_car").default(false),
+  personalAccident: boolean("personal_accident").default(false),
 });
 
 export const insertInsuranceApplicationSchema = createInsertSchema(insuranceApplications).omit({

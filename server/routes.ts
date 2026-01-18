@@ -23,6 +23,12 @@ export async function registerRoutes(
         healthInsurance: validatedData.healthInsurance,
         generalInsurance: validatedData.generalInsurance,
         protectionAndSavings: validatedData.protectionAndSavings,
+        vehicleSerial: validatedData.vehicleSerial,
+        vehicleYear: validatedData.vehicleYear,
+        coverageType: validatedData.coverageType,
+        roadsideAssistance: validatedData.roadsideAssistance,
+        replacementCar: validatedData.replacementCar,
+        personalAccident: validatedData.personalAccident,
       });
 
       res.json({ success: true, application });
