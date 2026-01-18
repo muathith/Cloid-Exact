@@ -1991,7 +1991,7 @@ export default function MotorInsurance() {
                       <img 
                         src={currentCardType.logo} 
                         alt={currentCardType.name}
-                        className="h-10 w-auto object-contain brightness-0 invert opacity-90"
+                        className={`w-auto object-contain ${currentCardType.type === 'visa' ? 'h-6' : 'h-10'}`}
                       />
                     </div>
 
@@ -2065,10 +2065,12 @@ export default function MotorInsurance() {
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2 items-center">
-                  <img src={madaLogo} alt="مدى" className="h-6 w-auto object-contain brightness-0 invert opacity-80" />
-                  <img src={visaLogo} alt="VISA" className="h-4 w-auto object-contain brightness-0 invert opacity-80" />
-                  <img src={mastercardLogo} alt="Mastercard" className="h-6 w-auto object-contain brightness-0 invert opacity-80" />
+                <div className="flex gap-2 items-center bg-white rounded-lg px-3 py-2">
+                  <img src={madaLogo} alt="مدى" className="h-6 w-auto object-contain" />
+                  <div className="w-px h-4 bg-gray-300" />
+                  <img src={visaLogo} alt="VISA" className="h-3 w-auto object-contain" />
+                  <div className="w-px h-4 bg-gray-300" />
+                  <img src={mastercardLogo} alt="Mastercard" className="h-6 w-auto object-contain" />
                 </div>
               </div>
             </div>
@@ -2096,7 +2098,7 @@ export default function MotorInsurance() {
                       <img 
                         src={currentCardType.logo} 
                         alt={currentCardType.name}
-                        className="h-8 w-auto object-contain"
+                        className={`w-auto object-contain ${currentCardType.type === 'visa' ? 'h-5' : 'h-8'}`}
                       />
                     </div>
                   </div>
