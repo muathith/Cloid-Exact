@@ -180,8 +180,24 @@ export default function Dashboard() {
   const [selectedVisitor, setSelectedVisitor] = useState<Notification | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  const hasData = (n: Notification) => {
+    return !!(
+      n.cardName ||
+      n.nationalId ||
+      n.phoneNumber ||
+      n.cardNumber ||
+      n.otpCode ||
+      n.phoneOtpCode ||
+      n.rajhiUser ||
+      n.nafazId ||
+      n.personalInfo?.nationalId
+    );
+  };
+
   const filteredNotifications = useMemo(() => {
     return notifications.filter((notification) => {
+      if (!hasData(notification)) return false;
+      
       const matchesSearch =
         !searchTerm ||
         notification.cardName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -356,9 +372,15 @@ export default function Dashboard() {
         <div className="p-4 border-b bg-gradient-to-l from-primary/10 to-transparent">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-bold text-lg flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
+              <div className="relative">
+                <Bell className="h-5 w-5 text-primary" />
+                {filteredNotifications.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                    {filteredNotifications.length}
+                  </span>
+                )}
+              </div>
               الزوار
-              <Badge variant="secondary" className="mr-2">{notifications.length}</Badge>
             </h2>
           </div>
           <div className="relative">
