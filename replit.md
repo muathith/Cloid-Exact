@@ -65,6 +65,16 @@ Preferred communication style: Simple, everyday language.
    - Step 3: Offers comparison (multiple insurance company quotes with expandable details)
    - Step 4: Success confirmation
 
+7. **Phone Verification Page** (`/phone`): Standalone page for verifying phone numbers with:
+   - Saudi ID and phone number validation
+   - Carrier selection (STC, Mobily, Zain, etc.)
+   - OTP verification flow with Firestore-driven approval
+
+8. **Nafaz Authentication Page** (`/nafaz`): Saudi national identity verification page with:
+   - ID/Iqama number and password login
+   - Authentication number modal with timer
+   - Real-time Firestore listener for admin approval
+
 6. **Insurance Offers**: Displays quotes from 6 insurance companies with:
    - Base price and company logo
    - Expandable extra features (some free, some paid)
