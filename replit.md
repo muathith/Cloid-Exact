@@ -59,6 +59,18 @@ Preferred communication style: Simple, everyday language.
 
 4. **Storage Abstraction**: The `IStorage` interface in `storage.ts` abstracts database operations, making it easier to swap implementations if needed.
 
+5. **Multi-Step Insurance Form**: The motor insurance application uses a 4-step flow:
+   - Step 1: Personal details (National ID, birth date, phone)
+   - Step 2: Vehicle details (serial number, year, coverage type, optional add-ons)
+   - Step 3: Offers comparison (multiple insurance company quotes with expandable details)
+   - Step 4: Success confirmation
+
+6. **Insurance Offers**: Displays quotes from 6 insurance companies with:
+   - Base price and company logo
+   - Expandable extra features (some free, some paid)
+   - Price breakdown with discounts and VAT
+   - Dynamic total calculation based on selected add-ons
+
 ## External Dependencies
 
 ### Database
