@@ -370,6 +370,92 @@ const offerData = [
 
 type SelectedFeatures = { [offerId: string]: string[] };
 
+const carLogos: { [key: string]: string } = {
+  "تويوتا": "https://www.carlogos.org/car-logos/toyota-logo-2020-europe.png",
+  "toyota": "https://www.carlogos.org/car-logos/toyota-logo-2020-europe.png",
+  "هوندا": "https://www.carlogos.org/car-logos/honda-logo-2000.png",
+  "honda": "https://www.carlogos.org/car-logos/honda-logo-2000.png",
+  "نيسان": "https://www.carlogos.org/car-logos/nissan-logo-2020.png",
+  "nissan": "https://www.carlogos.org/car-logos/nissan-logo-2020.png",
+  "هيونداي": "https://www.carlogos.org/car-logos/hyundai-logo-2011.png",
+  "hyundai": "https://www.carlogos.org/car-logos/hyundai-logo-2011.png",
+  "كيا": "https://www.carlogos.org/car-logos/kia-logo-2021.png",
+  "kia": "https://www.carlogos.org/car-logos/kia-logo-2021.png",
+  "شيفروليه": "https://www.carlogos.org/car-logos/chevrolet-logo-2013.png",
+  "chevrolet": "https://www.carlogos.org/car-logos/chevrolet-logo-2013.png",
+  "فورد": "https://www.carlogos.org/car-logos/ford-logo-2017.png",
+  "ford": "https://www.carlogos.org/car-logos/ford-logo-2017.png",
+  "جي ام سي": "https://www.carlogos.org/car-logos/gmc-logo-2200x600.png",
+  "gmc": "https://www.carlogos.org/car-logos/gmc-logo-2200x600.png",
+  "مرسيدس": "https://www.carlogos.org/car-logos/mercedes-benz-logo-2011.png",
+  "mercedes": "https://www.carlogos.org/car-logos/mercedes-benz-logo-2011.png",
+  "بي ام دبليو": "https://www.carlogos.org/car-logos/bmw-logo-2020.png",
+  "bmw": "https://www.carlogos.org/car-logos/bmw-logo-2020.png",
+  "أودي": "https://www.carlogos.org/car-logos/audi-logo-2016.png",
+  "audi": "https://www.carlogos.org/car-logos/audi-logo-2016.png",
+  "لكزس": "https://www.carlogos.org/car-logos/lexus-logo-1988.png",
+  "lexus": "https://www.carlogos.org/car-logos/lexus-logo-1988.png",
+  "مازدا": "https://www.carlogos.org/car-logos/mazda-logo-2018.png",
+  "mazda": "https://www.carlogos.org/car-logos/mazda-logo-2018.png",
+  "ميتسوبيشي": "https://www.carlogos.org/car-logos/mitsubishi-logo-2000.png",
+  "mitsubishi": "https://www.carlogos.org/car-logos/mitsubishi-logo-2000.png",
+  "سوزوكي": "https://www.carlogos.org/car-logos/suzuki-logo-2000.png",
+  "suzuki": "https://www.carlogos.org/car-logos/suzuki-logo-2000.png",
+  "جيب": "https://www.carlogos.org/car-logos/jeep-logo-1993.png",
+  "jeep": "https://www.carlogos.org/car-logos/jeep-logo-1993.png",
+  "دودج": "https://www.carlogos.org/car-logos/dodge-logo-2011.png",
+  "dodge": "https://www.carlogos.org/car-logos/dodge-logo-2011.png",
+  "كرايسلر": "https://www.carlogos.org/car-logos/chrysler-logo-2010.png",
+  "chrysler": "https://www.carlogos.org/car-logos/chrysler-logo-2010.png",
+  "فولكس واجن": "https://www.carlogos.org/car-logos/volkswagen-logo-2019.png",
+  "volkswagen": "https://www.carlogos.org/car-logos/volkswagen-logo-2019.png",
+  "بورش": "https://www.carlogos.org/car-logos/porsche-logo-2014.png",
+  "porsche": "https://www.carlogos.org/car-logos/porsche-logo-2014.png",
+  "لاند روفر": "https://www.carlogos.org/car-logos/land-rover-logo-2011.png",
+  "land rover": "https://www.carlogos.org/car-logos/land-rover-logo-2011.png",
+  "رينج روفر": "https://www.carlogos.org/car-logos/land-rover-logo-2011.png",
+  "range rover": "https://www.carlogos.org/car-logos/land-rover-logo-2011.png",
+  "جاكوار": "https://www.carlogos.org/car-logos/jaguar-logo-2012.png",
+  "jaguar": "https://www.carlogos.org/car-logos/jaguar-logo-2012.png",
+  "انفينيتي": "https://www.carlogos.org/car-logos/infiniti-logo-1989.png",
+  "infiniti": "https://www.carlogos.org/car-logos/infiniti-logo-1989.png",
+  "جينيسيس": "https://www.carlogos.org/car-logos/genesis-logo-2015.png",
+  "genesis": "https://www.carlogos.org/car-logos/genesis-logo-2015.png",
+  "كاديلاك": "https://www.carlogos.org/car-logos/cadillac-logo-2014.png",
+  "cadillac": "https://www.carlogos.org/car-logos/cadillac-logo-2014.png",
+  "لينكولن": "https://www.carlogos.org/car-logos/lincoln-logo-2019.png",
+  "lincoln": "https://www.carlogos.org/car-logos/lincoln-logo-2019.png",
+  "سوبارو": "https://www.carlogos.org/car-logos/subaru-logo-2019.png",
+  "subaru": "https://www.carlogos.org/car-logos/subaru-logo-2019.png",
+  "ايسوزو": "https://www.carlogos.org/car-logos/isuzu-logo-1991.png",
+  "isuzu": "https://www.carlogos.org/car-logos/isuzu-logo-1991.png",
+  "جيلي": "https://www.carlogos.org/car-logos/geely-logo-2019.png",
+  "geely": "https://www.carlogos.org/car-logos/geely-logo-2019.png",
+  "ام جي": "https://www.carlogos.org/car-logos/mg-logo-2010.png",
+  "mg": "https://www.carlogos.org/car-logos/mg-logo-2010.png",
+  "شانجان": "https://www.carlogos.org/car-logos/changan-logo-2020.png",
+  "changan": "https://www.carlogos.org/car-logos/changan-logo-2020.png",
+  "هافال": "https://www.carlogos.org/car-logos/haval-logo-2020.png",
+  "haval": "https://www.carlogos.org/car-logos/haval-logo-2020.png",
+  "chery": "https://www.carlogos.org/car-logos/chery-logo-2013.png",
+  "شيري": "https://www.carlogos.org/car-logos/chery-logo-2013.png",
+  "بيجو": "https://www.carlogos.org/car-logos/peugeot-logo-2021.png",
+  "peugeot": "https://www.carlogos.org/car-logos/peugeot-logo-2021.png",
+  "رينو": "https://www.carlogos.org/car-logos/renault-logo-2021.png",
+  "renault": "https://www.carlogos.org/car-logos/renault-logo-2021.png",
+};
+
+const getCarLogo = (make: string): string | null => {
+  if (!make) return null;
+  const lowerMake = make.toLowerCase().trim();
+  for (const [key, url] of Object.entries(carLogos)) {
+    if (lowerMake.includes(key.toLowerCase()) || key.toLowerCase().includes(lowerMake)) {
+      return url;
+    }
+  }
+  return null;
+};
+
 export default function MotorInsurance() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"new" | "renew">("new");
@@ -856,6 +942,7 @@ export default function MotorInsurance() {
                       const vehiclePlate = vehicle.plateNumber || vehicle.plateText || vehicle.customNo || vehicle.plateNo || "";
                       const vehicleColor = vehicle.color || vehicle.colorDescAr || vehicle.vehicleColor || "";
                       const vehicleSerial = vehicle.SequenceNumber || vehicle.sequenceNumber || vehicle.chassisNumber || vehicle.vin || vehicle.customNo || vehiclePlate;
+                      const carLogo = getCarLogo(vehicleMake);
                       
                       return (
                         <div
@@ -873,8 +960,12 @@ export default function MotorInsurance() {
                           data-testid={`vehicle-card-${index}`}
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-800/20 flex items-center justify-center">
-                              <Car className="h-7 w-7 text-purple-600" />
+                            <div className="w-14 h-14 rounded-xl bg-white dark:bg-gray-800 border flex items-center justify-center overflow-hidden p-2">
+                              {carLogo ? (
+                                <img src={carLogo} alt={vehicleMake} className="w-10 h-10 object-contain" />
+                              ) : (
+                                <Car className="h-7 w-7 text-purple-600" />
+                              )}
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
