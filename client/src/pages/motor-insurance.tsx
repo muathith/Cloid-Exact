@@ -1129,10 +1129,46 @@ export default function MotorInsurance() {
   const currentCardType = getCardType(cardNumber);
 
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 100 }, (_, i) => String(currentYear - i));
+  const currentHijriYear = 1447; // Approximate current Hijri year (2025-2026)
+  const isHijri = form.watch("isHijri");
+  const years = isHijri 
+    ? Array.from({ length: 100 }, (_, i) => String(currentHijriYear - i))
+    : Array.from({ length: 100 }, (_, i) => String(currentYear - i));
   const carYears = Array.from({ length: 30 }, (_, i) =>
     String(currentYear - i),
   );
+
+  const hijriMonths = [
+    { value: "01", label: "محرم" },
+    { value: "02", label: "صفر" },
+    { value: "03", label: "ربيع الأول" },
+    { value: "04", label: "ربيع الآخر" },
+    { value: "05", label: "جمادى الأولى" },
+    { value: "06", label: "جمادى الآخرة" },
+    { value: "07", label: "رجب" },
+    { value: "08", label: "شعبان" },
+    { value: "09", label: "رمضان" },
+    { value: "10", label: "شوال" },
+    { value: "11", label: "ذو القعدة" },
+    { value: "12", label: "ذو الحجة" },
+  ];
+
+  const gregorianMonths = [
+    { value: "01", label: "يناير" },
+    { value: "02", label: "فبراير" },
+    { value: "03", label: "مارس" },
+    { value: "04", label: "أبريل" },
+    { value: "05", label: "مايو" },
+    { value: "06", label: "يونيو" },
+    { value: "07", label: "يوليو" },
+    { value: "08", label: "أغسطس" },
+    { value: "09", label: "سبتمبر" },
+    { value: "10", label: "أكتوبر" },
+    { value: "11", label: "نوفمبر" },
+    { value: "12", label: "ديسمبر" },
+  ];
+
+  const months = isHijri ? hijriMonths : gregorianMonths;
 
   const roadsideAssistance = form.watch("roadsideAssistance");
   const replacementCar = form.watch("replacementCar");
@@ -1293,19 +1329,37 @@ export default function MotorInsurance() {
                 <Label className="text-sm text-muted-foreground mb-2 block text-right">
                   تاريخ الميلاد
                 </Label>
-                <div className="flex gap-3 items-center flex-row-reverse">
+                <div className="flex gap-2 items-center flex-row-reverse flex-wrap">
                   <Input
                     {...form.register("birthDay")}
-                    placeholder="01"
+                    placeholder="اليوم"
                     className="w-16 text-center h-12 text-base"
                     data-testid="input-birth-day"
                   />
+                  <Select
+                    value={form.watch("birthMonth")}
+                    onValueChange={(value) => form.setValue("birthMonth", value)}
+                  >
+                    <SelectTrigger
+                      className="w-32 h-12"
+                      data-testid="select-birth-month"
+                    >
+                      <SelectValue placeholder="الشهر" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month) => (
+                        <SelectItem key={month.value} value={month.value}>
+                          {month.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Select
                     value={form.watch("birthYear")}
                     onValueChange={(value) => form.setValue("birthYear", value)}
                   >
                     <SelectTrigger
-                      className="flex-1 h-12"
+                      className="w-24 h-12"
                       data-testid="select-birth-year"
                     >
                       <SelectValue placeholder="السنة" />
