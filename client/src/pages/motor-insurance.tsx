@@ -131,6 +131,85 @@ const offerData = [
       { id: "x3", reason: "رسوم إدارية", price: 54 },
     ],
   },
+  {
+    id: "comp-1",
+    name: "تكافل الراجحي للتأمين",
+    type: "comprehensive",
+    main_price: "2850.00",
+    company: {
+      name: "takaful-rajhi",
+      image_url: "https://github.com/user-attachments/assets/d37d419c-08bf-4211-b20c-7c881c9086d0",
+    },
+    extra_features: [
+      { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
+      { id: "e2", content: "تغطية الحوادث الشخصية للسائق والركاب", price: 150 },
+      { id: "e3", content: "المساعدة على الطريق 24/7", price: 0 },
+      { id: "e4", content: "سيارة بديلة أثناء الإصلاح", price: 350 },
+      { id: "e5", content: "تغطية الكوارث الطبيعية", price: 0 },
+    ],
+    extra_expenses: [
+      { id: "x1", reason: "خصم عدم وجود مطالبات", price: -285 },
+      { id: "x2", reason: "ضريبة القيمة المضافة", price: 427.5 },
+    ],
+  },
+  {
+    id: "comp-2",
+    name: "التعاونية للتأمين",
+    type: "comprehensive",
+    main_price: "2650.00",
+    company: {
+      name: "tawuniya",
+      image_url: "https://github.com/user-attachments/assets/2341cefe-8e2c-4c2d-8ec4-3fca8699b4fb",
+    },
+    extra_features: [
+      { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
+      { id: "e2", content: "تغطية الحوادث الشخصية للسائق والركاب", price: 200 },
+      { id: "e3", content: "المساعدة على الطريق + درايف مجانا", price: 0 },
+      { id: "e4", content: "سيارة بديلة لمدة 15 يوم", price: 450 },
+      { id: "e5", content: "إصلاح في الوكالة", price: 500 },
+    ],
+    extra_expenses: [
+      { id: "x1", reason: "خصم عدم وجود مطالبات", price: -265 },
+      { id: "x2", reason: "ضريبة القيمة المضافة", price: 397.5 },
+    ],
+  },
+  {
+    id: "comp-3",
+    name: "ميدغلف للتأمين",
+    type: "comprehensive",
+    main_price: "2450.00",
+    company: {
+      name: "med-gulf",
+      image_url: "https://github.com/user-attachments/assets/b0e744e3-1d0f-4ec0-847f-3ef463aef33c",
+    },
+    extra_features: [
+      { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
+      { id: "e2", content: "تغطية الحوادث الشخصية للسائق", price: 100 },
+      { id: "e3", content: "المساعدة على الطريق", price: 75 },
+    ],
+    extra_expenses: [
+      { id: "x1", reason: "خصم عدم وجود مطالبات", price: -245 },
+      { id: "x2", reason: "ضريبة القيمة المضافة", price: 367.5 },
+    ],
+  },
+  {
+    id: "comp-4",
+    name: "سلامة للتأمين",
+    type: "comprehensive",
+    main_price: "2380.00",
+    company: {
+      name: "salama",
+      image_url: "https://github.com/user-attachments/assets/207354df-0143-4207-b518-7f5bcc323a21",
+    },
+    extra_features: [
+      { id: "e1", content: "تغطية شاملة للمركبة ضد جميع المخاطر", price: 0 },
+      { id: "e2", content: "تغطية الحوادث الشخصية للسائق والركاب", price: 180 },
+    ],
+    extra_expenses: [
+      { id: "x1", reason: "خصم عدم وجود مطالبات", price: -238 },
+      { id: "x2", reason: "ضريبة القيمة المضافة", price: 357 },
+    ],
+  },
 ];
 
 type SelectedFeatures = { [offerId: string]: string[] };
@@ -143,6 +222,7 @@ export default function MotorInsurance() {
   const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
   const [selectedFeatures, setSelectedFeatures] = useState<SelectedFeatures>({});
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
+  const [insuranceTypeTab, setInsuranceTypeTab] = useState<"against-others" | "comprehensive">("against-others");
   
   const [cardNumber, setCardNumber] = useState("");
   const [cardName, setCardName] = useState("");
@@ -705,12 +785,51 @@ export default function MotorInsurance() {
               </div>
             </div>
 
+            <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex gap-1">
+              <button
+                onClick={() => {
+                  setInsuranceTypeTab("comprehensive");
+                  setSelectedOfferId(null);
+                  setExpandedOffer(null);
+                }}
+                className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
+                  insuranceTypeTab === "comprehensive"
+                    ? "bg-white dark:bg-gray-700 text-primary shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                data-testid="tab-comprehensive"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  <span>التأمين الشامل</span>
+                </div>
+              </button>
+              <button
+                onClick={() => {
+                  setInsuranceTypeTab("against-others");
+                  setSelectedOfferId(null);
+                  setExpandedOffer(null);
+                }}
+                className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
+                  insuranceTypeTab === "against-others"
+                    ? "bg-white dark:bg-gray-700 text-primary shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                data-testid="tab-against-others"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Car className="h-4 w-4" />
+                  <span>ضد الغير</span>
+                </div>
+              </button>
+            </div>
+
             <div className="text-sm text-muted-foreground text-center mb-4 flex items-center justify-center gap-2">
               <Info className="h-4 w-4" />
               <span>اضغط على العرض لمشاهدة التفاصيل والإضافات</span>
             </div>
 
-            {offerData.map((offer) => {
+            {offerData.filter(offer => offer.type === insuranceTypeTab).map((offer) => {
               const isExpanded = expandedOffer === offer.id;
               const isSelected = selectedOfferId === offer.id;
               const offerTotal = calculateOfferTotal(offer);
@@ -737,7 +856,7 @@ export default function MotorInsurance() {
                         </div>
                         <div>
                           <h3 className="font-semibold text-sm">{offer.name}</h3>
-                          <p className="text-xs text-muted-foreground">ضد الغير</p>
+                          <p className="text-xs text-muted-foreground">{offer.type === "comprehensive" ? "التأمين الشامل" : "ضد الغير"}</p>
                         </div>
                       </div>
                       <div className="text-left">
