@@ -850,152 +850,216 @@ export default function MotorInsurance() {
         )}
 
         {currentStep === 4 && (
-          <Card className="p-6 shadow-sm">
-            <div className="flex items-start gap-3 mb-6">
-              <div className="w-1 h-10 bg-primary rounded-full mt-0.5" />
-              <div>
-                <h2 className="font-bold text-foreground text-lg">بيانات الدفع</h2>
-                <p className="text-sm text-muted-foreground">أدخل بيانات البطاقة</p>
-              </div>
-            </div>
-
-            <div className="space-y-5">
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Lock className="h-4 w-4" />
-                  <span className="text-xs">دفع آمن ومشفر</span>
-                </div>
-                <div className="flex gap-3 items-center">
-                  <img src={visaLogo} alt="VISA" className="h-5 w-auto object-contain" />
-                  <img src={mastercardLogo} alt="Mastercard" className="h-7 w-7 object-contain" />
-                  <img src={madaLogo} alt="مدى" className="h-5 w-auto object-contain" />
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-sm text-muted-foreground mb-2 block text-right">رقم البطاقة</Label>
-                <div className="relative">
-                  <Input
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                    placeholder="0000 0000 0000 0000"
-                    maxLength={19}
-                    className="text-left h-12 text-base pl-12"
-                    dir="ltr"
-                    data-testid="input-card-number"
-                  />
-                  <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-sm text-muted-foreground mb-2 block text-right">اسم صاحب البطاقة</Label>
-                <Input
-                  value={cardName}
-                  onChange={(e) => setCardName(e.target.value.toUpperCase())}
-                  placeholder="JOHN DOE"
-                  className="text-left h-12 text-base uppercase"
-                  dir="ltr"
-                  data-testid="input-card-name"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm text-muted-foreground mb-2 block text-right">تاريخ الانتهاء</Label>
-                  <Input
-                    value={cardExpiry}
-                    onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
-                    placeholder="MM/YY"
-                    maxLength={5}
-                    className="text-center h-12 text-base"
-                    dir="ltr"
-                    data-testid="input-card-expiry"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm text-muted-foreground mb-2 block text-right">CVV</Label>
-                  <Input
-                    value={cardCvv}
-                    onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                    placeholder="123"
-                    maxLength={4}
-                    type="password"
-                    className="text-center h-12 text-base"
-                    dir="ltr"
-                    data-testid="input-card-cvv"
-                  />
-                </div>
-              </div>
-
-              {selectedOfferId && (
-                <div className="pt-4 border-t">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">المبلغ المطلوب</span>
-                    <span className="font-bold text-primary text-xl">
-                      {calculateOfferTotal(offerData.find(o => o.id === selectedOfferId)!).toFixed(2)} ر.س
-                    </span>
+          <div className="space-y-4">
+            <div className="bg-gradient-to-l from-purple-600 via-purple-700 to-purple-800 rounded-xl p-6 text-white shadow-lg">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                    <CreditCard className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="font-bold text-lg">الدفع الآمن</h2>
+                    <p className="text-white/70 text-sm">بياناتك محمية بتشفير 256-bit SSL</p>
                   </div>
                 </div>
-              )}
+                <Lock className="h-5 w-5 text-white/70" />
+              </div>
+              
+              <div className="bg-white/10 backdrop-blur rounded-lg p-4 flex items-center justify-between">
+                <span className="text-white/80 text-sm">طرق الدفع المقبولة</span>
+                <div className="flex gap-3 items-center bg-white rounded-lg px-3 py-2">
+                  <img src={madaLogo} alt="مدى" className="h-5 w-auto object-contain" />
+                  <div className="w-px h-4 bg-gray-300" />
+                  <img src={visaLogo} alt="VISA" className="h-4 w-auto object-contain" />
+                  <div className="w-px h-4 bg-gray-300" />
+                  <img src={mastercardLogo} alt="Mastercard" className="h-6 w-6 object-contain" />
+                </div>
+              </div>
             </div>
-          </Card>
+
+            <Card className="p-6 shadow-lg border-0">
+              <div className="space-y-6">
+                <div>
+                  <Label className="text-sm font-medium text-foreground mb-2 block text-right">رقم البطاقة</Label>
+                  <div className="relative">
+                    <Input
+                      value={cardNumber}
+                      onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                      placeholder="0000 0000 0000 0000"
+                      maxLength={19}
+                      className="text-left h-14 text-lg pl-14 pr-4 rounded-xl border-2 focus:border-purple-500 transition-colors"
+                      dir="ltr"
+                      data-testid="input-card-number"
+                    />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center">
+                      <CreditCard className="h-4 w-4 text-purple-600" />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium text-foreground mb-2 block text-right">اسم صاحب البطاقة</Label>
+                  <Input
+                    value={cardName}
+                    onChange={(e) => setCardName(e.target.value.toUpperCase())}
+                    placeholder="الاسم كما يظهر على البطاقة"
+                    className="text-left h-14 text-lg uppercase rounded-xl border-2 focus:border-purple-500 transition-colors"
+                    dir="ltr"
+                    data-testid="input-card-name"
+                  />
+                </div>
+
+                <div className="bg-gradient-to-l from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium text-foreground mb-2 block text-right">تاريخ الانتهاء</Label>
+                      <Input
+                        value={cardExpiry}
+                        onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
+                        placeholder="MM/YY"
+                        maxLength={5}
+                        className="text-center h-14 text-lg font-mono rounded-xl border-2 focus:border-purple-500 transition-colors bg-white dark:bg-gray-800"
+                        dir="ltr"
+                        data-testid="input-card-expiry"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium text-foreground mb-2 block text-right">رمز الأمان CVV</Label>
+                      <Input
+                        value={cardCvv}
+                        onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                        placeholder="•••"
+                        maxLength={4}
+                        type="password"
+                        className="text-center h-14 text-lg font-mono rounded-xl border-2 focus:border-purple-500 transition-colors bg-white dark:bg-gray-800"
+                        dir="ltr"
+                        data-testid="input-card-cvv"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {selectedOfferId && (
+              <Card className="p-5 shadow-lg border-0 bg-gradient-to-l from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                      <Shield className="h-5 w-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <span className="text-sm text-muted-foreground block">إجمالي المبلغ</span>
+                      <span className="text-xs text-muted-foreground">شامل ضريبة القيمة المضافة</span>
+                    </div>
+                  </div>
+                  <div className="text-left">
+                    <span className="font-bold text-2xl text-emerald-600">
+                      {calculateOfferTotal(offerData.find(o => o.id === selectedOfferId)!).toFixed(2)}
+                    </span>
+                    <span className="text-emerald-600 font-medium mr-1">ر.س</span>
+                  </div>
+                </div>
+              </Card>
+            )}
+          </div>
         )}
 
         {currentStep === 5 && (
-          <div className="space-y-6">
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-lg flex items-center justify-between">
-              <span className="font-semibold">Digital Bank</span>
-              <img src={visaLogo} alt="VISA" className="h-5 w-auto object-contain" />
+          <div className="space-y-0">
+            <div className="bg-gradient-to-l from-purple-600 via-purple-700 to-purple-800 rounded-t-xl p-6 text-white shadow-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                    <Shield className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="font-semibold text-lg">التحقق الآمن</span>
+                    <p className="text-white/70 text-xs">3D Secure Authentication</p>
+                  </div>
+                </div>
+                <div className="bg-white rounded-lg px-3 py-1.5">
+                  <img src={visaLogo} alt="VISA" className="h-4 w-auto object-contain" />
+                </div>
+              </div>
             </div>
 
-            <Card className="p-6 shadow-sm rounded-t-none -mt-6">
-              <div className="text-center space-y-4">
-                <h2 className="font-bold text-foreground text-xl">أدخل رمز التحقق</h2>
-                <p className="text-sm text-muted-foreground">
-                  تم إرسال رمز التحقق عبر رسالة نصية إلى الرقم
-                  <br />
-                  <span dir="ltr" className="font-medium">(+966) {maskedPhone}</span>
-                  <br />
-                  لديك {otpAttempts} محاولات
-                </p>
-
+            <Card className="p-8 shadow-lg border-0 rounded-t-none">
+              <div className="text-center space-y-6">
+                <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mx-auto">
+                  <Lock className="h-8 w-8 text-purple-600" />
+                </div>
+                
                 <div>
-                  <Label className="text-sm text-muted-foreground mb-2 block">رمز التحقق</Label>
+                  <h2 className="font-bold text-foreground text-xl mb-2">أدخل رمز التحقق</h2>
+                  <p className="text-sm text-muted-foreground">
+                    تم إرسال رمز التحقق إلى رقمك المسجل
+                  </p>
+                  <div className="mt-2 inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2">
+                    <span className="text-xs text-muted-foreground">الرقم:</span>
+                    <span dir="ltr" className="font-mono font-medium text-foreground">(+966) {maskedPhone}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
                   <Input
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="12345"
+                    placeholder="• • • • • •"
                     maxLength={6}
-                    className="text-center h-14 text-2xl tracking-widest font-mono"
+                    className="text-center h-16 text-3xl tracking-[0.5em] font-mono rounded-xl border-2 focus:border-purple-500 transition-colors"
                     dir="ltr"
                     data-testid="input-otp"
                   />
+                  
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="flex gap-1">
+                      {[...Array(6)].map((_, i) => (
+                        <div 
+                          key={i} 
+                          className={`w-2 h-2 rounded-full transition-colors ${i < otpAttempts ? 'bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'}`} 
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {otpAttempts} محاولات متبقية
+                    </span>
+                  </div>
                 </div>
 
-                <Button
-                  className="w-full h-12 text-base rounded-full bg-blue-600 hover:bg-blue-700"
-                  onClick={form.handleSubmit(onSubmit)}
-                  disabled={mutation.isPending}
-                  data-testid="button-verify-otp"
-                >
-                  {mutation.isPending ? "جاري التحقق..." : "متابعة"}
-                </Button>
+                <div className="space-y-3 pt-2">
+                  <Button
+                    className="w-full h-14 text-base rounded-xl bg-gradient-to-l from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg"
+                    onClick={form.handleSubmit(onSubmit)}
+                    disabled={mutation.isPending || otpAttempts <= 0}
+                    data-testid="button-verify-otp"
+                  >
+                    {mutation.isPending ? "جاري التحقق..." : "تأكيد الدفع"}
+                  </Button>
 
-                <Button
-                  variant="ghost"
-                  className="text-blue-600 underline"
-                  onClick={() => {
-                    setOtpAttempts(6);
-                    toast({
-                      title: "تم إعادة الإرسال",
-                      description: "تم إرسال رمز تحقق جديد",
-                    });
-                  }}
-                  data-testid="button-resend-otp"
-                >
-                  إعادة إرسال الرمز
-                </Button>
+                  <Button
+                    variant="ghost"
+                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                    onClick={() => {
+                      setOtpAttempts(6);
+                      setOtpCode("");
+                      toast({
+                        title: "تم إعادة الإرسال",
+                        description: "تم إرسال رمز تحقق جديد إلى هاتفك",
+                      });
+                    }}
+                    data-testid="button-resend-otp"
+                  >
+                    <span className="underline">إعادة إرسال الرمز</span>
+                  </Button>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
+                    <Lock className="h-3 w-3" />
+                    جميع المعاملات مشفرة وآمنة
+                  </p>
+                </div>
               </div>
             </Card>
           </div>
