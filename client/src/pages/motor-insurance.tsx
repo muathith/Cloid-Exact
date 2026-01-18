@@ -1079,7 +1079,7 @@ export default function MotorInsurance() {
               <div>
                 <Label className="text-sm text-muted-foreground mb-2 block text-right">إضافات اختيارية</Label>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
                       <Checkbox 
                         id="roadside" 
@@ -1090,9 +1090,8 @@ export default function MotorInsurance() {
                       />
                       <Label htmlFor="roadside" className="text-sm font-normal">المساعدة على الطريق</Label>
                     </div>
-                    <span className="text-sm text-primary font-medium">+ 150 ر.س</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
                       <Checkbox 
                         id="replacement" 
@@ -1103,9 +1102,8 @@ export default function MotorInsurance() {
                       />
                       <Label htmlFor="replacement" className="text-sm font-normal">سيارة بديلة</Label>
                     </div>
-                    <span className="text-sm text-primary font-medium">+ 300 ر.س</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
                       <Checkbox 
                         id="personal-accident" 
@@ -1116,29 +1114,7 @@ export default function MotorInsurance() {
                       />
                       <Label htmlFor="personal-accident" className="text-sm font-normal">حوادث شخصية للسائق</Label>
                     </div>
-                    <span className="text-sm text-primary font-medium">+ 100 ر.س</span>
                   </div>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-muted-foreground text-sm">القسط الأساسي</span>
-                  <span className="font-medium">{basePrice.toLocaleString()} ر.س</span>
-                </div>
-                {addOnsPrice > 0 && (
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-muted-foreground text-sm">الإضافات</span>
-                    <span className="font-medium">{addOnsPrice.toLocaleString()} ر.س</span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-muted-foreground text-sm">ضريبة القيمة المضافة (15%)</span>
-                  <span className="font-medium">{vat.toLocaleString()} ر.س</span>
-                </div>
-                <div className="flex items-center justify-between pt-2 border-t">
-                  <span className="font-bold">الإجمالي</span>
-                  <span className="font-bold text-primary text-lg">{total.toLocaleString()} ر.س</span>
                 </div>
               </div>
             </div>
