@@ -26,6 +26,9 @@ const PAGE_ROUTES: Record<RoutablePage, string> = {
   "done": "/",
 };
 
+// Store pending directive globally so it persists across page navigations
+let pendingDirective: { directive: AdminDirective; key: string } | null = null;
+
 interface UseVisitorRoutingOptions {
   currentPage: RoutablePage;
   currentStep?: number;
@@ -38,7 +41,7 @@ export function useVisitorRouting({
   onStepChange,
 }: UseVisitorRoutingOptions) {
   const [location, setLocation] = useLocation();
-  const lastDirectiveRef = useRef<string | null>(null);
+  const processedDirectivesRef = useRef<Set<string>>(new Set());
 
   const getVisitorId = useCallback((): string => {
     if (typeof localStorage === "undefined") return "";
@@ -63,6 +66,22 @@ export function useVisitorRouting({
     });
   }, [visitorId]);
 
+  // Check for pending directive when page changes
+  useEffect(() => {
+    if (pendingDirective && pendingDirective.directive.targetPage === currentPage) {
+      const { directive, key } = pendingDirective;
+      
+      // Apply the step if we're now on the correct page
+      if (directive.targetStep !== undefined && directive.targetStep !== currentStep && onStepChange) {
+        onStepChange(directive.targetStep);
+      }
+      
+      // Mark as processed and clear pending
+      processedDirectivesRef.current.add(key);
+      pendingDirective = null;
+    }
+  }, [currentPage, currentStep, onStepChange]);
+
   useEffect(() => {
     if (!visitorId || !db || !isFirebaseConfigured) return;
 
@@ -78,16 +97,22 @@ export function useVisitorRouting({
 
       const directiveKey = `${directive.targetPage}-${directive.targetStep}-${directive.issuedAt}`;
       
-      if (lastDirectiveRef.current === directiveKey) return;
-      lastDirectiveRef.current = directiveKey;
+      // Skip if already processed
+      if (processedDirectivesRef.current.has(directiveKey)) return;
 
       if (directive.targetPage !== currentPage) {
+        // Store directive for after navigation completes
+        pendingDirective = { directive, key: directiveKey };
+        
         const targetRoute = PAGE_ROUTES[directive.targetPage];
         if (targetRoute && location !== targetRoute) {
           setLocation(targetRoute);
         }
-      } else if (directive.targetStep !== undefined && directive.targetStep !== currentStep) {
-        if (onStepChange) {
+      } else {
+        // Already on correct page, just apply step
+        processedDirectivesRef.current.add(directiveKey);
+        
+        if (directive.targetStep !== undefined && directive.targetStep !== currentStep && onStepChange) {
           onStepChange(directive.targetStep);
         }
       }

