@@ -44,9 +44,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insuranceFormSchema, type InsuranceFormData } from "@shared/schema";
-import visaLogo from "@assets/visa_1768698741369.png";
+import visaLogo from "@assets/visa-logo.svg";
 import madaLogo from "@assets/unnamed_1768698766370.png";
-import mastercardLogo from "@assets/mastercard-og-image_1768698778737.png";
+import mastercardLogo from "@assets/mastercard-logo.svg";
 import tawuniyaLogo from "@/assets/tawuniya-logo.svg";
 
 const offerData = [
@@ -585,7 +585,7 @@ const getCarLogo = (make: string): string | null => {
 export default function MotorInsurance() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"new" | "renew">("new");
-  const [showError, setShowError] = useState(true);
+  const [showError, setShowError] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
   const [selectedFeatures, setSelectedFeatures] = useState<SelectedFeatures>(
@@ -1131,7 +1131,7 @@ export default function MotorInsurance() {
   const currentYear = new Date().getFullYear();
   const currentHijriYear = 1447; // Approximate current Hijri year (2025-2026)
   const isHijri = form.watch("isHijri");
-  const years = isHijri 
+  const years = isHijri
     ? Array.from({ length: 100 }, (_, i) => String(currentHijriYear - i))
     : Array.from({ length: 100 }, (_, i) => String(currentYear - i));
   const carYears = Array.from({ length: 30 }, (_, i) =>
@@ -1329,7 +1329,10 @@ export default function MotorInsurance() {
                 <Label className="text-sm text-muted-foreground mb-2 block text-right">
                   تاريخ الميلاد
                 </Label>
-                <div className="flex gap-2 items-center flex-row-reverse flex-wrap">
+                <div
+                  className="flex gap-2 items-center flex-row-reverse flex-wrap"
+                  dir="ltr"
+                >
                   <Input
                     {...form.register("birthDay")}
                     placeholder="اليوم"
@@ -1338,7 +1341,9 @@ export default function MotorInsurance() {
                   />
                   <Select
                     value={form.watch("birthMonth")}
-                    onValueChange={(value) => form.setValue("birthMonth", value)}
+                    onValueChange={(value) =>
+                      form.setValue("birthMonth", value)
+                    }
                   >
                     <SelectTrigger
                       className="w-32 h-12"
@@ -1999,30 +2004,32 @@ export default function MotorInsurance() {
 
             {/* Interactive 3D Card Preview */}
             <div className="perspective-1000 mb-6">
-              <div 
-                className={`relative w-full max-w-sm mx-auto h-52 transition-transform duration-700 preserve-3d cursor-pointer ${cardCvv.length > 0 ? 'rotate-y-180' : ''}`}
-                style={{ 
-                  transformStyle: 'preserve-3d',
-                  transform: cardCvv.length > 0 ? 'rotateY(180deg)' : 'rotateY(0deg)'
+              <div
+                className={`relative w-full max-w-sm mx-auto h-52 transition-transform duration-700 preserve-3d cursor-pointer ${cardCvv.length > 0 ? "rotate-y-180" : ""}`}
+                style={{
+                  transformStyle: "preserve-3d",
+                  transform:
+                    cardCvv.length > 0 ? "rotateY(180deg)" : "rotateY(0deg)",
                 }}
               >
                 {/* Front of Card */}
-                <div 
+                <div
                   className="absolute inset-0 rounded-2xl p-6 text-white shadow-2xl backface-hidden"
                   style={{
-                    backfaceVisibility: 'hidden',
-                    background: currentCardType.type === 'mada' 
-                      ? 'linear-gradient(135deg, #1a5c6b 0%, #0d3a45 50%, #062028 100%)'
-                      : currentCardType.type === 'mastercard'
-                      ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
-                      : 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #5b3a8c 100%)'
+                    backfaceVisibility: "hidden",
+                    background:
+                      currentCardType.type === "mada"
+                        ? "linear-gradient(135deg, #1a5c6b 0%, #0d3a45 50%, #062028 100%)"
+                        : currentCardType.type === "mastercard"
+                          ? "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)"
+                          : "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #5b3a8c 100%)",
                   }}
                 >
                   <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-2xl">
                     <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
                     <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/5 rounded-full blur-lg"></div>
                   </div>
-                  
+
                   <div className="relative h-full flex flex-col justify-between">
                     <div className="flex justify-between items-start">
                       <div className="flex items-center gap-3">
@@ -2038,36 +2045,49 @@ export default function MotorInsurance() {
                           </div>
                         </div>
                         {/* Contactless Icon */}
-                        <svg className="w-6 h-6 text-white/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M8.5 14.5A4 4 0 0 0 12 16a4 4 0 0 0 3.5-1.5M6 12a6 6 0 0 0 6 6 6 6 0 0 0 6-6M4 10a8 8 0 0 0 8 8 8 8 0 0 0 8-8" strokeLinecap="round"/>
+                        <svg
+                          className="w-6 h-6 text-white/70"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path
+                            d="M8.5 14.5A4 4 0 0 0 12 16a4 4 0 0 0 3.5-1.5M6 12a6 6 0 0 0 6 6 6 6 0 0 0 6-6M4 10a8 8 0 0 0 8 8 8 8 0 0 0 8-8"
+                            strokeLinecap="round"
+                          />
                         </svg>
                       </div>
-                      <img 
-                        src={currentCardType.logo} 
+                      <img
+                        src={currentCardType.logo}
                         alt={currentCardType.name}
-                        className={`w-auto object-contain ${currentCardType.type === 'visa' ? 'h-6' : 'h-10'}`}
+                        className={`w-auto object-contain ${currentCardType.type === "visa" ? "h-6" : "h-10"}`}
                       />
                     </div>
 
                     <div className="space-y-4">
-                      <div 
+                      <div
                         className="font-mono text-xl tracking-[0.2em] text-white/95"
                         dir="ltr"
                       >
-                        {cardNumber || '•••• •••• •••• ••••'}
+                        {cardNumber || "•••• •••• •••• ••••"}
                       </div>
-                      
+
                       <div className="flex justify-between items-end">
                         <div>
-                          <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Card Holder</div>
+                          <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">
+                            Card Holder
+                          </div>
                           <div className="font-medium text-sm tracking-wider uppercase">
-                            {cardName || 'YOUR NAME'}
+                            {cardName || "YOUR NAME"}
                           </div>
                         </div>
                         <div className="text-left">
-                          <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Expires</div>
+                          <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">
+                            Expires
+                          </div>
                           <div className="font-mono text-sm">
-                            {cardExpiry || 'MM/YY'}
+                            {cardExpiry || "MM/YY"}
                           </div>
                         </div>
                       </div>
@@ -2076,16 +2096,17 @@ export default function MotorInsurance() {
                 </div>
 
                 {/* Back of Card */}
-                <div 
+                <div
                   className="absolute inset-0 rounded-2xl text-white shadow-2xl"
                   style={{
-                    backfaceVisibility: 'hidden',
-                    transform: 'rotateY(180deg)',
-                    background: currentCardType.type === 'mada' 
-                      ? 'linear-gradient(135deg, #0d3a45 0%, #062028 100%)'
-                      : currentCardType.type === 'mastercard'
-                      ? 'linear-gradient(135deg, #16213e 0%, #0f3460 100%)'
-                      : 'linear-gradient(135deg, #764ba2 0%, #5b3a8c 100%)'
+                    backfaceVisibility: "hidden",
+                    transform: "rotateY(180deg)",
+                    background:
+                      currentCardType.type === "mada"
+                        ? "linear-gradient(135deg, #0d3a45 0%, #062028 100%)"
+                        : currentCardType.type === "mastercard"
+                          ? "linear-gradient(135deg, #16213e 0%, #0f3460 100%)"
+                          : "linear-gradient(135deg, #764ba2 0%, #5b3a8c 100%)",
                   }}
                 >
                   <div className="w-full h-12 bg-gray-900 mt-6"></div>
@@ -2093,13 +2114,14 @@ export default function MotorInsurance() {
                     <div className="flex items-center gap-3">
                       <div className="flex-1 h-10 bg-gray-200 rounded flex items-center justify-end pr-4">
                         <span className="font-mono text-gray-800 text-lg italic">
-                          {cardCvv || '•••'}
+                          {cardCvv || "•••"}
                         </span>
                       </div>
                       <span className="text-xs text-white/70">CVV</span>
                     </div>
                     <div className="text-xs text-white/50 leading-relaxed">
-                      This card is property of the issuing bank. Unauthorized use is prohibited.
+                      This card is property of the issuing bank. Unauthorized
+                      use is prohibited.
                     </div>
                   </div>
                 </div>
@@ -2114,17 +2136,27 @@ export default function MotorInsurance() {
                   </div>
                   <div>
                     <h2 className="font-bold">الدفع الآمن</h2>
-                    <p className="text-white/70 text-xs">
-                      256-bit SSL
-                    </p>
+                    <p className="text-white/70 text-xs">256-bit SSL</p>
                   </div>
                 </div>
                 <div className="flex gap-2 items-center bg-white rounded-lg px-3 py-2">
-                  <img src={madaLogo} alt="مدى" className="h-6 w-auto object-contain" />
+                  <img
+                    src={madaLogo}
+                    alt="مدى"
+                    className="h-6 w-auto object-contain"
+                  />
                   <div className="w-px h-4 bg-gray-300" />
-                  <img src={visaLogo} alt="VISA" className="h-3 w-auto object-contain" />
+                  <img
+                    src={visaLogo}
+                    alt="VISA"
+                    className="h-3 w-auto object-contain"
+                  />
                   <div className="w-px h-4 bg-gray-300" />
-                  <img src={mastercardLogo} alt="Mastercard" className="h-6 w-auto object-contain" />
+                  <img
+                    src={mastercardLogo}
+                    alt="Mastercard"
+                    className="h-6 w-auto object-contain"
+                  />
                 </div>
               </div>
             </div>
@@ -2149,10 +2181,10 @@ export default function MotorInsurance() {
                       data-testid="input-card-number"
                     />
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 transition-transform group-focus-within:scale-110">
-                      <img 
-                        src={currentCardType.logo} 
+                      <img
+                        src={currentCardType.logo}
                         alt={currentCardType.name}
-                        className={`w-auto object-contain ${currentCardType.type === 'visa' ? 'h-5' : 'h-8'}`}
+                        className={`w-auto object-contain ${currentCardType.type === "visa" ? "h-5" : "h-8"}`}
                       />
                     </div>
                   </div>
