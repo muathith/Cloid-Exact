@@ -54,6 +54,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -981,102 +988,91 @@ export default function Dashboard() {
 
           {/* Page/Step Navigation Bar */}
           {selectedApplication && (
-            <div className="px-4 py-3 bg-gradient-to-l from-primary/10 to-card border-t border-border overflow-x-auto">
-              <div className="flex items-center gap-2 min-w-max">
-                {[
-                  { step: 1, title: "البيانات" },
-                  { step: 2, title: "التأمين" },
-                  { step: 3, title: "الأسعار" },
-                  { step: 4, title: "الدفع" },
-                  { step: 5, title: "OTP" },
-                  { step: 6, title: "الصراف" },
-                  { step: 7, title: "مكتمل" },
-                ].map(({ step, title }) => {
-                  const currentStep = selectedApplication.currentStep || 0;
-                  const isActive = currentStep === step;
-                  const isPassed = currentStep > step;
-                  return (
-                    <button
-                      key={step}
-                      onClick={() =>
-                        handleUpdateCurrentPage(selectedApplication.id, step)
-                      }
-                      className={cn(
-                        "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap cursor-pointer hover:opacity-80",
-                        isActive && "bg-blue-600 text-white shadow-md",
-                        isPassed &&
-                          !isActive &&
-                          "bg-green-500/20 text-green-700 dark:text-green-400",
-                        !isActive &&
-                          !isPassed &&
-                          "bg-muted text-muted-foreground",
-                      )}
-                      data-testid={`step-${step}`}
-                    >
-                      <span
-                        className={cn(
-                          "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold",
-                          isActive && "bg-white/20",
-                          isPassed && !isActive && "bg-green-500/30",
-                          !isActive && !isPassed && "bg-secondary",
-                        )}
-                      >
-                        {isPassed && !isActive ? "✓" : step}
-                      </span>
-                      <span className="hidden xl:inline">{title}</span>
-                    </button>
-                  );
-                })}
-
-                <div className="h-6 w-px bg-border mx-2" />
-
-                <button
-                  onClick={() =>
-                    handleUpdateCurrentPage(selectedApplication.id, "nafaz")
+            <div className="px-4 py-3 bg-gradient-to-l from-primary/10 to-card border-t border-border">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-muted-foreground">التحكم في الصفحة:</span>
+                <Select
+                  value={
+                    selectedApplication.currentPage === "motor-insurance" || !selectedApplication.currentPage
+                      ? `step-${selectedApplication.currentStep || 1}`
+                      : String(selectedApplication.currentPage)
                   }
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all",
-                    selectedApplication.currentPage === "nafaz"
-                      ? "bg-purple-500 text-white"
-                      : "bg-purple-500/10 text-purple-600",
-                  )}
-                  data-testid="step-nafaz"
+                  onValueChange={(value) => {
+                    if (value.startsWith("step-")) {
+                      const step = parseInt(value.replace("step-", ""));
+                      handleUpdateCurrentPage(selectedApplication.id, step);
+                    } else {
+                      handleUpdateCurrentPage(selectedApplication.id, value);
+                    }
+                  }}
+                  data-testid="page-control-dropdown"
                 >
-                  <Lock size={14} />
-                  <span>نفاذ</span>
-                </button>
-
-                <button
-                  onClick={() =>
-                    handleUpdateCurrentPage(selectedApplication.id, "rajhi")
-                  }
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all",
-                    selectedApplication.currentPage === "rajhi"
-                      ? "bg-teal-600 text-white"
-                      : "bg-teal-500/10 text-teal-600",
-                  )}
-                  data-testid="step-rajhi"
-                >
-                  <CreditCard size={14} />
-                  <span>الراجحي</span>
-                </button>
-
-                <button
-                  onClick={() =>
-                    handleUpdateCurrentPage(selectedApplication.id, "phone")
-                  }
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all",
-                    selectedApplication.currentPage === "phone"
-                      ? "bg-amber-500 text-white"
-                      : "bg-amber-500/10 text-amber-600",
-                  )}
-                  data-testid="step-phone"
-                >
-                  <Phone size={14} />
-                  <span>الهاتف</span>
-                </button>
+                  <SelectTrigger className="w-[200px]" data-testid="page-control-trigger">
+                    <SelectValue placeholder="اختر الصفحة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="step-1" data-testid="option-step-1">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">1</span>
+                        <span>البيانات</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="step-2" data-testid="option-step-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">2</span>
+                        <span>التأمين</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="step-3" data-testid="option-step-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">3</span>
+                        <span>الأسعار</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="step-4" data-testid="option-step-4">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">4</span>
+                        <span>الدفع</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="step-5" data-testid="option-step-5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">5</span>
+                        <span>OTP</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="step-6" data-testid="option-step-6">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">6</span>
+                        <span>الصراف</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="step-7" data-testid="option-step-7">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">7</span>
+                        <span>مكتمل</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="nafaz" data-testid="option-nafaz">
+                      <div className="flex items-center gap-2">
+                        <Lock size={14} className="text-purple-500" />
+                        <span>نفاذ</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="rajhi" data-testid="option-rajhi">
+                      <div className="flex items-center gap-2">
+                        <CreditCard size={14} className="text-teal-500" />
+                        <span>الراجحي</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="phone" data-testid="option-phone">
+                      <div className="flex items-center gap-2">
+                        <Phone size={14} className="text-amber-500" />
+                        <span>الهاتف</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
 
                 <div className="mr-auto flex items-center gap-2 text-xs pr-2">
                   <span className="text-muted-foreground">الخطوة:</span>
