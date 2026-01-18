@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <rect width="800" height="500" rx="40" fill="white" stroke="#F3F3F3"/>
+  <g transform="translate(200, 150)">
+    <path d="M0 100 L80 0 L160 100 L240 0 L320 100 L400 0" stroke="#4ECDC4" stroke-width="40" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="200" y="180" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="#1A5C85" text-anchor="middle">mada</text>
+  </g>
+</svg>
