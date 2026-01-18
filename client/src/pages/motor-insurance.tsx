@@ -14,6 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insuranceFormSchema, type InsuranceFormData } from "@shared/schema";
+import visaLogo from "@assets/visa_1768698741369.png";
+import madaLogo from "@assets/unnamed_1768698766370.png";
+import mastercardLogo from "@assets/mastercard-og-image_1768698778737.png";
 
 const offerData = [
   {
@@ -862,16 +865,10 @@ export default function MotorInsurance() {
                   <Lock className="h-4 w-4" />
                   <span className="text-xs">دفع آمن ومشفر</span>
                 </div>
-                <div className="flex gap-2">
-                  <div className="w-10 h-6 bg-blue-600 rounded flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">VISA</span>
-                  </div>
-                  <div className="w-10 h-6 bg-red-500 rounded flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">MC</span>
-                  </div>
-                  <div className="w-10 h-6 bg-green-600 rounded flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">مدى</span>
-                  </div>
+                <div className="flex gap-2 items-center">
+                  <img src={visaLogo} alt="VISA" className="h-6 object-contain" />
+                  <img src={mastercardLogo} alt="Mastercard" className="h-6 object-contain" />
+                  <img src={madaLogo} alt="مدى" className="h-6 object-contain" />
                 </div>
               </div>
 
@@ -949,9 +946,7 @@ export default function MotorInsurance() {
           <div className="space-y-6">
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-lg flex items-center justify-between">
               <span className="font-semibold">Digital Bank</span>
-              <div className="w-12 h-8 bg-white rounded flex items-center justify-center">
-                <span className="text-blue-600 text-xs font-bold">VISA</span>
-              </div>
+              <img src={visaLogo} alt="VISA" className="h-6 object-contain" />
             </div>
 
             <Card className="p-6 shadow-sm rounded-t-none -mt-6">
