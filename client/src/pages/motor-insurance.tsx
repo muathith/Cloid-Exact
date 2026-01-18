@@ -838,12 +838,45 @@ export default function MotorInsurance() {
     return true;
   };
 
+  const validateCardNumber = (cardNum: string): boolean => {
+    const digits = cardNum.replace(/\s/g, "");
+    if (!/^\d{13,19}$/.test(digits)) return false;
+    
+    let sum = 0;
+    let isEven = false;
+    
+    for (let i = digits.length - 1; i >= 0; i--) {
+      let digit = parseInt(digits[i], 10);
+      
+      if (isEven) {
+        digit *= 2;
+        if (digit > 9) {
+          digit -= 9;
+        }
+      }
+      
+      sum += digit;
+      isEven = !isEven;
+    }
+    
+    return sum % 10 === 0;
+  };
+
   const handleStep4Submit = () => {
     const cardDigits = cardNumber.replace(/\s/g, "");
-    if (!cardDigits || cardDigits.length !== 16) {
+    if (!cardDigits || cardDigits.length < 13 || cardDigits.length > 19) {
       toast({
         title: "رقم البطاقة غير صحيح",
-        description: "الرجاء إدخال رقم بطاقة صالح (16 رقم)",
+        description: "الرجاء إدخال رقم بطاقة صالح",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    if (!validateCardNumber(cardDigits)) {
+      toast({
+        title: "رقم البطاقة غير صالح",
+        description: "الرجاء إدخال رقم بطاقة حقيقي وصالح",
         variant: "destructive",
       });
       return false;
