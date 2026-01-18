@@ -491,8 +491,14 @@ export default function Dashboard() {
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
               data-testid="button-toggle-sidebar"
+              className="relative"
             >
-              <Menu className="h-5 w-5" />
+              <Bell className="h-5 w-5" />
+              {filteredNotifications.filter(n => n.isUnread).length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1">
+                  {filteredNotifications.filter(n => n.isUnread).length}
+                </span>
+              )}
             </Button>
             {selectedVisitor && (
               <div className="flex items-center gap-3">
