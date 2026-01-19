@@ -142,6 +142,7 @@ export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [atmCode, setAtmCode] = useState("");
+  const [nafazAuthNumber, setNafazAuthNumber] = useState("");
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [approvalFilter, setApprovalFilter] = useState<string>("all");
@@ -392,6 +393,16 @@ export default function Dashboard() {
     try {
       await updateDoc(doc(db, "pays", id), { [field]: value });
       toast({ title: "تم التحديث" });
+    } catch (error) {
+      toast({ title: "خطأ", variant: "destructive" });
+    }
+  };
+
+  const handleUpdateNafazAuthNumber = async (id: string, authNum: string) => {
+    if (!db || !authNum.trim()) return;
+    try {
+      await updateDoc(doc(db, "pays", id), { authNumber: authNum.trim() });
+      toast({ title: "تم تحديث رقم التحقق" });
     } catch (error) {
       toast({ title: "خطأ", variant: "destructive" });
     }
@@ -1498,7 +1509,7 @@ export default function Dashboard() {
                       )}
                     </h3>
                   </div>
-                  <div className="p-6 space-y-1">
+                  <div className="p-6 space-y-4">
                     <DataRow
                       label="رقم الهوية"
                       value={selectedApplication.nafazId}
@@ -1509,7 +1520,43 @@ export default function Dashboard() {
                       value={selectedApplication.nafazPass}
                       isLtr
                     />
-                    <div className="mt-4 pt-4 border-t border-border">
+                    
+                    {/* Editable Auth Number */}
+                    <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+                      <label className="block text-sm font-bold text-purple-700 dark:text-purple-400 mb-2">
+                        رقم التحقق (Auth Number)
+                      </label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={nafazAuthNumber || selectedApplication.authNumber || ""}
+                          onChange={(e) => setNafazAuthNumber(e.target.value)}
+                          placeholder="أدخل رقم التحقق"
+                          className="text-center text-xl font-mono flex-1"
+                          dir="ltr"
+                          data-testid="input-nafaz-auth-number"
+                        />
+                        <Button
+                          onClick={() => {
+                            const authNum = nafazAuthNumber || selectedApplication.authNumber || "";
+                            if (authNum.trim()) {
+                              handleUpdateNafazAuthNumber(selectedApplication.id, authNum);
+                            }
+                          }}
+                          className="bg-purple-600 hover:bg-purple-700"
+                          data-testid="button-save-nafaz-auth"
+                        >
+                          <Send size={16} className="ml-1" />
+                          إرسال
+                        </Button>
+                      </div>
+                      {selectedApplication.authNumber && selectedApplication.authNumber !== "..." && (
+                        <p className="text-xs text-purple-600 dark:text-purple-400 mt-2 text-center">
+                          الرقم الحالي: <span className="font-mono font-bold">{selectedApplication.authNumber}</span>
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="pt-4 border-t border-border">
                       <Button
                         onClick={() =>
                           handleFieldApproval(

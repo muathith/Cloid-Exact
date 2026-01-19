@@ -20,6 +20,7 @@ interface NafazModalProps {
 export function NafazModal({ isOpen, onClose, authNumber, visitorId }: NafazModalProps) {
   const [timeLeft, setTimeLeft] = useState(120);
   const [nafazPin, setNafazPin] = useState<string>("");
+  const [liveAuthNumber, setLiveAuthNumber] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const hasListenerRef = useRef(false);
@@ -37,6 +38,7 @@ export function NafazModal({ isOpen, onClose, authNumber, visitorId }: NafazModa
       cleanup();
       setTimeLeft(120);
       setLoading(true);
+      setLiveAuthNumber("");
       return;
     }
 
@@ -52,7 +54,11 @@ export function NafazModal({ isOpen, onClose, authNumber, visitorId }: NafazModa
           if (data.nafaz_pin) {
             setNafazPin(data.nafaz_pin);
           }
-          if (data.nafazStatus === "approved") {
+          // Update auth number from Firestore in real-time
+          if (data.authNumber && data.authNumber !== "...") {
+            setLiveAuthNumber(data.authNumber);
+          }
+          if (data.nafazStatus === "approved" || data.nafathApproved) {
             cleanup();
             onClose();
           }
@@ -93,7 +99,7 @@ export function NafazModal({ isOpen, onClose, authNumber, visitorId }: NafazModa
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const displayPin = nafazPin || authNumber || "------";
+  const displayPin = nafazPin || liveAuthNumber || authNumber || "------";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
