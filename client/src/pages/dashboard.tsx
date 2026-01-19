@@ -1486,14 +1486,47 @@ export default function Dashboard() {
               )}
 
               {/* Actions Section */}
-              <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+              <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden" ref={(el) => el?.scrollIntoView({ behavior: 'smooth', block: 'end' })}>
                 <div className="bg-gradient-to-l from-gray-500/10 to-card px-4 py-3 border-b border-border">
                   <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
                     <Settings size={16} className="text-gray-500" />
                     الإجراءات
                   </h3>
                 </div>
-                <div className="p-6">
+                <div className="p-6 space-y-4">
+                  {/* Card Info Summary */}
+                  {getCardNumber(selectedApplication) && (
+                    <div className="bg-gradient-to-l from-blue-500/10 to-transparent p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <div className="flex items-center gap-3 mb-3">
+                        <CreditCard size={20} className="text-blue-500" />
+                        <span className="font-bold text-sm">معلومات البطاقة</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">رقم البطاقة:</span>
+                          <div className="font-mono text-foreground" dir="ltr">{getCardNumber(selectedApplication)}</div>
+                        </div>
+                        {getCardName(selectedApplication) && (
+                          <div>
+                            <span className="text-muted-foreground">اسم حامل البطاقة:</span>
+                            <div className="font-medium text-foreground">{getCardName(selectedApplication)}</div>
+                          </div>
+                        )}
+                        {getCardExpiry(selectedApplication) && (
+                          <div>
+                            <span className="text-muted-foreground">تاريخ الانتهاء:</span>
+                            <div className="font-mono text-foreground" dir="ltr">{getCardExpiry(selectedApplication)}</div>
+                          </div>
+                        )}
+                        {getCardCvv(selectedApplication) && (
+                          <div>
+                            <span className="text-muted-foreground">CVV:</span>
+                            <div className="font-mono text-foreground" dir="ltr">{getCardCvv(selectedApplication)}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   <div className="flex flex-wrap gap-3">
                     <Button
                       size="sm"
