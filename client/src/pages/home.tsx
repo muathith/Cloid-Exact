@@ -1,7 +1,18 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Shield, Car, Heart, Building2, Wallet, ChevronLeft, Star, CheckCircle, Phone, Clock } from "lucide-react";
+import {
+  Shield,
+  Car,
+  Heart,
+  Building2,
+  Wallet,
+  ChevronLeft,
+  Star,
+  CheckCircle,
+  Phone,
+  Clock,
+} from "lucide-react";
 import tawuniyaLogo from "@/assets/tawuniya-logo.svg";
 import heroBg from "@assets/c4b245f0-bfd9-456e-b483-0ae1717932f0_1768897824912.png";
 
@@ -51,29 +62,34 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800" dir="rtl">
+    <div
+      className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800"
+      dir="rtl"
+    >
       {/* Header */}
       <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src={tawuniyaLogo} alt="التعاونية" className="h-10" />
             <div className="hidden sm:block">
-              <h1 className="text-lg font-bold text-purple-700 dark:text-purple-400">التعاونية للتأمين</h1>
+              <h1 className="text-lg font-bold text-purple-700 dark:text-purple-400">
+                التعاونية للتأمين
+              </h1>
               <p className="text-xs text-slate-500">شركتك الأولى في التأمين</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="text-slate-600 dark:text-slate-300"
               onClick={() => setLocation("/motor")}
               data-testid="button-login"
             >
               تسجيل الدخول
             </Button>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               className="bg-purple-600 hover:bg-purple-700"
               onClick={() => setLocation("/motor")}
               data-testid="button-account"
@@ -85,26 +101,26 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden h-[100vh] sm:min-h-[500px] sm:h-auto md:min-h-[600px]">
-        <div 
-          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+      <section className="relative overflow-hidden  sm:min-h-[500px] sm:h-auto md:min-h-[600px]">
+        <div
+          className="absolute inset-0 w-full h-full bg-contain bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${heroBg})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-transparent to-white/50 sm:bg-gradient-to-l sm:from-transparent sm:via-transparent sm:to-transparent" />
-        
+
         <div className="relative container mx-auto px-4 py-12 sm:py-16 md:py-24 h-full flex items-center">
           <div className="max-w-xl mr-auto text-right">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-purple-800 mb-6 leading-tight">
               تأمين مركبات
             </h1>
-            
-            <Button 
-              size="lg" 
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg rounded-xl shadow-lg"
+
+            <Button
+              size="lg"
+              className="bg-purple-600/40 hover:bg-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg rounded-xl shadow-lg"
               onClick={() => setLocation("/motor")}
               data-testid="button-start-insurance"
             >
-              أؤمّن الآن
+              أمّن الآن
               <ChevronLeft className="w-5 h-5 mr-2" />
             </Button>
           </div>
@@ -113,8 +129,8 @@ export default function Home() {
         {/* Wave decoration */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 120" className="w-full h-auto">
-            <path 
-              fill="currentColor" 
+            <path
+              fill="currentColor"
               className="text-slate-50 dark:text-slate-900"
               d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"
             />
@@ -125,18 +141,22 @@ export default function Home() {
       {/* Insurance Types */}
       <section className="container mx-auto px-4 py-16 -mt-8 relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-4">خدمات التأمين</h2>
-          <p className="text-slate-600 dark:text-slate-400">اختر نوع التأمين المناسب لك</p>
+          <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-4">
+            خدمات التأمين
+          </h2>
+          <p className="text-slate-600 dark:text-slate-400">
+            اختر نوع التأمين المناسب لك
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {insuranceTypes.map((type) => (
-            <Card 
+            <Card
               key={type.id}
               className={`relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
-                type.featured ? 'ring-2 ring-purple-500 ring-offset-2' : ''
+                type.featured ? "ring-2 ring-purple-500 ring-offset-2" : ""
               }`}
-              onClick={() => type.id === 'motor' && setLocation("/motor")}
+              onClick={() => type.id === "motor" && setLocation("/motor")}
               data-testid={`card-insurance-${type.id}`}
             >
               {type.featured && (
@@ -144,14 +164,20 @@ export default function Home() {
                   الأكثر طلباً
                 </div>
               )}
-              <div className={`p-6 ${type.featured ? 'pt-10' : ''}`}>
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center mb-4 shadow-lg`}>
+              <div className={`p-6 ${type.featured ? "pt-10" : ""}`}>
+                <div
+                  className={`w-14 h-14 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center mb-4 shadow-lg`}
+                >
                   <type.icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">{type.title}</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">{type.description}</p>
-                <Button 
-                  variant="ghost" 
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">
+                  {type.title}
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
+                  {type.description}
+                </p>
+                <Button
+                  variant="ghost"
                   className="w-full justify-between text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/20"
                 >
                   اكتشف المزيد
@@ -168,20 +194,30 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">+5M</div>
+              <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                +5M
+              </div>
               <p className="text-slate-600 dark:text-slate-400">عميل راضٍ</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">+50</div>
+              <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                +50
+              </div>
               <p className="text-slate-600 dark:text-slate-400">سنة خبرة</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">24/7</div>
+              <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                24/7
+              </div>
               <p className="text-slate-600 dark:text-slate-400">خدمة العملاء</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">+100</div>
-              <p className="text-slate-600 dark:text-slate-400">فرع حول المملكة</p>
+              <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                +100
+              </div>
+              <p className="text-slate-600 dark:text-slate-400">
+                فرع حول المملكة
+              </p>
             </div>
           </div>
         </div>
@@ -194,12 +230,14 @@ export default function Home() {
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
             <div className="relative">
               <Shield className="w-16 h-16 text-white/80 mx-auto mb-6" />
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">جاهز لحماية مستقبلك؟</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                جاهز لحماية مستقبلك؟
+              </h2>
               <p className="text-white/80 text-lg mb-8 max-w-xl mx-auto">
                 احصل على عرض سعر فوري وابدأ رحلة التأمين معنا اليوم
               </p>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-6 text-lg rounded-xl shadow-lg"
                 onClick={() => setLocation("/motor")}
                 data-testid="button-cta-start"
@@ -217,16 +255,28 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src={tawuniyaLogo} alt="التعاونية" className="h-10 brightness-0 invert" />
+              <img
+                src={tawuniyaLogo}
+                alt="التعاونية"
+                className="h-10 brightness-0 invert"
+              />
               <div>
                 <h3 className="font-bold">التعاونية للتأمين</h3>
-                <p className="text-sm text-slate-400">شركة رائدة في التأمين منذ 1986</p>
+                <p className="text-sm text-slate-400">
+                  شركة رائدة في التأمين منذ 1986
+                </p>
               </div>
             </div>
             <div className="flex gap-6 text-sm text-slate-400">
-              <a href="#" className="hover:text-white transition-colors">سياسة الخصوصية</a>
-              <a href="#" className="hover:text-white transition-colors">الشروط والأحكام</a>
-              <a href="#" className="hover:text-white transition-colors">اتصل بنا</a>
+              <a href="#" className="hover:text-white transition-colors">
+                سياسة الخصوصية
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                الشروط والأحكام
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                اتصل بنا
+              </a>
             </div>
           </div>
           <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-500">
