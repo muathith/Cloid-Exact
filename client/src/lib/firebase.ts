@@ -1,5 +1,13 @@
 import { getApp, getApps, initializeApp, FirebaseApp } from "firebase/app";
 import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User,
+  Auth,
+} from "firebase/auth";
+import {
   getDatabase,
   Database,
   ref,
@@ -35,10 +43,12 @@ const isFirebaseConfigured = Boolean(
 let app: FirebaseApp | null = null;
 let db: Firestore | null = null;
 let database: Database | null = null;
+let auth: Auth | null = null;
 
 if (isFirebaseConfigured) {
   app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   db = getFirestore(app);
+  auth = getAuth(app);
   if (firebaseConfig.databaseURL) {
     database = getDatabase(app);
   }
@@ -47,6 +57,33 @@ if (isFirebaseConfigured) {
     "Firebase is not configured. Please set the required environment variables.",
   );
 }
+
+// Auth functions
+export const loginWithEmail = async (email: string, password: string): Promise<User | null> => {
+  if (!auth) return null;
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    return result.user;
+  } catch (error) {
+    console.error("Login error:", error);
+    throw error;
+  }
+};
+
+export const logout = async (): Promise<void> => {
+  if (!auth) return;
+  await signOut(auth);
+};
+
+export const subscribeToAuthState = (callback: (user: User | null) => void): (() => void) => {
+  if (!auth) {
+    callback(null);
+    return () => {};
+  }
+  return onAuthStateChanged(auth, callback);
+};
+
+export { auth };
 
 export async function getData(id: string) {
   if (!db) {

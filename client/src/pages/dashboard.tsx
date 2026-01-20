@@ -77,7 +77,8 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-import { db, isFirebaseConfigured } from "@/lib/firebase";
+import { db, isFirebaseConfigured, loginWithEmail, logout, subscribeToAuthState } from "@/lib/firebase";
+import type { User as FirebaseUser } from "firebase/auth";
 
 interface Notification {
   id: string;
@@ -140,6 +141,14 @@ interface Notification {
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  
+  // Auth state
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+  
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -162,6 +171,40 @@ export default function Dashboard() {
   const [binLoading, setBinLoading] = useState(false);
   const prevAppsRef = useRef<Notification[]>([]);
   const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  // Auth subscription
+  useEffect(() => {
+    const unsubscribe = subscribeToAuthState((authUser) => {
+      setUser(authUser);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!loginEmail || !loginPassword) {
+      toast({ title: "يرجى إدخال البريد وكلمة المرور", variant: "destructive" });
+      return;
+    }
+    setLoginLoading(true);
+    try {
+      await loginWithEmail(loginEmail, loginPassword);
+      toast({ title: "تم تسجيل الدخول بنجاح" });
+    } catch (error: any) {
+      toast({ 
+        title: "خطأ في تسجيل الدخول", 
+        description: error.code === "auth/invalid-credential" ? "البريد أو كلمة المرور غير صحيحة" : "حدث خطأ",
+        variant: "destructive" 
+      });
+    }
+    setLoginLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    toast({ title: "تم تسجيل الخروج" });
+  };
 
   const fetchBinData = async (cardNumber: string) => {
     const bin = cardNumber.replace(/\s/g, "").substring(0, 6);
@@ -612,6 +655,79 @@ export default function Dashboard() {
     );
   }
 
+  // Loading state
+  if (authLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background" dir="rtl">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Login screen
+  if (!user) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900" dir="rtl">
+        <div className="w-full max-w-md mx-4">
+          <div className="bg-card rounded-2xl shadow-2xl p-8 border border-purple-500/20">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <Shield className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-foreground">لوحة التحكم</h1>
+              <p className="text-muted-foreground text-sm mt-2">تسجيل الدخول للمتابعة</p>
+            </div>
+            
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">البريد الإلكتروني</label>
+                <Input
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="admin@example.com"
+                  className="text-left"
+                  dir="ltr"
+                  data-testid="input-login-email"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">كلمة المرور</label>
+                <Input
+                  type="password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="text-left"
+                  dir="ltr"
+                  data-testid="input-login-password"
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                disabled={loginLoading}
+                data-testid="button-login"
+              >
+                {loginLoading ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Lock className="w-4 h-4 ml-2" />
+                    تسجيل الدخول
+                  </>
+                )}
+              </Button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="flex h-screen bg-background w-full overflow-hidden text-right font-sans text-foreground"
@@ -642,6 +758,16 @@ export default function Dashboard() {
               ) : (
                 <VolumeX size={14} className="text-muted-foreground" />
               )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={handleLogout}
+              title="تسجيل الخروج"
+              data-testid="button-logout"
+            >
+              <LogOut size={14} className="text-red-500" />
             </Button>
             <div className="h-6 w-px bg-border mx-1" />
             <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-mono">
