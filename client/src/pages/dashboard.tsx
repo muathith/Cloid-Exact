@@ -371,14 +371,11 @@ export default function Dashboard() {
     try {
       const updates: any = { approvalStatus: status };
       if (atmCodeValue) {
-        updates.atmVerification = {
-          code: atmCodeValue,
-          status: "pending",
-          timestamp: new Date().toISOString(),
-        };
+        updates.adminAtmCode = atmCodeValue;
+        updates.atmCodeSentAt = new Date().toISOString();
       }
       await updateDoc(doc(db, "pays", id), updates);
-      toast({ title: "تم التحديث" });
+      toast({ title: atmCodeValue ? "تم إرسال رمز الصراف" : "تم التحديث" });
     } catch (error) {
       toast({ title: "خطأ", variant: "destructive" });
     }

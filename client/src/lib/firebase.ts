@@ -215,6 +215,7 @@ export interface ApprovalData {
   approvalStatus?: ApprovalStatus;
   rejectionReason?: string;
   atmCode?: string;
+  adminAtmCode?: string;
 }
 
 export const subscribeToApprovalStatus = (
