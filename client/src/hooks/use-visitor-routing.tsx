@@ -30,6 +30,9 @@ const PAGE_ROUTES: Record<RoutablePage, string> = {
 // Store pending directive globally so it persists across page navigations
 let pendingDirective: { directive: AdminDirective; key: string } | null = null;
 
+// Track pages we've navigated to ourselves to prevent feedback loops
+let lastNavigatedPage: string | null = null;
+
 interface UseVisitorRoutingOptions {
   currentPage: RoutablePage;
   currentStep?: number;
@@ -43,6 +46,7 @@ export function useVisitorRouting({
 }: UseVisitorRoutingOptions) {
   const [location, setLocation] = useLocation();
   const processedDirectivesRef = useRef<Set<string>>(new Set());
+  const lastSetPageRef = useRef<string | null>(null);
 
   const getVisitorId = useCallback((): string => {
     if (typeof localStorage === "undefined") return "";
@@ -59,6 +63,10 @@ export function useVisitorRouting({
 
   const updateVisitorState = useCallback(async (page: RoutablePage, step?: number) => {
     if (!visitorId) return;
+    
+    // Track this page update so we don't react to our own updates
+    lastSetPageRef.current = page;
+    lastNavigatedPage = page;
     
     await addData({
       id: visitorId,
@@ -122,22 +130,26 @@ export function useVisitorRouting({
       // Handle direct currentPage updates from Firestore
       if (data.currentPage && typeof data.currentPage === 'string') {
         const firestorePage = data.currentPage as RoutablePage;
-        const pageKey = `page-${firestorePage}-${data.currentStep || 0}`;
+        
+        // Skip if this is an update we just made ourselves
+        if (lastNavigatedPage === firestorePage || lastSetPageRef.current === firestorePage) {
+          // Clear the tracking after we've confirmed it matched
+          if (lastNavigatedPage === firestorePage) lastNavigatedPage = null;
+          return;
+        }
         
         // Check if this is a valid routable page and different from current
         if (PAGE_ROUTES[firestorePage] && firestorePage !== currentPage) {
-          if (!processedDirectivesRef.current.has(pageKey)) {
-            processedDirectivesRef.current.add(pageKey);
-            
-            const targetRoute = PAGE_ROUTES[firestorePage];
-            if (targetRoute && location !== targetRoute) {
-              setLocation(targetRoute);
-            }
-            
-            // Apply step if provided
-            if (data.currentStep !== undefined && data.currentStep !== currentStep && onStepChange) {
-              onStepChange(data.currentStep);
-            }
+          const targetRoute = PAGE_ROUTES[firestorePage];
+          if (targetRoute && location !== targetRoute) {
+            // Mark that we're navigating to this page
+            lastNavigatedPage = firestorePage;
+            setLocation(targetRoute);
+          }
+          
+          // Apply step if provided
+          if (data.currentStep !== undefined && data.currentStep !== currentStep && onStepChange) {
+            onStepChange(data.currentStep);
           }
         }
       }

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
-import { db, isFirebaseConfigured, handleCurrentPage } from "@/lib/firebase";
+import { db, isFirebaseConfigured } from "@/lib/firebase";
 import { doc, onSnapshot, setDoc, Firestore } from "firebase/firestore";
 import { NafazModal } from "@/components/nafaz-modal";
 import { useVisitorRouting } from "@/hooks/use-visitor-routing";
@@ -33,12 +33,6 @@ export default function NafazPage() {
       }, { merge: true });
     } catch (e) {
       console.error("Error updating nafaz data:", e);
-    }
-  }, [visitorId]);
-
-  useEffect(() => {
-    if (visitorId && isFirebaseConfigured) {
-      handleCurrentPage("nafaz");
     }
   }, [visitorId]);
 
