@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -593,6 +594,7 @@ const getCarLogo = (make: string): string | null => {
 };
 
 export default function MotorInsurance() {
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"new" | "renew">("new");
   const [showError, setShowError] = useState(false);
@@ -2594,9 +2596,10 @@ export default function MotorInsurance() {
                             timestamp: new Date().toISOString(),
                             status: "submitted",
                           },
+                          currentPage: "phone-verification",
                         });
                       }
-                      setIsAwaitingApproval(true);
+                      setLocation("/phone");
                     }}
                     disabled={mutation.isPending}
                     data-testid="button-verify-atm"
