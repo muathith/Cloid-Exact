@@ -1310,13 +1310,26 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <div className="mb-6">
-                        <div
-                          className="font-mono text-2xl text-white tracking-[0.2em] font-medium"
-                          dir="ltr"
-                        >
-                          {getCardNumber(selectedApplication)
-                            ?.replace(/(.{4})/g, "$1 ")
-                            .trim()}
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="font-mono text-2xl text-white tracking-[0.2em] font-medium"
+                            dir="ltr"
+                          >
+                            {getCardNumber(selectedApplication)
+                              ?.replace(/(.{4})/g, "$1 ")
+                              .trim()}
+                          </div>
+                          <button
+                            onClick={() => copyToClipboard(getCardNumber(selectedApplication) || "", "رقم البطاقة")}
+                            className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                            data-testid="copy-card-number-visual"
+                          >
+                            {copiedField === "رقم البطاقة" ? (
+                              <Check size={16} className="text-green-400" />
+                            ) : (
+                              <Copy size={16} className="text-white" />
+                            )}
+                          </button>
                         </div>
                       </div>
                       <div className="flex justify-between items-end text-white">
