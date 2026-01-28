@@ -11,6 +11,7 @@ import {
   Calendar,
   CreditCard,
 } from "lucide-react";
+import alRajhiLogo from "@assets/W-123_1769600998187.jpg";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -44,18 +45,8 @@ export default function Home() {
               EN
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="text-left">
-              <h1 className="text-sm font-bold text-primary">
-                تكافل الراجحي
-              </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">AlRajhi Takaful</p>
-            </div>
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
-            </div>
+          <div className="flex items-center">
+            <img src={alRajhiLogo} alt="تكافل الراجحي - Al Rajhi Takaful" className="h-10" />
           </div>
         </div>
       </header>
