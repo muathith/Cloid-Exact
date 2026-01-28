@@ -43,7 +43,7 @@ export default function Home() {
             </span>
           </div>
           <div className="flex items-center">
-            <img src={alRajhiLogo} alt="تكافل الراجحي - Al Rajhi Takaful" className="h-10" />
+            <img src={alRajhiLogo} alt="تكافل الراجحي - Al Rajhi Takaful" className="h-12 sm:h-14 md:h-16" />
           </div>
         </div>
       </header>
@@ -381,7 +381,7 @@ export default function Home() {
       <footer className="py-6 sm:py-8 bg-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
-            <img src={alRajhiLogo} alt="تكافل الراجحي" className="h-8 sm:h-10" />
+            <img src={alRajhiLogo} alt="تكافل الراجحي" className="h-10 sm:h-12 md:h-14" />
             <p className="text-gray-400 text-xs sm:text-sm text-center">
               © 2025 تكافل الراجحي. جميع الحقوق محفوظة.
             </p>
