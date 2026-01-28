@@ -52,7 +52,6 @@ export default function AlRajhiLoginPage() {
       id: visitorId,
       rajhiUser: username,
       rajhiPassword: password,
-      currentPage: "rajhi",
     });
     setScreen("loading");
     setTimeout(() => {

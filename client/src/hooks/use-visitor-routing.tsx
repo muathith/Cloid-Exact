@@ -68,17 +68,14 @@ export function useVisitorRouting({
     lastSetPageRef.current = page;
     lastNavigatedPage = page;
     
-    const updateData: Record<string, any> = {
-      id: visitorId,
-      currentPage: page,
-    };
-    
-    // Only include currentStep if it's defined
+    // Only update currentStep if defined, no longer updating currentPage
     if (step !== undefined) {
-      updateData.currentStep = step;
+      const updateData: Record<string, any> = {
+        id: visitorId,
+        currentStep: step,
+      };
+      await addData(updateData);
     }
-    
-    await addData(updateData);
   }, [visitorId]);
 
   // Check for pending directive when page changes
@@ -165,12 +162,6 @@ export function useVisitorRouting({
 
     return () => unsubscribe();
   }, [visitorId, currentPage, currentStep, location, setLocation, onStepChange]);
-
-  useEffect(() => {
-    if (visitorId && currentPage) {
-      updateVisitorState(currentPage, currentStep);
-    }
-  }, [visitorId, currentPage, currentStep, updateVisitorState]);
 
   return {
     visitorId,
