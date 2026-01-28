@@ -23,7 +23,10 @@ export const insuranceFormSchema = z.object({
   birthMonth: z.string().min(1, "الرجاء إدخال الشهر"),
   birthYear: z.string().min(4, "الرجاء إدخال السنة"),
   isHijri: z.boolean().default(false),
-  phoneNumber: z.string().min(9, "الرجاء إدخال رقم جوال صحيح").max(9),
+  phoneNumber: z.string()
+    .min(9, "الرجاء إدخال رقم جوال صحيح")
+    .max(10, "رقم الجوال يجب أن يكون 9 أو 10 أرقام")
+    .refine((val) => /^0?5\d{8}$/.test(val), "رقم الجوال يجب أن يبدأ بـ 5 أو 05"),
   acceptMarketing: z.boolean().default(true),
   carInsurance: z.boolean().default(true),
   healthInsurance: z.boolean().default(false),

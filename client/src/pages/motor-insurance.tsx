@@ -1449,7 +1449,7 @@ export default function MotorInsurance() {
                 <div className="flex gap-2 flex-row-reverse">
                   <Input
                     {...form.register("phoneNumber")}
-                    placeholder="5xxxxxxxx"
+                    placeholder="5xxxxxxxx أو 05xxxxxxxx"
                     className="flex-1 text-left h-12 text-base"
                     dir="ltr"
                     data-testid="input-phone"
