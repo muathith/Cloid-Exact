@@ -12,6 +12,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import alRajhiLogo from "@assets/W-123_1769600998187.jpg";
+import heroImage from "@assets/motor-img_1769601137526.webp";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -52,11 +53,12 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative h-32 bg-gradient-to-r from-primary to-cyan-600 overflow-hidden">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-4 left-1/4 w-32 h-32 border border-white/20 rounded-full" />
-          <div className="absolute -bottom-8 right-1/4 w-48 h-48 border border-white/20 rounded-full" />
-        </div>
+      <section className="relative h-48 sm:h-56 md:h-64 overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${heroImage})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       </section>
 
       {/* Main Content Card */}
