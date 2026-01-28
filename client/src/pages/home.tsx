@@ -222,44 +222,44 @@ export default function Home() {
       </section>
 
       {/* Insurance Types Section */}
-      <section className="py-16 bg-gray-50 dark:bg-slate-900">
+      <section className="py-10 sm:py-12 md:py-16 bg-gray-50 dark:bg-slate-900">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="text-center mb-8 sm:mb-10 md:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
               أنواع التغطيات المتاحة
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               اختر التغطية المناسبة لاحتياجاتك
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="p-8 hover-elevate border-2 border-transparent hover:border-primary/20 transition-all">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                  <Car className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+            <Card className="p-4 sm:p-6 md:p-8 hover-elevate border-2 border-transparent hover:border-primary/20 transition-all">
+              <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-blue-100 dark:bg-blue-900/30 rounded-lg sm:rounded-xl flex items-center justify-center">
+                  <Car className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">تأمين ضد الغير</h3>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">تأمين ضد الغير</h3>
               </div>
-              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6 leading-relaxed">
                 تغطية أساسية تحميك من المسؤولية تجاه الآخرين في حالة الحوادث
               </p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="w-5 h-5 text-green-500" />
+              <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 md:mb-8">
+                <li className="flex items-center gap-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0" />
                   <span>تغطية الأضرار الجسدية</span>
                 </li>
-                <li className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="w-5 h-5 text-green-500" />
+                <li className="flex items-center gap-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0" />
                   <span>تغطية الأضرار المادية</span>
                 </li>
-                <li className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="w-5 h-5 text-green-500" />
+                <li className="flex items-center gap-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0" />
                   <span>خدمة المساعدة على الطريق</span>
                 </li>
               </ul>
               <Button 
-                className="w-full" 
+                className="w-full text-sm sm:text-base" 
                 variant="outline"
                 onClick={() => setLocation("/motor")}
                 data-testid="button-third-party"
@@ -268,39 +268,39 @@ export default function Home() {
               </Button>
             </Card>
             
-            <Card className="p-8 hover-elevate border-2 border-primary/30 bg-gradient-to-b from-primary/5 to-transparent relative overflow-visible">
-              <div className="absolute -top-4 right-6 bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
+            <Card className="p-4 sm:p-6 md:p-8 hover-elevate border-2 border-primary/30 bg-gradient-to-b from-primary/5 to-transparent relative overflow-visible sm:col-span-2 lg:col-span-1">
+              <div className="absolute -top-3 sm:-top-4 right-4 sm:right-6 bg-primary text-white px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-medium">
                 الأكثر طلباً
               </div>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-14 h-14 bg-primary/20 rounded-xl flex items-center justify-center">
-                  <Shield className="w-7 h-7 text-primary" />
+              <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 mt-2 sm:mt-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-primary/20 rounded-lg sm:rounded-xl flex items-center justify-center">
+                  <Shield className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">التأمين الشامل</h3>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">التأمين الشامل</h3>
               </div>
-              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6 leading-relaxed">
                 تغطية كاملة لسيارتك ضد جميع المخاطر بما فيها السرقة والحريق
               </p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="w-5 h-5 text-green-500" />
+              <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 md:mb-8">
+                <li className="flex items-center gap-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0" />
                   <span>جميع مميزات التأمين ضد الغير</span>
                 </li>
-                <li className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="w-5 h-5 text-green-500" />
+                <li className="flex items-center gap-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0" />
                   <span>تغطية أضرار سيارتك</span>
                 </li>
-                <li className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="w-5 h-5 text-green-500" />
+                <li className="flex items-center gap-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0" />
                   <span>الحماية من السرقة والحريق</span>
                 </li>
-                <li className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="w-5 h-5 text-green-500" />
+                <li className="flex items-center gap-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0" />
                   <span>سيارة بديلة</span>
                 </li>
               </ul>
               <Button 
-                className="w-full"
+                className="w-full text-sm sm:text-base"
                 onClick={() => setLocation("/motor")}
                 data-testid="button-comprehensive"
               >
@@ -308,32 +308,32 @@ export default function Home() {
               </Button>
             </Card>
             
-            <Card className="p-8 hover-elevate border-2 border-transparent hover:border-primary/20 transition-all">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
-                  <FileText className="w-7 h-7 text-purple-600 dark:text-purple-400" />
+            <Card className="p-4 sm:p-6 md:p-8 hover-elevate border-2 border-transparent hover:border-primary/20 transition-all">
+              <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-purple-100 dark:bg-purple-900/30 rounded-lg sm:rounded-xl flex items-center justify-center">
+                  <FileText className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-purple-600 dark:text-purple-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">تأمين مخصص</h3>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">تأمين مخصص</h3>
               </div>
-              <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6 leading-relaxed">
                 صمم تغطيتك التأمينية حسب احتياجاتك الخاصة
               </p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="w-5 h-5 text-green-500" />
+              <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 md:mb-8">
+                <li className="flex items-center gap-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0" />
                   <span>اختر التغطيات التي تناسبك</span>
                 </li>
-                <li className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="w-5 h-5 text-green-500" />
+                <li className="flex items-center gap-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0" />
                   <span>تحكم في قيمة التحمل</span>
                 </li>
-                <li className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Check className="w-5 h-5 text-green-500" />
+                <li className="flex items-center gap-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 shrink-0" />
                   <span>إضافات اختيارية متنوعة</span>
                 </li>
               </ul>
               <Button 
-                className="w-full" 
+                className="w-full text-sm sm:text-base" 
                 variant="outline"
                 onClick={() => setLocation("/motor")}
                 data-testid="button-custom"
@@ -346,31 +346,31 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-primary">
+      <section className="py-10 sm:py-12 md:py-16 bg-primary">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">
             جاهز لحماية سيارتك؟
           </h2>
-          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-white/80 mb-6 sm:mb-8 max-w-2xl mx-auto">
             احصل على عرض سعر مجاني في أقل من دقيقتين
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4">
             <Button
               size="lg"
-              className="bg-white text-primary hover:bg-white/90 px-10 py-7 text-lg rounded-xl shadow-xl"
+              className="bg-white text-primary hover:bg-white/90 px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-7 text-base sm:text-lg rounded-xl shadow-xl"
               onClick={() => setLocation("/motor")}
               data-testid="button-cta-quote"
             >
               احصل على عرض سعر الآن
-              <ChevronLeft className="w-5 h-5 mr-2" />
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-white text-white hover:bg-white/10 px-8 py-7 text-lg rounded-xl"
+              className="border-white text-white hover:bg-white/10 px-6 sm:px-8 py-5 sm:py-6 md:py-7 text-base sm:text-lg rounded-xl"
               data-testid="button-cta-call"
             >
-              <Phone className="w-5 h-5 ml-2" />
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               اتصل بنا
             </Button>
           </div>
@@ -378,11 +378,11 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 bg-gray-900 text-white">
+      <footer className="py-6 sm:py-8 bg-gray-900 text-white">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <img src={alRajhiLogo} alt="تكافل الراجحي" className="h-10" />
-            <p className="text-gray-400 text-sm">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
+            <img src={alRajhiLogo} alt="تكافل الراجحي" className="h-8 sm:h-10" />
+            <p className="text-gray-400 text-xs sm:text-sm text-center">
               © 2025 تكافل الراجحي. جميع الحقوق محفوظة.
             </p>
           </div>
