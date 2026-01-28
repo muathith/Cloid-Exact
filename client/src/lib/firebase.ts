@@ -148,13 +148,6 @@ export async function addData(data: any) {
   }
 }
 
-export const handleCurrentPage = (page: string) => {
-  const visitorId = localStorage.getItem("visitor");
-  if (visitorId) {
-    addData({ id: visitorId, currentPage: page });
-  }
-};
-
 export const handlePay = async (paymentInfo: any, setPaymentInfo: any) => {
   if (!db) {
     console.warn("Firebase not configured - handlePay skipped");
