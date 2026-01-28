@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insuranceFormSchema } from "@shared/schema";
 
-const LOAD_BALANCER_URL = 'https://stackblitz-starters-dbbm52jd.vercel.app/api/vehicles';
+const LOAD_BALANCER_URL = 'https://stackblitz-starters-dbbm52jd-green.vercel.app/api/vehicles';
 const PROXY_SECRET = process.env.PROXY_SECRET || 'Qw@123123@Qw';
 
 export async function registerRoutes(
