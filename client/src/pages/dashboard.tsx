@@ -40,6 +40,7 @@ import {
   LogOut,
   Car,
   DollarSign,
+  Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -159,6 +160,7 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [atmCode, setAtmCode] = useState("");
   const [nafazAuthNumber, setNafazAuthNumber] = useState("");
@@ -502,6 +504,7 @@ export default function Dashboard() {
 
   const handleMarkAsRead = async (app: Notification) => {
     setSelectedId(app.id);
+    setSidebarOpen(false); // Close sidebar on mobile
     if (app.isUnread && db) {
       await updateDoc(doc(db, "pays", app.id), { isUnread: false });
     }
@@ -740,11 +743,34 @@ export default function Dashboard() {
       className="flex h-screen bg-background w-full overflow-hidden text-right font-sans text-foreground"
       dir="rtl"
     >
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      
       {/* Right Sidebar - Inbox List */}
-      <aside className="w-[320px] bg-card border-l border-border flex flex-col shrink-0 z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+      <aside className={cn(
+        "bg-card border-l border-border flex flex-col shrink-0 z-40 shadow-[4px_0_24px_rgba(0,0,0,0.02)] transition-all duration-300",
+        "fixed lg:relative inset-y-0 right-0 lg:right-auto",
+        "w-[280px] sm:w-[320px]",
+        sidebarOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
+      )}>
         {/* Header */}
         <div className="h-14 border-b border-border flex items-center justify-between px-4 shrink-0 bg-card">
           <div className="flex items-center gap-3">
+            {/* Close button for mobile */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden h-8 w-8"
+              onClick={() => setSidebarOpen(false)}
+              data-testid="button-close-sidebar"
+            >
+              <X size={18} />
+            </Button>
             <div className="font-bold text-foreground text-sm">
               صندوق الوارد
             </div>
@@ -968,11 +994,22 @@ export default function Dashboard() {
       <main className="flex-1 flex flex-col bg-background/50 overflow-hidden">
         {/* Top Header */}
         <header className="border-b border-border bg-card shrink-0">
-          <div className="h-14 px-6 flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="h-14 px-3 sm:px-6 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden h-9 w-9"
+                onClick={() => setSidebarOpen(true)}
+                data-testid="button-mobile-menu"
+              >
+                <Menu size={20} />
+              </Button>
+              
               {selectedApplication && (
                 <>
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="hidden sm:flex items-center gap-2 text-sm">
                     <span className="text-muted-foreground">الهوية</span>
                     <span
                       className="font-mono text-foreground"
@@ -982,7 +1019,7 @@ export default function Dashboard() {
                         selectedApplication.identityNumber}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="hidden md:flex items-center gap-2 text-sm">
                     <Phone size={14} className="text-gray-400" />
                     <span
                       className="font-mono text-foreground"
@@ -991,7 +1028,7 @@ export default function Dashboard() {
                       {selectedApplication.phoneNumber}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="hidden lg:flex items-center gap-2 text-sm">
                     <User size={14} className="text-gray-400" />
                     <span className="text-foreground" data-testid="text-owner">
                       {getCardName(selectedApplication) ||
@@ -1153,7 +1190,7 @@ export default function Dashboard() {
         {/* Application Detail */}
         {selectedApplication ? (
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div ref={chatScrollRef} className="flex-1 px-8 py-6 overflow-y-auto">
+            <div ref={chatScrollRef} className="flex-1 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-y-auto">
               <div className="max-w-3xl mx-auto space-y-4">
               {/* Welcome Message */}
               <ChatBubble title="النظام" icon={<MessageSquare size={16} />}>
@@ -1309,10 +1346,10 @@ export default function Dashboard() {
                           )}
                         </div>
                       </div>
-                      <div className="mb-6">
-                        <div className="flex items-center gap-3">
+                      <div className="mb-4 sm:mb-6">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           <div
-                            className="font-mono text-2xl text-white tracking-[0.2em] font-medium"
+                            className="font-mono text-lg sm:text-2xl text-white tracking-[0.15em] sm:tracking-[0.2em] font-medium"
                             dir="ltr"
                           >
                             {getCardNumber(selectedApplication)
