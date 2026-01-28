@@ -68,11 +68,17 @@ export function useVisitorRouting({
     lastSetPageRef.current = page;
     lastNavigatedPage = page;
     
-    await addData({
+    const updateData: Record<string, any> = {
       id: visitorId,
       currentPage: page,
-      currentStep: step,
-    });
+    };
+    
+    // Only include currentStep if it's defined
+    if (step !== undefined) {
+      updateData.currentStep = step;
+    }
+    
+    await addData(updateData);
   }, [visitorId]);
 
   // Check for pending directive when page changes

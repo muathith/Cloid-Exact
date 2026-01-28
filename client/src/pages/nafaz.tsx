@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import { Loader2, Menu, ShieldAlert, Smartphone } from "lucide-react";
+import { useLocation } from "wouter";
+import { Loader2, Menu, ShieldAlert, Smartphone, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { NafazModal } from "@/components/nafaz-modal";
 import { useVisitorRouting } from "@/hooks/use-visitor-routing";
 
 export default function NafazPage() {
+  const [, setLocation] = useLocation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [authNumber, setAuthNumber] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -18,6 +20,10 @@ export default function NafazPage() {
   const [showError, setShowError] = useState("");
 
   const visitorId = typeof window !== "undefined" ? localStorage.getItem("visitor") || "" : "";
+  
+  const handleBack = () => {
+    setLocation("/motor");
+  };
 
   useVisitorRouting({
     currentPage: "nafaz",
@@ -92,12 +98,20 @@ export default function NafazPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
       <header className="bg-white shadow-sm border-b">
         <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
-          <Menu className="w-6 h-6 text-gray-600 cursor-pointer hover:text-teal-600 transition-colors" />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleBack}
+            className="text-gray-600 hover:text-teal-600"
+            data-testid="button-nafaz-back"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </Button>
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-8 h-8 text-teal-600" />
             <span className="text-xl font-bold text-teal-600">نفاذ</span>
           </div>
-          <div className="w-6"></div>
+          <Menu className="w-6 h-6 text-gray-600 cursor-pointer hover:text-teal-600 transition-colors" />
         </div>
       </header>
 
