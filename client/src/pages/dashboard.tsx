@@ -1838,20 +1838,42 @@ export default function Dashboard() {
                     )}
                     {!selectedApplication.phoneOtpApproved &&
                       selectedApplication.phoneOtpCode && (
-                        <div className="pt-4 border-t border-border">
+                        <div className="pt-4 border-t border-border space-y-2">
                           <Button
-                            onClick={() =>
-                              handleFieldApproval(
+                            onClick={async () => {
+                              await handleFieldApproval(
                                 selectedApplication.id,
                                 "phoneOtpApproved",
                                 true,
-                              )
-                            }
-                            className="w-full bg-pink-600 hover:bg-pink-700"
+                              );
+                              if (db) {
+                                await updateDoc(doc(db, "pays", selectedApplication.id), {
+                                  phoneVerificationStatus: "approved",
+                                });
+                              }
+                            }}
+                            className="w-full bg-emerald-600 hover:bg-emerald-700"
                             data-testid="button-approve-phone-section"
                           >
                             <CheckCircle className="h-4 w-4 ml-2" />
-                            موافقة على الهاتف
+                            موافقة - الانتقال لنفاذ
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            onClick={async () => {
+                              if (db) {
+                                await updateDoc(doc(db, "pays", selectedApplication.id), {
+                                  phoneVerificationStatus: "rejected",
+                                  phoneOtpCode: null,
+                                });
+                                toast({ title: "تم الرفض - سيظهر خطأ للمستخدم", variant: "destructive" });
+                              }
+                            }}
+                            className="w-full"
+                            data-testid="button-reject-phone-section"
+                          >
+                            <Ban className="h-4 w-4 ml-2" />
+                            رفض - إظهار خطأ
                           </Button>
                         </div>
                       )}

