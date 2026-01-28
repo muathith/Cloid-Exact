@@ -782,6 +782,31 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* OTP Pending Approvals Warning */}
+        {pendingApprovals.phoneApprovals > 0 && (
+          <div
+            className="mx-3 mt-3 p-3 border rounded-lg animate-pulse bg-gradient-to-l from-amber-500/15 to-amber-500/5 border-amber-500/40"
+            data-testid="warning-otp-approvals"
+          >
+            <div className="flex items-center gap-2 text-amber-600">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center animate-bounce bg-amber-500">
+                <Bell size={14} className="text-white" />
+              </div>
+              <div className="flex-1">
+                <div className="font-bold text-sm">بانتظار موافقة OTP</div>
+                <div className="text-xs text-amber-600/80">
+                  <span className="inline-flex items-center gap-1">
+                    <Phone size={10} /> {pendingApprovals.phoneApprovals} طلب
+                  </span>
+                </div>
+              </div>
+              <Badge className="bg-amber-500 text-white">
+                {pendingApprovals.phoneApprovals}
+              </Badge>
+            </div>
+          </div>
+        )}
+
         {/* Search */}
         <div className="p-3 border-b border-border space-y-3 bg-card/50">
           <div className="relative">
