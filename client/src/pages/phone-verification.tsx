@@ -212,7 +212,7 @@ export default function PhoneVerificationPage() {
       <div
         className="min-h-screen bg-gradient-to-b from-[#1a5c85] to-[#2d7ba8] flex items-center justify-center p-4"
         dir="rtl"
-      >
+      >`1`````````````
         <div className="w-full max-w-lg space-y-6">
           <div className="text-center text-white space-y-2 mb-8">
             <h1 className="text-4xl font-bold text-balance">
