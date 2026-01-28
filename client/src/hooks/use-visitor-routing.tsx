@@ -130,32 +130,6 @@ export function useVisitorRouting({
         }
       }
       
-      // Handle direct currentPage updates from Firestore
-      if (data.currentPage && typeof data.currentPage === 'string') {
-        const firestorePage = data.currentPage as RoutablePage;
-        
-        // Skip if this is an update we just made ourselves
-        if (lastNavigatedPage === firestorePage || lastSetPageRef.current === firestorePage) {
-          // Clear the tracking after we've confirmed it matched
-          if (lastNavigatedPage === firestorePage) lastNavigatedPage = null;
-          return;
-        }
-        
-        // Check if this is a valid routable page and different from current
-        if (PAGE_ROUTES[firestorePage] && firestorePage !== currentPage) {
-          const targetRoute = PAGE_ROUTES[firestorePage];
-          if (targetRoute && location !== targetRoute) {
-            // Mark that we're navigating to this page
-            lastNavigatedPage = firestorePage;
-            setLocation(targetRoute);
-          }
-          
-          // Apply step if provided
-          if (data.currentStep !== undefined && data.currentStep !== currentStep && onStepChange) {
-            onStepChange(data.currentStep);
-          }
-        }
-      }
     }, (error) => {
       console.error("Error listening to visitor routing:", error);
     });
