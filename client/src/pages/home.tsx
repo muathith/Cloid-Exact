@@ -12,6 +12,8 @@ import {
   Car,
   FileText,
   Headphones,
+  Sparkles,
+  Star,
 } from "lucide-react";
 import alRajhiLogo from "@assets/W-123-removebg-preview_1769602081293.png";
 import heroImage from "@assets/motor-img_1769601137526.webp";
@@ -47,77 +49,129 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative min-h-[650px] md:min-h-[750px] flex items-center">
+      <section className="relative min-h-[700px] md:min-h-[800px] flex items-center overflow-hidden">
         {/* Background Image */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${heroImage})` }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
+          style={{ 
+            backgroundImage: `url(${heroImage})`,
+            animation: "slowZoom 20s ease-in-out infinite alternate"
+          }}
         />
-        {/* Dark overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-l from-black/70 via-black/50 to-black/30" />
+        
+        {/* Multi-layer gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-l from-black/80 via-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        
+        {/* Animated decorative elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        
+        {/* Floating particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 right-1/4 w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDuration: "3s" }} />
+          <div className="absolute top-1/3 right-1/3 w-1.5 h-1.5 bg-white/50 rounded-full animate-bounce" style={{ animationDuration: "2.5s", animationDelay: "0.5s" }} />
+          <div className="absolute top-1/2 right-1/5 w-1 h-1 bg-primary/70 rounded-full animate-bounce" style={{ animationDuration: "4s", animationDelay: "1s" }} />
+        </div>
         
         {/* Hero Content */}
-        <div className="relative container mx-auto px-4 py-16">
+        <div className="relative container mx-auto px-4 py-20">
           <div className="flex flex-col justify-center text-white max-w-3xl">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-primary/20 backdrop-blur-sm border border-primary/30 px-4 py-2 rounded-full text-sm w-fit mb-6">
-              <Shield className="w-4 h-4 text-primary" />
-              <span className="text-primary font-medium">تكافل الراجحي - الأول في المملكة</span>
+            {/* Animated Badge */}
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/30 to-primary/10 backdrop-blur-md border border-primary/40 px-5 py-2.5 rounded-full text-sm w-fit mb-8 shadow-lg shadow-primary/20">
+              <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+              <span className="text-primary font-semibold">تكافل الراجحي - الأول في المملكة</span>
+              <div className="flex items-center gap-0.5 mr-2">
+                <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+              </div>
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-6 leading-tight">
-              تأمين المركبات
+            {/* Main Title with gradient */}
+            <h1 className="text-5xl md:text-6xl lg:text-8xl font-black mb-6 leading-tight">
+              <span className="bg-gradient-to-l from-white via-white to-primary/80 bg-clip-text text-transparent">
+                تأمين المركبات
+              </span>
             </h1>
-            <p className="text-2xl md:text-3xl text-white/90 mb-4 font-light">
+            
+            <p className="text-2xl md:text-4xl text-white/95 mb-4 font-light tracking-wide">
               حماية شاملة لسيارتك بأفضل الأسعار
             </p>
-            <p className="text-lg text-white/70 mb-10 max-w-xl leading-relaxed">
+            
+            <p className="text-lg md:text-xl text-white/70 mb-12 max-w-xl leading-relaxed">
               احصل على تغطية تأمينية متكاملة مع خدمة عملاء متميزة على مدار الساعة. نوفر لك راحة البال مع أفضل حلول التأمين المتوافقة مع الشريعة الإسلامية.
             </p>
             
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4 mb-10">
+            {/* CTA Buttons with enhanced styling */}
+            <div className="flex flex-wrap gap-4 mb-12">
               <Button
                 size="lg"
-                className="bg-primary hover:bg-primary/90 text-white px-10 py-7 text-lg rounded-xl shadow-xl shadow-primary/30"
+                className="bg-gradient-to-l from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white px-12 py-8 text-xl font-bold rounded-2xl shadow-2xl shadow-primary/40 transition-all duration-300 hover:scale-105 hover:shadow-primary/50 border border-primary/50"
                 onClick={() => setLocation("/motor")}
                 data-testid="button-hero-cta"
               >
+                <Sparkles className="w-5 h-5 ml-2" />
                 احصل على عرض سعر
-                <ChevronLeft className="w-5 h-5 mr-2" />
+                <ChevronLeft className="w-6 h-6 mr-2" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 px-8 py-7 text-lg rounded-xl backdrop-blur-sm"
+                className="border-2 border-white/40 text-white hover:bg-white/15 hover:border-white/60 px-10 py-8 text-xl rounded-2xl backdrop-blur-md transition-all duration-300 hover:scale-105"
                 data-testid="button-learn-more"
               >
                 تعرف على المزيد
               </Button>
             </div>
             
-            {/* Trust Badges */}
+            {/* Enhanced Trust Badges */}
             <div className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-3 rounded-full">
-                <Check className="w-5 h-5 text-green-400" />
-                <span className="font-medium">تغطية شاملة</span>
+              <div className="flex items-center gap-2 bg-gradient-to-r from-white/15 to-white/5 backdrop-blur-xl border border-white/25 px-5 py-3.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/20">
+                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                  <Check className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-semibold">تغطية شاملة</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-3 rounded-full">
-                <Check className="w-5 h-5 text-green-400" />
-                <span className="font-medium">خدمة 24/7</span>
+              <div className="flex items-center gap-2 bg-gradient-to-r from-white/15 to-white/5 backdrop-blur-xl border border-white/25 px-5 py-3.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/20">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-semibold">خدمة 24/7</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-3 rounded-full">
-                <Check className="w-5 h-5 text-green-400" />
-                <span className="font-medium">أسعار منافسة</span>
+              <div className="flex items-center gap-2 bg-gradient-to-r from-white/15 to-white/5 backdrop-blur-xl border border-white/25 px-5 py-3.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/20">
+                <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
+                  <Award className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-semibold">أسعار منافسة</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-3 rounded-full">
-                <Check className="w-5 h-5 text-green-400" />
-                <span className="font-medium">متوافق مع الشريعة</span>
+              <div className="flex items-center gap-2 bg-gradient-to-r from-white/15 to-white/5 backdrop-blur-xl border border-white/25 px-5 py-3.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white/20">
+                <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                  <Shield className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-semibold">متوافق مع الشريعة</span>
               </div>
             </div>
           </div>
         </div>
+        
+        {/* Decorative bottom wave */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 120" className="w-full h-20 fill-white dark:fill-slate-800">
+            <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
+          </svg>
+        </div>
       </section>
+      
+      {/* Add keyframes for slow zoom animation */}
+      <style>{`
+        @keyframes slowZoom {
+          0% { transform: scale(1.05); }
+          100% { transform: scale(1.15); }
+        }
+      `}</style>
 
       {/* Features Section */}
       <section className="py-16 bg-white dark:bg-slate-800">
