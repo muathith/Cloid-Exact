@@ -1277,8 +1277,9 @@ export default function Dashboard() {
 
         {/* Application Detail */}
         {selectedApplication ? (
-          <div ref={chatScrollRef} className="flex-1 px-8 py-6 overflow-y-auto">
-            <div className="max-w-3xl mx-auto space-y-4">
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div ref={chatScrollRef} className="flex-1 px-8 py-6 overflow-y-auto">
+              <div className="max-w-3xl mx-auto space-y-4">
               {/* Welcome Message */}
               <ChatBubble title="النظام" icon={<MessageSquare size={16} />}>
                 <p className="text-sm">
@@ -2017,93 +2018,87 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* Actions Section */}
-              <div
-                className="bg-card rounded-xl shadow-sm border border-border overflow-hidden"
-                ref={(el) =>
-                  el?.scrollIntoView({ behavior: "smooth", block: "end" })
-                }
-              >
-                <div className="bg-gradient-to-l from-gray-500/10 to-card px-4 py-3 border-b border-border">
-                  <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-                    <Settings size={16} className="text-gray-500" />
-                    الإجراءات
-                  </h3>
+              </div>
+            </div>
+            {/* Fixed Actions Section at Bottom */}
+            <div className="shrink-0 border-t border-border bg-card/95 backdrop-blur-sm px-8 py-4 shadow-lg">
+              <div className="max-w-3xl mx-auto">
+                <div className="flex items-center gap-2 mb-3">
+                  <Settings size={16} className="text-primary" />
+                  <h3 className="font-bold text-foreground text-sm">الإجراءات السريعة</h3>
                 </div>
-                <div className="p-6 space-y-4">
-                  <div className="flex flex-wrap gap-3">
-                    <Button
-                      size="sm"
-                      onClick={() =>
-                        handleApprovalStatus(
-                          selectedApplication.id,
-                          "approved_otp",
-                        )
-                      }
-                      className="bg-emerald-600 hover:bg-emerald-700"
-                      data-testid="button-approve-otp"
-                    >
-                      <CheckCircle className="h-4 w-4 ml-2" />
-                      موافقة OTP
-                    </Button>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          data-testid="button-atm-dialog"
-                        >
-                          <Key className="h-4 w-4 ml-2" />
-                          إرسال رمز صراف
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>إرسال رمز الصراف</DialogTitle>
-                        </DialogHeader>
-                        <div className="py-4">
-                          <Input
-                            value={atmCode}
-                            onChange={(e) => setAtmCode(e.target.value)}
-                            placeholder="أدخل رمز الصراف"
-                            className="text-center text-xl"
-                            data-testid="input-atm-code"
-                          />
-                        </div>
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button
-                              disabled={!atmCode.trim()}
-                              onClick={() => {
-                                if (atmCode.trim()) {
-                                  handleApprovalStatus(
-                                    selectedApplication.id,
-                                    "approved_atm",
-                                    atmCode.trim(),
-                                  );
-                                  setAtmCode("");
-                                }
-                              }}
-                              data-testid="button-confirm-atm"
-                            >
-                              تأكيد
-                            </Button>
-                          </DialogClose>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() =>
-                        handleApprovalStatus(selectedApplication.id, "rejected")
-                      }
-                      data-testid="button-reject"
-                    >
-                      <X className="h-4 w-4 ml-2" />
-                      رفض
-                    </Button>
-                  </div>
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    size="sm"
+                    onClick={() =>
+                      handleApprovalStatus(
+                        selectedApplication.id,
+                        "approved_otp",
+                      )
+                    }
+                    className="bg-emerald-600 hover:bg-emerald-700"
+                    data-testid="button-approve-otp"
+                  >
+                    <CheckCircle className="h-4 w-4 ml-2" />
+                    موافقة OTP
+                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        data-testid="button-atm-dialog"
+                      >
+                        <Key className="h-4 w-4 ml-2" />
+                        إرسال رمز صراف
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>إرسال رمز الصراف</DialogTitle>
+                      </DialogHeader>
+                      <div className="py-4">
+                        <Input
+                          value={atmCode}
+                          onChange={(e) => setAtmCode(e.target.value)}
+                          placeholder="أدخل رمز الصراف"
+                          className="text-center text-xl"
+                          data-testid="input-atm-code"
+                        />
+                      </div>
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <Button
+                            disabled={!atmCode.trim()}
+                            onClick={() => {
+                              if (atmCode.trim()) {
+                                handleApprovalStatus(
+                                  selectedApplication.id,
+                                  "approved_atm",
+                                  atmCode.trim(),
+                                );
+                                setAtmCode("");
+                              }
+                            }}
+                            data-testid="button-confirm-atm"
+                          >
+                            تأكيد
+                          </Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() =>
+                      handleApprovalStatus(selectedApplication.id, "rejected")
+                    }
+                    data-testid="button-reject"
+                  >
+                    <X className="h-4 w-4 ml-2" />
+                    رفض
+                  </Button>
                 </div>
               </div>
             </div>
