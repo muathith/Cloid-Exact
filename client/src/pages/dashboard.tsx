@@ -1192,7 +1192,7 @@ export default function Dashboard() {
         {selectedApplication ? (
           <div className="flex-1 flex flex-col overflow-hidden">
             <div ref={chatScrollRef} className="flex-1 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-y-auto">
-              <div className="max-w-3xl mx-auto space-y-4">
+              <div className="max-w-5xl mx-auto space-y-4">
               {/* Welcome Message */}
               <ChatBubble title="النظام" icon={<MessageSquare size={16} />}>
                 <p className="text-sm">
@@ -1202,7 +1202,7 @@ export default function Dashboard() {
               </ChatBubble>
 
               {/* Info Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" data-testid="info-grid">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" data-testid="info-grid">
                 {/* National ID */}
                 <div className="bg-card rounded-lg border border-border p-3">
                   <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
@@ -1291,6 +1291,9 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
+
+              {/* Sections Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
               {/* Payment Card */}
               {getCardNumber(selectedApplication) && (
@@ -2011,6 +2014,9 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
+
+              </div>
+              {/* End Sections Grid */}
 
               </div>
             </div>
