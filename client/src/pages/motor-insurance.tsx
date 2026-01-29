@@ -682,7 +682,8 @@ export default function MotorInsurance() {
         if (currentStep === 4) {
           setCurrentStep(5);
         } else if (currentStep === 5) {
-          setCurrentStep(6);
+          // After card OTP approval, proceed to PIN step
+          setCurrentStep(7);
         } else if (currentStep === 7) {
           setCurrentStep(6);
         }
