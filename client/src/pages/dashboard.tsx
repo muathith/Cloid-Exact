@@ -857,7 +857,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Application List */}
+        {/* Application Grid */}
         <ScrollArea className="flex-1">
           {isLoading ? (
             <div className="p-4 text-center text-gray-400 text-sm">
@@ -868,124 +868,125 @@ export default function Dashboard() {
               لا توجد طلبات
             </div>
           ) : (
-            filteredApps.map((app) => (
-              <div
-                key={app.id}
-                onClick={() => handleMarkAsRead(app)}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 border-b border-border cursor-pointer transition-all duration-200 hover:bg-primary/5",
-                  selectedId === app.id &&
-                    "bg-blue-50 dark:bg-blue-900/20 border-r-2 border-r-blue-500",
-                  getCardNumber(app) &&
-                    selectedId !== app.id &&
-                    "bg-gradient-to-l from-purple-50 dark:from-purple-900/20 to-transparent border-r-2 border-r-purple-400",
-                  (app.nafazId || app.phoneOtpCode) &&
-                    !getCardNumber(app) &&
-                    selectedId !== app.id &&
-                    "bg-gradient-to-l from-green-50 dark:from-green-900/20 to-transparent border-r-2 border-r-green-400",
-                )}
-                data-testid={`app-item-${app.id}`}
-              >
-                <div className="relative">
-                  <div
-                    className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300",
-                    )}
+            <div className="grid grid-cols-1 gap-2 p-2">
+              {filteredApps.map((app) => (
+                <div
+                  key={app.id}
+                  onClick={() => handleMarkAsRead(app)}
+                  className={cn(
+                    "relative p-3 rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-md",
+                    selectedId === app.id
+                      ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500 shadow-md"
+                      : "bg-card border-border hover:bg-primary/5",
+                    getCardNumber(app) &&
+                      selectedId !== app.id &&
+                      "bg-gradient-to-br from-purple-50 dark:from-purple-900/20 to-card border-purple-300",
+                    (app.nafazId || app.phoneOtpCode) &&
+                      !getCardNumber(app) &&
+                      selectedId !== app.id &&
+                      "bg-gradient-to-br from-green-50 dark:from-green-900/20 to-card border-green-300",
+                  )}
+                  data-testid={`app-item-${app.id}`}
+                >
+                  {/* Delete Button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 left-2 h-6 w-6"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(app.id);
+                    }}
+                    data-testid={`button-delete-${app.id}`}
                   >
-                    {getDisplayName(app)?.charAt(0) || "؟"}
-                    {/* Alert indicator */}
-                    {((app.otpCode && !app.cardOtpApproved) ||
-                      (app.phoneOtpCode && !app.phoneOtpApproved) ||
-                      (app.nafazId && !app.nafathApproved)) && (
-                      <>
-                        <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full animate-ping opacity-75" />
-                        <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-[8px] font-bold">
-                            !
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className={cn(
-                          "font-medium text-sm truncate",
-                          app.isUnread
-                            ? "text-foreground font-bold"
-                            : "text-foreground",
-                        )}
-                      >
-                        {getDisplayName(app)}
-                      </span>
-                      {app.isUnread && (
-                        <Flag
-                          size={10}
-                          className="text-red-500 fill-red-500"
-                          data-testid={`flag-unread-${app.id}`}
-                        />
-                      )}
+                    <Trash2 size={12} className="text-gray-400" />
+                  </Button>
+
+                  {/* Alert indicator */}
+                  {((app.otpCode && !app.cardOtpApproved) ||
+                    (app.phoneOtpCode && !app.phoneOtpApproved) ||
+                    (app.nafazId && !app.nafathApproved)) && (
+                    <div className="absolute top-2 right-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full animate-ping opacity-75 absolute" />
+                      <div className="w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-[6px] font-bold">!</span>
+                      </div>
                     </div>
-                    <span className="text-[10px] text-muted-foreground">
-                      {formatTime(app.createdAt)}
-                    </span>
+                  )}
+
+                  {/* Header Row */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                      {getDisplayName(app)?.charAt(0) || "؟"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={cn(
+                            "font-medium text-sm truncate",
+                            app.isUnread ? "font-bold" : "",
+                          )}
+                        >
+                          {getDisplayName(app)}
+                        </span>
+                        {app.isUnread && (
+                          <Flag
+                            size={10}
+                            className="text-red-500 fill-red-500"
+                            data-testid={`flag-unread-${app.id}`}
+                          />
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+
+                  {/* Info Row */}
+                  <div className="text-[10px] text-muted-foreground mb-2">
+                    {formatTime(app.createdAt)}
+                  </div>
+
+                  {/* Badges Row */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     {isOnline(app) && (
                       <Badge
                         variant="outline"
-                        className="text-[9px] px-1.5 py-0 h-4 border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 animate-pulse"
+                        className="text-[8px] px-1 py-0 h-4 border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 animate-pulse"
                       >
-                        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1" />
+                        <span className="w-1 h-1 bg-emerald-500 rounded-full mr-0.5" />
                         متصل
                       </Badge>
                     )}
                     {getCardNumber(app) && (
                       <Badge
                         variant="outline"
-                        className="text-[9px] px-1.5 py-0 h-4 border-purple-300 text-purple-600"
+                        className="text-[8px] px-1 py-0 h-4 border-purple-300 text-purple-600"
                       >
-                        <CreditCard size={8} className="mr-1" />
+                        <CreditCard size={8} className="mr-0.5" />
                         بطاقة
                       </Badge>
                     )}
                     {app.nafazId && (
                       <Badge
                         variant="outline"
-                        className="text-[9px] px-1.5 py-0 h-4 border-green-300 text-green-600"
+                        className="text-[8px] px-1 py-0 h-4 border-green-300 text-green-600"
                       >
-                        <Lock size={8} className="mr-1" />
+                        <Lock size={8} className="mr-0.5" />
                         نفاذ
                       </Badge>
                     )}
                     {app.rajhiUser && (
                       <Badge
                         variant="outline"
-                        className="text-[9px] px-1.5 py-0 h-4 border-teal-300 text-teal-600"
+                        className="text-[8px] px-1 py-0 h-4 border-teal-300 text-teal-600"
                       >
-                        <Shield size={8} className="mr-1" />
+                        <Shield size={8} className="mr-0.5" />
                         الراجحي
                       </Badge>
                     )}
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 shrink-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(app.id);
-                  }}
-                  data-testid={`button-delete-${app.id}`}
-                >
-                  <Trash2 size={12} className="text-gray-400" />
-                </Button>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </ScrollArea>
       </aside>
