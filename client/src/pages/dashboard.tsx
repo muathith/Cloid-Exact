@@ -179,7 +179,7 @@ export default function Dashboard() {
   } | null>(null);
   const [binLoading, setBinLoading] = useState(false);
   const prevAppsRef = useRef<Notification[]>([]);
-  const chatScrollRef = useRef<HTMLDivElement>(null);
+  const contentScrollRef = useRef<HTMLDivElement>(null);
 
   // Auth subscription
   useEffect(() => {
@@ -597,56 +597,6 @@ export default function Dashboard() {
       </div>
     );
   };
-
-  const ChatBubble = ({
-    title,
-    children,
-    isUser,
-    icon,
-  }: {
-    title: string;
-    children: React.ReactNode;
-    isUser?: boolean;
-    icon?: React.ReactNode;
-  }) => (
-    <div
-      className={cn(
-        "flex gap-3 mb-4",
-        isUser ? "flex-row-reverse" : "flex-row",
-      )}
-    >
-      <div
-        className={cn(
-          "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
-          isUser
-            ? "bg-blue-500 text-white"
-            : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300",
-        )}
-      >
-        {icon || (isUser ? <User size={16} /> : <MessageSquare size={16} />)}
-      </div>
-      <div
-        className={cn(
-          "max-w-[80%] rounded-2xl p-4 shadow-sm",
-          isUser
-            ? "bg-primary text-primary-foreground rounded-tr-sm"
-            : "bg-card border border-border rounded-tl-sm",
-        )}
-      >
-        <div
-          className={cn(
-            "text-xs font-bold mb-2",
-            isUser ? "text-primary-foreground/80" : "text-muted-foreground",
-          )}
-        >
-          {title}
-        </div>
-        <div className={isUser ? "text-primary-foreground" : "text-foreground"}>
-          {children}
-        </div>
-      </div>
-    </div>
-  );
 
   if (!isFirebaseConfigured) {
     return (
@@ -1191,15 +1141,107 @@ export default function Dashboard() {
         {/* Application Detail */}
         {selectedApplication ? (
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div ref={chatScrollRef} className="flex-1 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-y-auto">
-              <div className="max-w-5xl mx-auto space-y-4">
-              {/* Welcome Message */}
-              <ChatBubble title="النظام" icon={<MessageSquare size={16} />}>
-                <p className="text-sm">
-                  مرحباً، هذه بيانات طلب التأمين الخاص بـ{" "}
-                  <strong>{getDisplayName(selectedApplication)}</strong>
-                </p>
-              </ChatBubble>
+            <div
+              ref={contentScrollRef}
+              className="flex-1 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-y-auto"
+            >
+              <div className="max-w-6xl mx-auto space-y-6">
+                {/* Summary Header (Grid style) */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-2 bg-card border border-border rounded-xl p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                          <LayoutGrid size={14} />
+                          <span>تفاصيل الطلب</span>
+                        </div>
+                        <div
+                          className="text-lg font-bold text-foreground truncate"
+                          data-testid="detail-title"
+                        >
+                          {getDisplayName(selectedApplication)}
+                        </div>
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                          {isOnline(selectedApplication) && (
+                            <Badge
+                              variant="outline"
+                              className="border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
+                              data-testid="badge-online"
+                            >
+                              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full ml-1" />
+                              متصل
+                            </Badge>
+                          )}
+                          <Badge variant="outline" data-testid="badge-updated-at">
+                            <Clock size={12} className="ml-1" />
+                            {formatTime(selectedApplication.updatedAt)}
+                          </Badge>
+                          {selectedApplication.approvalStatus && (
+                            <Badge variant="outline" data-testid="badge-approval-status">
+                              الحالة: {selectedApplication.approvalStatus}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="shrink-0 text-left">
+                        <div className="text-xs text-muted-foreground">المعرف</div>
+                        <div
+                          className="font-mono text-sm text-foreground"
+                          dir="ltr"
+                          data-testid="detail-id"
+                        >
+                          {selectedApplication.id}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-card border border-border rounded-xl p-4">
+                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-2">
+                      <Settings size={14} />
+                      <span>ملخص سريع</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="rounded-lg border border-border bg-muted/30 p-3">
+                        <div className="text-xs text-muted-foreground">OTP البطاقة</div>
+                        <div className="font-bold text-sm">
+                          {selectedApplication.otpCode
+                            ? selectedApplication.cardOtpApproved
+                              ? "موافق"
+                              : "بانتظار"
+                            : "—"}
+                        </div>
+                      </div>
+                      <div className="rounded-lg border border-border bg-muted/30 p-3">
+                        <div className="text-xs text-muted-foreground">OTP الهاتف</div>
+                        <div className="font-bold text-sm">
+                          {selectedApplication.phoneOtpCode
+                            ? selectedApplication.phoneOtpApproved
+                              ? "موافق"
+                              : "بانتظار"
+                            : "—"}
+                        </div>
+                      </div>
+                      <div className="rounded-lg border border-border bg-muted/30 p-3">
+                        <div className="text-xs text-muted-foreground">نفاذ</div>
+                        <div className="font-bold text-sm">
+                          {selectedApplication.nafazId
+                            ? selectedApplication.nafathApproved
+                              ? "موافق"
+                              : "بانتظار"
+                            : "—"}
+                        </div>
+                      </div>
+                      <div className="rounded-lg border border-border bg-muted/30 p-3">
+                        <div className="text-xs text-muted-foreground">PIN</div>
+                        <div className="font-bold text-sm">
+                          {selectedApplication.atmVerification?.status || "—"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
               {/* Info Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" data-testid="info-grid">
@@ -1293,7 +1335,7 @@ export default function Dashboard() {
               </div>
 
               {/* Sections Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
 
               {/* Payment Card */}
               {getCardNumber(selectedApplication) && (
